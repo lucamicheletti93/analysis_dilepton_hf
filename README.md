@@ -17,6 +17,6 @@
   
 Test sample:
 ```ruby
-\alice/data/2022/LHC22m/523308/apass4_tpc_v1/0050/o2_ctf_run00523308_orbit0329613340_tf0000082184_epn072/002/AO2D.root
+/alice/data/2022/LHC22m/523308/apass4_tpc_v1/0050/o2_ctf_run00523308_orbit0329613340_tf0000082184_epn072/002/AO2D.root
 ```
 
