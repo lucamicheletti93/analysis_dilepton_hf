@@ -178,8 +178,8 @@
     "analysis-dilepton-hadron": {
         "cfgLeptonCuts": "",
         "cfgAddDileptonHadHistogram": "",
-        "processSkimmed": "false",
-        "processDummy": "true"
+        "processSkimmed": "true",
+        "processDummy": "false"
     },
     "internal-dpl-aod-global-analysis-file-sink": "",
     "internal-dpl-aod-writer": ""
