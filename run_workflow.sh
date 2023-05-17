@@ -45,7 +45,7 @@ if [ "$ENABLED0" = true ]; then
     TASKD0WOFRFLOW="o2-analysis-hf-task-d0 $COMMONCONFIGS |"
 fi
 if [ "$ENABLEJPSID0" = true ]; then
-    TASKD0WOFRFLOW="o2-analysis-dq-task-jpsi-d0 $COMMONCONFIGS |"
+    TASKD0WOFRFLOW="o2-analysis-dq-task-jpsi-hf $COMMONCONFIGS |"
 fi
 
 WORKFLOW="$TRACKTOCOLLASS $PIDTPCBASEWORKFLOW $PIDTOFBASEWORKFLOW $PIDTPCWORKFLOW $PIDTOFWORKFLOW $HFSKIMCREATORWOFRFLOW $CREATORD0WOFRFLOW $SELECTORD0WOFRFLOW $TASKD0WOFRFLOW $TASKJPSID0WOFRFLOW $FWDTRACKEXT $DQTABLEMAKER $DQTABLEREADER o2-analysis-trackselection $COMMONCONFIGS | o2-analysis-track-propagation $COMMONCONFIGS | o2-analysis-multiplicity-table $COMMONCONFIGS | o2-analysis-timestamp $COMMONCONFIGS | o2-analysis-zdc-converter $COMMONCONFIGS | o2-analysis-event-selection $COMMONCONFIGS | o2-analysis-timestamp $COMMONCONFIGS --aod-file @$INPUTDATA --resources-monitoring 2 --fairmq-ipc-prefix ."
