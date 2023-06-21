@@ -20,7 +20,12 @@ Test sample:
 /alice/data/2022/LHC22m/523308/apass4_tpc_v1/0050/o2_ctf_run00523308_orbit0329613340_tf0000082184_epn072/002/AO2D.root
 ```
 
-Helper script
+Helper script to generate another script (`run_workflow.sh`) that runs the workflows in parallel on multiple inputs
 ```ruby
-bash run_workflow.sh
+chmod +x generate_workflow.sh
+./generate_workflow.sh
+```
+To run the workflows:
+```ruby
+./run_workflow.sh
 ```
