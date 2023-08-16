@@ -6,10 +6,9 @@ ENABLED0=false
 ENABLEJPSI=false
 ENABLEJPSID0=true
 INPUTDATA=input_data.txt
-TIMELIMIT=180
 CONFIGJSON=configuration_dq_hf.json
 #_________________________
-COMMONCONFIGS="-b --configuration json://$CONFIGJSON --aod-memory-rate-limit 1000000000 --shm-segment-size 7500000000 --time-limit $TIMELIMIT"
+COMMONCONFIGS="-b --configuration json://$CONFIGJSON --aod-memory-rate-limit 1000000000 --shm-segment-size 7500000000"
 
 # HF + HELPERS
 TRACKTOCOLLASS=""

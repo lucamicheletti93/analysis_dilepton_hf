@@ -1301,7 +1301,7 @@
       "cfgMagField": "5",
       "ccdburl": "http:\/\/alice-ccdb.cern.ch",
       "grpmagPath": "GLO\/Config\/GRPMagField",
-      "cfgUseAbsDCA": "false",
+      "cfgUseAbsDCA": "true",
       "cfgPropToPCA": "true",
       "cfgCorrFullGeo": "false",
       "lutPath": "GLO\/Param\/MatLUT",
