@@ -5,14 +5,13 @@
 ENABLED0=false
 ENABLEJPSI=false
 ENABLEJPSID0=true
-INPUTDATA=input_data_523792.txt
-TIMELIMIT=18000000000
+INPUTDATA=input_data.txt
 CONFIGJSON=configuration_dq_hf.json
 NTOT=516
 N=51
 OUTPUTDIR=LHC22m_pass4_523792
 #_________________________
-COMMONCONFIGS="-b --configuration json://$CONFIGJSON --aod-memory-rate-limit 1000000000 --shm-segment-size 7500000000 --time-limit $TIMELIMIT"
+COMMONCONFIGS="-b --configuration json://$CONFIGJSON --aod-memory-rate-limit 1000000000 --shm-segment-size 7500000000"
 
 # HF + HELPERS
 TRACKTOCOLLASS=""
