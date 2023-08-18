@@ -13,6 +13,8 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import yaml
 
@@ -81,7 +83,7 @@ def data_prep(config, ipt):
         n_bkg = n_prompt = n_nonprompt = n_cand_min
     elif share == "all_signal":
         n_bkg = min(
-            [n_bkg, (n_prompt + n_nonprompt) * config["data_prep"]["class_balance"]["bkg_factor"]])
+            [n_bkg, (n_prompt + n_nonprompt) * config["data_prep"]["class_balance"]["bkg_factor"][ipt]])
     else:
         print(f"ERROR: class_balance option {share} not implemented")
         sys.exit()
@@ -116,6 +118,7 @@ def data_prep(config, ipt):
     plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99,
                         top=0.96, hspace=0.55, wspace=0.55)
     plt.savefig(f"{out_dir}/DistributionsAll_{suffix}_pt{pt_min}_{pt_max}.pdf")
+    plt.savefig(f"{out_dir}/DistributionsAll_{suffix}_pt{pt_min}_{pt_max}.svg")
     plt.close("all")
 
     # _____________________________________________
@@ -124,6 +127,8 @@ def data_prep(config, ipt):
         plt.figure(fig.number)
         plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
         fig.savefig(f"{out_dir}/CorrMatrix_{suffix}_{lab}_pt{pt_min}_{pt_max}.pdf")
+        fig.savefig(f"{out_dir}/CorrMatrix_{suffix}_{lab}_pt{pt_min}_{pt_max}.svg")
+    plt.close("all")
 
     return train_test_data
 
@@ -205,8 +210,11 @@ def train(config, train_test_data, ipt):  # pylint: disable=too-many-locals
     if n_classes > 2:
         for fig, lab in zip(fig_ml_output, leg_labels):
             fig.savefig(f'{out_dir}/MLOutputDistr_{lab}_{suffix}{pt_label}.pdf')
+            fig.savefig(f'{out_dir}/MLOutputDistr_{lab}_{suffix}{pt_label}.svg')
     else:
         fig_ml_output.savefig(f'{out_dir}/MLOutputDistr_{suffix}{pt_label}.pdf')
+        fig_ml_output.savefig(f'{out_dir}/MLOutputDistr_{suffix}{pt_label}.svg')
+    plt.close("all")
 
     # _____________________________________________
     plt.rcParams["figure.figsize"] = (10, 9)
@@ -219,8 +227,10 @@ def train(config, train_test_data, ipt):  # pylint: disable=too-many-locals
         config['ml']['roc_auc_approach']
     )
     fig_roc_curve.savefig(f'{out_dir}/ROCCurveAll_{suffix}{pt_label}.pdf')
+    fig_roc_curve.savefig(f'{out_dir}/ROCCurveAll_{suffix}{pt_label}.svg')
     pickle.dump(fig_roc_curve, open(
         f'{out_dir}/ROCCurveAll_{suffix}{pt_label}.pickle', 'wb'))
+    plt.close("all")
 
     # _____________________________________________
     plt.rcParams["figure.figsize"] = (12, 7)
@@ -235,8 +245,11 @@ def train(config, train_test_data, ipt):  # pylint: disable=too-many-locals
         if i_fig < n_plot:
             lab = leg_labels[i_fig] if n_classes > 2 else ''
             fig.savefig(f'{out_dir}/FeatureImportance_{lab}_{suffix}{pt_label}.pdf')
+            fig.savefig(f'{out_dir}/FeatureImportance_{lab}_{suffix}{pt_label}.svg')
         else:
             fig.savefig(f'{out_dir}/FeatureImportanceAll_{suffix}{pt_label}.pdf')
+            fig.savefig(f'{out_dir}/FeatureImportanceAll_{suffix}{pt_label}.svg')
+    plt.close("all")
 
 
 def main(config):
