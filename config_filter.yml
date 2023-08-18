@@ -1,7 +1,7 @@
 ---
 inputs:
-  prompt: AO2D_LHC22b1b.root
-  nonprompt: AO2D_LHC22b1a.root
-  data: AO2D_LHC22o_small.root
+  prompt: [AO2D_LHC22b1b.root, AO2D_LHC22b1a.root]
+  nonprompt: [AO2D_LHC22b1b.root, AO2D_LHC22b1a.root]
+  data: [AO2D_LHC22o_small.root]
 
-selections: null # to be 
+selections: null
