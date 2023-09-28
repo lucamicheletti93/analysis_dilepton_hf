@@ -6,18 +6,23 @@ def main():
     print('start')
     parser = argparse.ArgumentParser(description='Arguments to pass')
     #parser.add_argument('cfgFileName', metavar='text', default='config.yml', help='config file name')
-    parser.add_argument("--do_fit", help="Do the fit to data / toy MC", action="store_true")
     parser.add_argument("--do_prefit", help="Do the pre-fit to data", action="store_true")
+    parser.add_argument("--do_fit", help="Do the fit to data / toy MC", action="store_true")
+    parser.add_argument("--do_upper_limit", help="Do the calculation of the upper limit", action="store_true")
     args = parser.parse_args()
 
-    if args.do_fit:
-        fit()
-    
     if args.do_prefit:
         prefit()
 
+    if args.do_fit:
+        fit()
+
+    if args.do_upper_limit:
+        upper_limit()
+
 
 def prefit():
+    ROOT.gStyle.SetPalette(ROOT.kBird)
     # Variables
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.76, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
@@ -82,12 +87,15 @@ def prefit():
 
     canvasFit.Update()
 
+    canvasFit.SaveAs("prefit.pdf")
+
     fitResultD0.Print()
     fitResultJpsi.Print()
     input()
     exit()
 
 def fit():
+    toy_mc = False
     # Variables
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
@@ -131,27 +139,29 @@ def fit():
     # Sum all Pdfs
     model = ROOT.RooAddPdf("model", "sigD0_sigJpsiPdf + bkgD0_sigJpsiPdf + bkgJpsi_sigD0Pdf + bkgD0_bkgJpsiPdf", ROOT.RooArgList(sigD0_sigJpsiPdf, bkgD0_sigJpsiPdf, bkgJpsi_sigD0Pdf, bkgD0_bkgJpsiPdf), ROOT.RooArgList(nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg))
 
-    # Generate toy sample
-    data  = sigD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genJpsiD0)
-    sig1bkg1Sample  = bkgD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genBkgJpsi)
-    sig2bkg2Sample  = bkgJpsi_sigD0Pdf.generate(ROOT.RooArgSet(mJpsi, mD0), genBkgD0)
-    bkg1bkg2Sample = bkgD0_bkgJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genBkgBkg)
+    if toy_mc:
+        # Generate toy sample
+        data  = sigD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genJpsiD0)
+        sig1bkg1Sample  = bkgD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genBkgJpsi)
+        sig2bkg2Sample  = bkgJpsi_sigD0Pdf.generate(ROOT.RooArgSet(mJpsi, mD0), genBkgD0)
+        bkg1bkg2Sample = bkgD0_bkgJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genBkgBkg)
 
-    data.append(sig1bkg1Sample)
-    data.append(sig2bkg2Sample)
-    data.append(bkg1bkg2Sample)
+        data.append(sig1bkg1Sample)
+        data.append(sig2bkg2Sample)
+        data.append(bkg1bkg2Sample)
 
-    # Create histograms for plot / fitting
-    #histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
-    fIn = ROOT.TFile("histograms.root", "READ")
-    histJpsiD0= fIn.Get("hSparseJPsiDmeson_proj_3_2")
+        histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+    else:
+        fIn = ROOT.TFile("histograms.root", "READ")
+        histJpsiD0= fIn.Get("hSparseJPsiDmeson_proj_3_2")
+
     dataHist = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi], Import=histJpsiD0)
 
     # Fit
     fitResult = model.fitTo(dataHist, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
     modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     modelHist.SetLineColor(ROOT.kRed)
-    modelHist.SetLineWidth(2)
+    modelHist.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title="Dimuon")
     dataHist.plotOn(mJpsiframe)
@@ -189,6 +199,7 @@ def fit():
     mD0frame.Draw()
     legend.Draw()
     canvasFit.Update()
+    canvasFit.SaveAs("projected_fit.pdf")
 
     canvasFitHist = ROOT.TCanvas("canvasFitHist", "canvasFitHist", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
@@ -205,6 +216,132 @@ def fit():
     fOut = ROOT.TFile("myTest.root", "RECREATE")
     canvasFitHist.Write()
     fOut.Close()
+
+    input()
+    exit()
+
+def upper_limit():
+    toy_mc = True
+    # Variables
+    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
+    mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
+
+    # Yields parameters
+    genJpsiD0  = 5
+    genBkgJpsi = 100
+    genBkgD0   = 100
+    genBkgBkg  = 500
+
+    if toy_mc:
+        nJPsiD0  = ROOT.RooRealVar("nJPsiD0", "number of JPsi-D0", genJpsiD0, 0., 50.)
+        nBkgJPsi = ROOT.RooRealVar("nBkgJPsi", "number of JPsi-Bkg", genBkgJpsi, 0., 200.)
+        nBkgD0   = ROOT.RooRealVar("nBkgD0", "number of D0-Bkg", genBkgD0, 0., 200.)
+        nBkgBkg  = ROOT.RooRealVar("nBkgBkg", "number of Bkg-Bkg", genBkgBkg, 0., 500)
+
+    else:
+        nJPsiD0  = ROOT.RooRealVar("nJPsiD0", "number of JPsi-D0", genJpsiD0, 0., genJpsiD0 * 10.)
+        nBkgJPsi = ROOT.RooRealVar("nBkgJPsi", "number of JPsi-Bkg", genBkgJpsi, 0., genBkgJpsi * 10.)
+        nBkgD0   = ROOT.RooRealVar("nBkgD0", "number of D0-Bkg", genBkgD0, 0., genBkgD0 * 10.)
+        nBkgBkg  = ROOT.RooRealVar("nBkgBkg", "number of Bkg-Bkg", genBkgBkg, 0., genBkgBkg * 10.)
+
+    # Pdfs
+    meanJpsi  = ROOT.RooRealVar("meanJpsi", "meanJpsi", 3.0741e+00)
+    sigmaJpsi = ROOT.RooRealVar("sigmaJpsi", "sigmaJpsi", 9.5902e-02)
+    alphaJpsi = ROOT.RooRealVar("alphaJpsi", "alphaJpsi", 1.0632e+00)
+    nJpsi     = ROOT.RooRealVar("nJpsi", "nJpsi", 1.0000e+01)
+    cbPdfJpsi = ROOT.RooCBShape("cbPdfJpsi", "Crystal Ball J/psi", mJpsi, meanJpsi, sigmaJpsi, alphaJpsi, nJpsi)
+
+    parsJpsi = [-9.8794e-01, 3.0372e-01, -8.5216e-02]
+    chebyParsJpsi = [ROOT.RooRealVar(f"cheb_coeff_jpsi_{i}", f"Coeff_jpsi_{i}", parsJpsi[i]) for i in range(3)]
+    chebyPdfJpsi = ROOT.RooChebychev("chebyPdfJpsi", "Cheby for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
+
+    meanD0  = ROOT.RooRealVar("meanD0", "meanD0", 1.8600e+00)
+    sigmaD0 = ROOT.RooRealVar("sigmaD0", "sigmaD0", 2.2635e-02)
+    gausPdfD0 = ROOT.RooGaussian("gausPdfD0", "Gaussian D0", mD0, meanD0, sigmaD0)
+
+    parsD0 = [-1.7735e-01, -2.5525e-02, 1.6542e-03]
+    chebyParsD0 = [ROOT.RooRealVar(f"cheb_coeff_d0_{i}", f"Coeff_d0_{i}", parsD0[i]) for i in range(3)]
+    chebyPdfD0 = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg2", mD0, ROOT.RooArgList(*chebyParsD0))
+
+    # Product of Pdfs
+    sigD0_sigJpsiPdf = ROOT.RooProdPdf("sigD0_sigJpsiPdf", "Jpsi Pdf * D0 Pdf", ROOT.RooArgList(gausPdfD0, cbPdfJpsi))
+    bkgD0_sigJpsiPdf = ROOT.RooProdPdf("bkgD0_sigJpsiPdf", "Jpsi Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, cbPdfJpsi))
+    bkgJpsi_sigD0Pdf = ROOT.RooProdPdf("bkgJpsi_sigD0Pdf", "D0 Pdf * Bkg1 Pdf", ROOT.RooArgList(chebyPdfJpsi, gausPdfD0))
+    bkgD0_bkgJpsiPdf = ROOT.RooProdPdf("bkgD0_bkgJpsiPdf", "Bkg1 Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, chebyPdfJpsi))
+
+    # Sum all Pdfs
+    model = ROOT.RooAddPdf("model", "sigD0_sigJpsiPdf + bkgD0_sigJpsiPdf + bkgJpsi_sigD0Pdf + bkgD0_bkgJpsiPdf", ROOT.RooArgList(sigD0_sigJpsiPdf, bkgD0_sigJpsiPdf, bkgJpsi_sigD0Pdf, bkgD0_bkgJpsiPdf), ROOT.RooArgList(nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg))
+
+    if toy_mc:
+        # Generate toy sample
+        data  = sigD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genJpsiD0)
+        sig1bkg1Sample  = bkgD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genBkgJpsi)
+        sig2bkg2Sample  = bkgJpsi_sigD0Pdf.generate(ROOT.RooArgSet(mJpsi, mD0), genBkgD0)
+        bkg1bkg2Sample = bkgD0_bkgJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genBkgBkg)
+
+        data.append(sig1bkg1Sample)
+        data.append(sig2bkg2Sample)
+        data.append(bkg1bkg2Sample)
+
+        histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+    else:
+        fIn = ROOT.TFile("histograms.root", "READ")
+        histJpsiD0= fIn.Get("hSparseJPsiDmeson_proj_3_2")
+
+    dataHist = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi], Import=histJpsiD0)
+
+    nuisanceParameters = {meanJpsi, sigmaJpsi, alphaJpsi, meanD0, sigmaD0}
+    wspace = ROOT.RooWorkspace()
+    modelConfig = ROOT.RooStats.ModelConfig(wspace)
+    modelConfig.SetPdf(model)
+    modelConfig.SetParametersOfInterest({nJPsiD0})
+    modelConfig.SetNuisanceParameters(nuisanceParameters)
+    #modelConfig.SetGlobalObservables({nBkgBkg, nBkgD0, nBkgJPsi})
+    modelConfig.SetObservables({mD0, mJpsi})
+    modelConfig.SetName("ModelConfig")
+    wspace.Import(modelConfig)
+    wspace.Import(dataHist)
+    wspace.SetName("w")
+
+    # First, let's use a Calculator based on the Profile Likelihood Ratio
+    plc = ROOT.RooStats.ProfileLikelihoodCalculator(dataHist, modelConfig)
+    #plc.SetTestSize(0.05)
+    plc.SetConfidenceLevel(0.95)
+    lrinterval = plc.GetInterval()
+    
+    # Let's make a plot
+    dataCanvas = ROOT.TCanvas("dataCanvas")
+
+    plotInt = ROOT.RooStats.LikelihoodIntervalPlot(lrinterval)
+    plotInt.SetTitle("Profile Likelihood Ratio and Posterior for S")
+    plotInt.Draw()
+
+    # Second, use a Calculator based on the Feldman Cousins technique
+    fc = ROOT.RooStats.FeldmanCousins(dataHist, modelConfig)
+    fc.UseAdaptiveSampling(True)
+    fc.FluctuateNumDataEntries(True)  # number counting analysis: dataset always has 1 entry with N events observed
+    fc.SetNBins(20)  # number of points to test per parameter
+    fc.SetTestSize(0.05)
+    # fc.SaveBeltToFile(True) # optional
+    fcint = fc.GetInterval()
+
+    # Get Lower and Upper limits from Profile Calculator
+    print("Profile lower limit on s = ", lrinterval.LowerLimit(nJPsiD0))
+    print("Profile upper limit on s = ", lrinterval.UpperLimit(nJPsiD0))
+
+    # Get Lower and Upper limits from FeldmanCousins with profile construction
+    if fcint:
+        fcul = fcint.UpperLimit(nJPsiD0)
+        fcll = fcint.LowerLimit(nJPsiD0)
+        print("FC lower limit on s = ", fcll)
+        print("FC upper limit on s = ", fcul)
+        fcllLine = ROOT.TLine(fcll, 0, fcll, 1)
+        fculLine = ROOT.TLine(fcul, 0, fcul, 1)
+        fcllLine.SetLineColor(ROOT.kRed)
+        fculLine.SetLineColor(ROOT.kRed)
+        fcllLine.Draw("same")
+        fculLine.Draw("same")
+        dataCanvas.Update()
 
     input()
     exit()
