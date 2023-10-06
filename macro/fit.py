@@ -1,6 +1,9 @@
+import sys
 import argparse
 import ROOT
 from ROOT import *
+sys.path.append('../utils')
+from plot_library import LoadStyle, SetGraStat, SetGraSyst, SetLegend
 
 def main():
     print('start')
@@ -22,7 +25,14 @@ def main():
 
 
 def prefit():
+    LoadStyle()
     ROOT.gStyle.SetPalette(ROOT.kBird)
+
+    letexTitle = ROOT.TLatex()
+    letexTitle.SetTextSize(0.040)
+    letexTitle.SetNDC()
+    letexTitle.SetTextFont(42)
+
     # Variables
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.76, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
@@ -46,7 +56,7 @@ def prefit():
 
     fitResultD0 = modelD0.fitTo(dataHistD0, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
 
-    mD0frame = mD0.frame(Title="D-meson")
+    mD0frame = mD0.frame(Title=" ")
     dataHistD0.plotOn(mD0frame)
     modelD0.plotOn(mD0frame)
     modelD0.plotOn(mD0frame, Name={"Sig"}, Components={gausPdfD0}, LineStyle="--", LineColor=ROOT.kRed+1)
@@ -68,26 +78,38 @@ def prefit():
 
     fitResultJpsi = modelJpsi.fitTo(dataHistJpsi, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
 
-    mJpsiframe = mJpsi.frame(Title="Dmuon")
+    mJpsiframe = mJpsi.frame(Title=" ")
     dataHistJpsi.plotOn(mJpsiframe)
     modelJpsi.plotOn(mJpsiframe)
     modelJpsi.plotOn(mJpsiframe, Name={"Sig"}, Components={cbPdfJpsi}, LineStyle="--", LineColor=ROOT.kRed+1)
     modelJpsi.plotOn(mJpsiframe, Name={"Bkg"}, Components={chebyPdfJpsi}, LineStyle="--", LineColor=ROOT.kAzure+4)
 
-    canvasFit = ROOT.TCanvas("canvasFit", "canvasFit", 1200, 600)
-    canvasFit.Divide(2, 1)
-
-    canvasFit.cd(1)
+    canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 600)
+    canvasFitD0.SetTickx(1)
+    canvasFitD0.SetTicky(1)
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.Draw()
 
-    canvasFit.cd(2)
+    letexTitle.DrawLatex(0.65, 0.44, "#it{N}_{D0} = %1.0f #pm %1.0f" % (nSigD0.getVal(), nSigD0.getError()))
+    letexTitle.DrawLatex(0.65, 0.38, "#it{#mu}_{D0} = %4.3f #pm %4.3f" % (meanD0.getVal(), meanD0.getError()))
+    letexTitle.DrawLatex(0.65, 0.32, "#it{#sigma}_{D0} = %4.3f #pm %4.3f" % (sigmaD0.getVal(), sigmaD0.getError()))
+    
+    canvasFitD0.Update()
+
+    canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 600)
+    canvasFitJpsi.SetTickx(1)
+    canvasFitJpsi.SetTicky(1)
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.Draw()
 
-    canvasFit.Update()
+    letexTitle.DrawLatex(0.65, 0.74, "#it{N}_{J/#psi} = %1.0f #pm %1.0f" % (nSigJpsi.getVal(), nSigJpsi.getError()))
+    letexTitle.DrawLatex(0.65, 0.68, "#it{#mu}_{J/#psi} = %4.3f #pm %4.3f" % (meanJpsi.getVal(), meanJpsi.getError()))
+    letexTitle.DrawLatex(0.65, 0.62, "#it{#sigma}_{J/#psi} = %4.3f #pm %4.3f" % (sigmaJpsi.getVal(), sigmaJpsi.getError()))
+    
+    canvasFitJpsi.Update()
 
-    canvasFit.SaveAs("prefit.pdf")
+    canvasFitD0.SaveAs("prefitD0.pdf")
+    canvasFitJpsi.SaveAs("prefitJpsi.pdf")
 
     fitResultD0.Print()
     fitResultJpsi.Print()
@@ -159,9 +181,14 @@ def fit():
 
     # Fit
     fitResult = model.fitTo(dataHist, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
+
     modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     modelHist.SetLineColor(ROOT.kRed)
     modelHist.SetLineWidth(1)
+
+    #modelFunc = model.asTF([mD0, mJpsi])
+    #modelFunc.SetLineColor(ROOT.kRed)
+    #modelFunc.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title="Dimuon")
     dataHist.plotOn(mJpsiframe)
@@ -201,7 +228,17 @@ def fit():
     canvasFit.Update()
     canvasFit.SaveAs("projected_fit.pdf")
 
-    canvasFitHist = ROOT.TCanvas("canvasFitHist", "canvasFitHist", 1000, 1000)
+    #canvasFitHist2D = ROOT.TCanvas("canvasFitHist2D", "canvasFitHist2D", 1000, 1000)
+    #ROOT.gStyle.SetOptStat(0)
+    #ROOT.gPad.SetLeftMargin(0.15)
+    #histJpsiD0.GetXaxis().SetTitleOffset(1.5)
+    #histJpsiD0.GetYaxis().SetTitleOffset(2.0)
+    #histJpsiD0.GetZaxis().SetTitleOffset(2.0)
+    #histJpsiD0.Draw("COLZ")
+    #modelFunc.Draw("SAME")
+    #canvasFitHist2D.Update()
+
+    canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gPad.SetLeftMargin(0.15)
     histJpsiD0.GetXaxis().SetTitleOffset(2.0)
@@ -209,19 +246,20 @@ def fit():
     histJpsiD0.GetZaxis().SetTitleOffset(2.0)
     histJpsiD0.Draw("LEGO2")
     modelHist.Draw("SURF SAME")
-    canvasFitHist.Update()
+    canvasFitHist3D.Update()
 
     fitResult.Print()
 
     fOut = ROOT.TFile("myTest.root", "RECREATE")
-    canvasFitHist.Write()
+    #canvasFitHist2D.Write()
+    canvasFitHist3D.Write()
     fOut.Close()
 
     input()
     exit()
 
 def upper_limit():
-    toy_mc = True
+    toy_mc = False
     # Variables
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
@@ -343,6 +381,7 @@ def upper_limit():
         fculLine.Draw("same")
         dataCanvas.Update()
 
+    dataCanvas.SaveAs("upper_limit.pdf")
     input()
     exit()
 
