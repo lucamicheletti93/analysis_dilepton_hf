@@ -23,7 +23,7 @@ def filter_derived_ao2d(config):
             continue
         for input_name in input_names:
             with uproot.open(input_name) as infile:
-                df_list, used_df = [], []
+                used_df = []
                 for key in infile.keys():
                     if "O2hfcandd0lite" in key:
                         df_name = key.split(sep="/")[0]
