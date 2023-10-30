@@ -44,6 +44,9 @@ def filter_derived_ao2d(config):
             origin = 2
         output_df.query(f"({d0_string} or {d0bar_string}) and fOriginMcRec == {origin}",
                         inplace=True)
+        selections = config['selections']
+        if selections is not None:
+            output_df.query(selections, inplace=True)
         output_df = output_df[config['columns_to_keep']]
         outdir = config['output']['directory']
         suffix = config['output']['suffix'][input_type]
