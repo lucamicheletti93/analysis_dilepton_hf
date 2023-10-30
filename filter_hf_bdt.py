@@ -3,6 +3,7 @@ Simple script to filter derived AO2Ds for BDT trainings
 """
 
 import argparse
+import os
 import pandas as pd
 import yaml
 import uproot
@@ -18,13 +19,21 @@ def filter_derived_ao2d(config):
 
     for input_type, input_names in config["inputs"].items():
         df_list = []
+        if len(input_names) == 0:
+            continue
         for input_name in input_names:
             with uproot.open(input_name) as infile:
-                df_list = []
+                df_list, used_df = [], []
                 for key in infile.keys():
                     if "O2hfcandd0lite" in key:
-                        df_list.append(infile[key].arrays(library="pd"))
-        output_df = pd.concat(df_list)
+                        df_name = key.split(sep="/")[0]
+                        if df_name not in used_df:
+                            used_df.append(df_name)
+                            df_list.append(infile[key].arrays(library="pd"))
+        if len(df_list) > 1:
+            output_df = pd.concat(df_list)
+        else:
+            output_df = df_list[0]
         # we remove the reflected signal and we split prompt/nonprompt
         d0_string = "(fCandidateSelFlag == 1 and fFlagMc >= 0)"
         d0bar_string = "(fCandidateSelFlag == 2 and fFlagMc <= 0)"
@@ -35,7 +44,10 @@ def filter_derived_ao2d(config):
             origin = 2
         output_df.query(f"({d0_string} or {d0bar_string}) and fOriginMcRec == {origin}",
                         inplace=True)
-        outfile = uproot.recreate(f"tree_d0_{input_type}.root")
+        output_df = output_df[config['columns_to_keep']]
+        outdir = config['output']['directory']
+        suffix = config['output']['suffix'][input_type]
+        outfile = uproot.recreate(os.path.join(outdir, f"tree_d0_{input_type}{suffix}.root"))
         outfile["treeD0"] = output_df
 
 

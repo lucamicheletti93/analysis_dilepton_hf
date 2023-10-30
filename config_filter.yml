@@ -1,7 +1,15 @@
 ---
 inputs:
-  prompt: [AO2D_LHC22b1b.root, AO2D_LHC22b1a.root]
-  nonprompt: [AO2D_LHC22b1b.root, AO2D_LHC22b1a.root]
-  data: [AO2D_LHC22o_small.root]
+  prompt: [data_shared/AO2D_mc_prompt_train129895.root]
+  nonprompt: [data_shared/AO2D_mc_nonprompt_train129893.root]
+  data: [data_shared/AO2D_data_train129478.root]
 
 selections: null
+columns_to_keep: [fM, fPt, fDecayLength, fDecayLengthXY, fImpactParameter0, fImpactParameter1, fCpa, fCpaXY]
+
+output:
+  directory: data_shared
+  suffix:
+    prompt: _train129895
+    nonprompt: _train129893
+    data: _train129478.root

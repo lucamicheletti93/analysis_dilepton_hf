@@ -1,0 +1,4 @@
+*.root
+data_shared/*.root
+performanceMetrics.json
+dpl-config.json
