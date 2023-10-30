@@ -1,5 +1,5 @@
 """
-Script for the training of ML models to be used in HF triggers
+Script for the training of ML models for HF candidates
 It requires hipe4ml and hipe4ml_converter to be installed:
   pip install hipe4ml
   pip install hipe4ml_converter
