@@ -1,5 +1,6 @@
 import sys
 import argparse
+import yaml
 import ROOT
 from ROOT import *
 sys.path.append('../utils')
@@ -8,21 +9,34 @@ from plot_library import LoadStyle, SetGraStat, SetGraSyst, SetLegend
 def main():
     print('start')
     parser = argparse.ArgumentParser(description='Arguments to pass')
-    #parser.add_argument('cfgFileName', metavar='text', default='config.yml', help='config file name')
+    parser.add_argument('cfgFileName', metavar='text', default='config.yml', help='config file name')
     parser.add_argument("--do_prefit", help="Do the pre-fit to data", action="store_true")
     parser.add_argument("--do_fit", help="Do the fit to data / toy MC", action="store_true")
     parser.add_argument("--do_upper_limit", help="Do the calculation of the upper limit", action="store_true")
+    parser.add_argument("--do_prefilter", help="Apply selections", action="store_true")
     args = parser.parse_args()
+
+    with open(args.cfgFileName, 'r') as yml_cfg:
+        inputCfg = yaml.load(yml_cfg, yaml.FullLoader)
 
     if args.do_prefit:
         prefit()
 
     if args.do_fit:
-        fit()
+        fit(inputCfg)
 
     if args.do_upper_limit:
         upper_limit()
 
+    if args.do_prefilter:
+        prefilter(inputCfg)
+
+def prefilter(config):
+    fIn = ROOT.TFile(config["inputs"]["data"], "READ")
+    tree = fIn.Get(config["inputs"]["tree"])
+    rDataFrame = ROOT.RDataFrame(tree).Filter(config["fit"]["cuts"])
+    rDataFrame.Snapshot(config["inputs"]["tree"], f'{config["inputs"]["data"].replace(".root", "_filtered.root")}')
+    fIn.Close()
 
 def prefit():
     LoadStyle()
@@ -37,8 +51,8 @@ def prefit():
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.76, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
-     # Load data for pre-fit
-    fIn = ROOT.TFile("histograms.root", "READ")
+    # Load data for pre-fit
+    fIn = ROOT.TFile("data/histograms.root", "READ")
     dataHistD0 = ROOT.RooDataHist("dataHistD0", "dataHistD0", [mD0], Import=fIn.Get("hMassDmeson"))
     dataHistJpsi = ROOT.RooDataHist("dataHistJpsi", "dataHistJpsi", [mJpsi], Import=fIn.Get("hMassJPsi"))
 
@@ -108,19 +122,20 @@ def prefit():
     
     canvasFitJpsi.Update()
 
-    canvasFitD0.SaveAs("prefitD0.pdf")
-    canvasFitJpsi.SaveAs("prefitJpsi.pdf")
+    canvasFitD0.SaveAs("figures/prefitD0.pdf")
+    canvasFitJpsi.SaveAs("figures/prefitJpsi.pdf")
 
     fitResultD0.Print()
     fitResultJpsi.Print()
     input()
     exit()
 
-def fit():
-    toy_mc = False
+def fit(config):
     # Variables
-    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
-    mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
+    #mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
+    #mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
+    mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
+    mJpsi = ROOT.RooRealVar("fMass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
     # Yields parameters
     genJpsiD0  = 5000
@@ -161,7 +176,7 @@ def fit():
     # Sum all Pdfs
     model = ROOT.RooAddPdf("model", "sigD0_sigJpsiPdf + bkgD0_sigJpsiPdf + bkgJpsi_sigD0Pdf + bkgD0_bkgJpsiPdf", ROOT.RooArgList(sigD0_sigJpsiPdf, bkgD0_sigJpsiPdf, bkgJpsi_sigD0Pdf, bkgD0_bkgJpsiPdf), ROOT.RooArgList(nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg))
 
-    if toy_mc:
+    if config["fit"]["toy_mc"]:
         # Generate toy sample
         data  = sigD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genJpsiD0)
         sig1bkg1Sample  = bkgD0_sigJpsiPdf.generate(ROOT.RooArgSet(mD0, mJpsi), genBkgJpsi)
@@ -172,15 +187,23 @@ def fit():
         data.append(sig2bkg2Sample)
         data.append(bkg1bkg2Sample)
 
-        histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+        if not config["fit"]["unbinned"]:
+            sample = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     else:
-        fIn = ROOT.TFile("histograms.root", "READ")
-        histJpsiD0= fIn.Get("hSparseJPsiDmeson_proj_3_2")
-
-    dataHist = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi], Import=histJpsiD0)
+        if config["fit"]["unbinned"]:
+            prefilter(config)
+            fIn = ROOT.TFile(config["inputs"]["data"].replace(".root", "_filtered.root"), "READ")
+            sample = fIn.Get(config["inputs"]["tree"])
+        else:
+            fIn = ROOT.TFile(config["inputs"]["data"], "READ")
+            sample = fIn.Get(config["inputs"]["hist"])
+    if config["fit"]["unbinned"]:
+        sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi], Import=sample)
+    else:
+        sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi], Import=sample)
 
     # Fit
-    fitResult = model.fitTo(dataHist, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
+    fitResult = model.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
 
     modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     modelHist.SetLineColor(ROOT.kRed)
@@ -191,7 +214,7 @@ def fit():
     #modelFunc.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title="Dimuon")
-    dataHist.plotOn(mJpsiframe)
+    sampleToFit.plotOn(mJpsiframe)
     model.plotOn(mJpsiframe)
     model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
     model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
@@ -199,7 +222,7 @@ def fit():
     model.plotOn(mJpsiframe, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kMagenta)
 
     mD0frame = mD0.frame(Title="D-meson")
-    dataHist.plotOn(mD0frame)
+    sampleToFit.plotOn(mD0frame)
     model.plotOn(mD0frame)
     model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
     model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
@@ -226,31 +249,31 @@ def fit():
     mD0frame.Draw()
     legend.Draw()
     canvasFit.Update()
-    canvasFit.SaveAs("projected_fit.pdf")
+    canvasFit.SaveAs(f'{config["output"]["figures"]}/projected_fit.pdf')
 
     #canvasFitHist2D = ROOT.TCanvas("canvasFitHist2D", "canvasFitHist2D", 1000, 1000)
     #ROOT.gStyle.SetOptStat(0)
     #ROOT.gPad.SetLeftMargin(0.15)
-    #histJpsiD0.GetXaxis().SetTitleOffset(1.5)
-    #histJpsiD0.GetYaxis().SetTitleOffset(2.0)
-    #histJpsiD0.GetZaxis().SetTitleOffset(2.0)
-    #histJpsiD0.Draw("COLZ")
+    #sample.GetXaxis().SetTitleOffset(1.5)
+    #sample.GetYaxis().SetTitleOffset(2.0)
+    #sample.GetZaxis().SetTitleOffset(2.0)
+    #sample.Draw("COLZ")
     #modelFunc.Draw("SAME")
     #canvasFitHist2D.Update()
 
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gPad.SetLeftMargin(0.15)
-    histJpsiD0.GetXaxis().SetTitleOffset(2.0)
-    histJpsiD0.GetYaxis().SetTitleOffset(2.0)
-    histJpsiD0.GetZaxis().SetTitleOffset(2.0)
-    histJpsiD0.Draw("LEGO2")
+    #sample.GetXaxis().SetTitleOffset(2.0)
+    #sample.GetYaxis().SetTitleOffset(2.0)
+    #sample.GetZaxis().SetTitleOffset(2.0)
+    sample.Draw("LEGO2")
     modelHist.Draw("SURF SAME")
     canvasFitHist3D.Update()
 
     fitResult.Print()
 
-    fOut = ROOT.TFile("myTest.root", "RECREATE")
+    fOut = ROOT.TFile(f'{config["output"]["directory"]}/myTest.root', "RECREATE")
     #canvasFitHist2D.Write()
     canvasFitHist3D.Write()
     fOut.Close()
@@ -323,7 +346,7 @@ def upper_limit():
 
         histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     else:
-        fIn = ROOT.TFile("histograms.root", "READ")
+        fIn = ROOT.TFile("data/histograms.root", "READ")
         histJpsiD0= fIn.Get("hSparseJPsiDmeson_proj_3_2")
 
     dataHist = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi], Import=histJpsiD0)
@@ -381,7 +404,7 @@ def upper_limit():
         fculLine.Draw("same")
         dataCanvas.Update()
 
-    dataCanvas.SaveAs("upper_limit.pdf")
+    dataCanvas.SaveAs("figures/upper_limit.pdf")
     input()
     exit()
 

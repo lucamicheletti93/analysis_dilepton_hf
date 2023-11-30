@@ -1,0 +1,15 @@
+---
+inputs:
+  #data: data/histograms.root
+  data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged.root
+  hist: hSparseJPsiDmeson_proj_3_2
+  tree: treeJpsiD0
+
+fit:
+  toy_mc: False
+  unbinned: True
+  cuts: "fBdtBkg < 0.05"
+
+output:
+  directory: outputs
+  figures: figures
