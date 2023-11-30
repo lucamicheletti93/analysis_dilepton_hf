@@ -29,3 +29,9 @@ To run the workflows:
 ```ruby
 ./run_workflow.sh
 ```
+
+Workflow to run the task on reduced AO2Ds and produce analysis trees:
+```ruby
+o2-analysis-dq-task-j-psi-hf -b --configuration json://configuration.json --aod-file @input_data.txt --aod-writer-json OutputDirector.json --aod-parent-access-level 1
+```
+
