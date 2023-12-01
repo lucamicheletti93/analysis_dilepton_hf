@@ -1,0 +1,14 @@
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/000/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/001/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/002/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/003/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/004/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/005/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/006/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/007/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/008/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/009/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/010/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/011/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/012/AO2D_LHC22_pass4_highIR.root
+/home/fgrosa/analysis_dilepton_hf/data_shared/AO2D_LHC22_pass4_highIR/013/AO2D_LHC22_pass4_highIR.root

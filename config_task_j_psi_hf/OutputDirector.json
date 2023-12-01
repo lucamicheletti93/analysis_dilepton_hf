@@ -1,0 +1,10 @@
+{ "OutputDirector": {
+  "debug_mode": true,
+  "resfile": "reducedAO2D",
+  "OutputDescriptors": [
+    {
+      "table": "AOD/RTDILPTDMESALL/0"
+    }
+  ],
+  "ntfmerge": 1
+} }

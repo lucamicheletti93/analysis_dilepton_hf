@@ -1,0 +1,9 @@
+{
+  "task-j-psi-hf": {
+    "massHfCandMax": "2.1",
+    "massDileptonCandMax": "5",
+    "massHfCandMin": "1.5",
+    "massDileptonCandMin": "1",
+    "processRedJspiD0": "1"
+  }
+}
