@@ -32,10 +32,11 @@ def main():
         prefilter(inputCfg)
 
 def prefilter(config):
-    fIn = ROOT.TFile(config["inputs"]["data"], "READ")
-    tree = fIn.Get(config["inputs"]["tree"])
-    rDataFrame = ROOT.RDataFrame(tree).Filter(config["fit"]["cuts"])
-    rDataFrame.Snapshot(config["inputs"]["tree"], f'{config["inputs"]["data"].replace(".root", "_filtered.root")}')
+    fIn = ROOT.TFile(config["prefilter"]["data"], "READ")
+    tree = fIn.Get(config["prefilter"]["tree"])
+    rDataFrame = ROOT.RDataFrame(tree).Filter(config["prefilter"]["cuts"])
+    fOutName = config["prefilter"]["data"].replace(".root", config["prefilter"]["suffix"] + ".root")
+    rDataFrame.Snapshot(config["prefilter"]["tree"], fOutName)
     fIn.Close()
 
 def prefit():
@@ -51,32 +52,51 @@ def prefit():
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.76, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
-    # Load data for pre-fit
-    fIn = ROOT.TFile("data/histograms.root", "READ")
-    dataHistD0 = ROOT.RooDataHist("dataHistD0", "dataHistD0", [mD0], Import=fIn.Get("hMassDmeson"))
-    dataHistJpsi = ROOT.RooDataHist("dataHistJpsi", "dataHistJpsi", [mJpsi], Import=fIn.Get("hMassJPsi"))
-
     # Pre-fit D0
+    # Load data for pre-fit for D0 - taken from BDT selection applied to TH3D
+    fInD0 = ROOT.TFile("/Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/massD0.root", "READ")
+    pt_bins = ["pt0_1","pt1_2", "pt2_3", "pt3_4", "pt4_6", "pt6_8", "pt8_10", "pt10_20", "pt20_50", "pt0_50"]
+    for i, pt_bin in enumerate(pt_bins):
+        if i == 0:
+            hMassDmesonTmp = fInD0.Get(f'hist_mass_d0_{pt_bin}')
+            hMassDmeson = hMassDmesonTmp.Clone("hMassDmeson")
+        else:
+            hMassDmesonTmp = fInD0.Get(f'hist_mass_d0_{pt_bin}')
+            hMassDmeson.Add(hMassDmesonTmp)
+    
+    dataHistD0 = ROOT.RooDataHist("dataHistD0", "dataHistD0", [mD0], Import=hMassDmeson)
+    
     meanD0  = ROOT.RooRealVar("meanD0", "meanD0", 1.850, 1.750, 1.950)
     sigmaD0 = ROOT.RooRealVar("sigmaD0", "sigmaD0", 0.050, 0.010, 0.080)
-    gausPdfD0 = ROOT.RooGaussian("gausPdfD0", "Crystal Ball D0", mD0, meanD0, sigmaD0)
+    alphaD0 = ROOT.RooRealVar("alphaD0", "alphaD0", 0.500, 0.000, 5.000)
+    nD0     = ROOT.RooRealVar("nD0", "nD0", 1.000, 0.000, 10.000)
+    cbPdfD0 = ROOT.RooCBShape("cbPdfD0", "Crystal Ball J/psi", mD0, meanD0, sigmaD0, alphaD0, nD0)
 
     chebyParsD0 = [ROOT.RooRealVar(f"cheb_coeff_{i}", f"Coeff_{i}", 0.05, -10, 10) for i in range(3)]
     chebyPdfD0 = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg1", mD0, ROOT.RooArgList(*chebyParsD0))
 
-    nSigD0  = ROOT.RooRealVar("nSigD0", "D0 signal", 1e6, 0., 1e8)
-    nBkgD0  = ROOT.RooRealVar("nBkgD0", "D0 background", 1e6, 0., 1e8)
-    modelD0 = ROOT.RooAddPdf("modelD0", "sigD0 + bkgD0", ROOT.RooArgList(gausPdfD0, chebyPdfD0), ROOT.RooArgList(nSigD0, nBkgD0))
+    nSigD0  = ROOT.RooRealVar("nSigD0", "D0 signal", 1e6, 0., 1e10)
+    nBkgD0  = ROOT.RooRealVar("nBkgD0", "D0 background", 1e6, 0., 1e10)
+    modelD0 = ROOT.RooAddPdf("modelD0", "sigD0 + bkgD0", ROOT.RooArgList(cbPdfD0, chebyPdfD0), ROOT.RooArgList(nSigD0, nBkgD0))
 
     fitResultD0 = modelD0.fitTo(dataHistD0, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
 
     mD0frame = mD0.frame(Title=" ")
     dataHistD0.plotOn(mD0frame)
     modelD0.plotOn(mD0frame)
-    modelD0.plotOn(mD0frame, Name={"Sig"}, Components={gausPdfD0}, LineStyle="--", LineColor=ROOT.kRed+1)
+    modelD0.plotOn(mD0frame, Name={"Sig"}, Components={cbPdfD0}, LineStyle="--", LineColor=ROOT.kRed+1)
     modelD0.plotOn(mD0frame, Name={"Bkg"}, Components={chebyPdfD0}, LineStyle="--", LineColor=ROOT.kAzure+4)
 
     # Pre-fit J/psi
+    # Load data for pre-fit for J/psi - Taken from AnalysisResults
+    fInJpsi = ROOT.TFile("/Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/AnalysisResults_LHC22_pass4_highIR.root", "READ")
+    hlistInJpsi = fInJpsi.Get("table-maker-jpsi-hf/output")
+    listInJpsi = hlistInJpsi.FindObject("JPsi")
+    hMassJpsiTmp = listInJpsi.FindObject("hMassVsPtJPsi")
+    hMassJPsi = hMassJpsiTmp.ProjectionY("hMassJPsi")
+
+    dataHistJpsi = ROOT.RooDataHist("dataHistJpsi", "dataHistJpsi", [mJpsi], Import=hMassJPsi)
+
     meanJpsi  = ROOT.RooRealVar("meanJpsi", "meanJpsi", 3.096, 2.900, 3.250)
     sigmaJpsi = ROOT.RooRealVar("sigmaJpsi", "sigmaJpsi", 0.090, 0.060, 0.120)
     alphaJpsi = ROOT.RooRealVar("alphaJpsi", "alphaJpsi", 0.500, 0.000, 5.000)
@@ -122,8 +142,8 @@ def prefit():
     
     canvasFitJpsi.Update()
 
-    canvasFitD0.SaveAs("figures/prefitD0.pdf")
-    canvasFitJpsi.SaveAs("figures/prefitJpsi.pdf")
+    canvasFitD0.SaveAs("figures/prefitD0_new.pdf")
+    canvasFitJpsi.SaveAs("figures/prefitJpsi_new.pdf")
 
     fitResultD0.Print()
     fitResultJpsi.Print()
@@ -132,8 +152,6 @@ def prefit():
 
 def fit(config):
     # Variables
-    #mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
-    #mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
     mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
     mJpsi = ROOT.RooRealVar("fMass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
@@ -149,28 +167,28 @@ def fit(config):
     nBkgBkg  = ROOT.RooRealVar("nBkgBkg", "number of Bkg-Bkg", genBkgBkg, 0., genBkgBkg * 5.)
 
     # Pdfs
-    meanJpsi  = ROOT.RooRealVar("meanJpsi", "meanJpsi", 3.0741e+00)
-    sigmaJpsi = ROOT.RooRealVar("sigmaJpsi", "sigmaJpsi", 9.5902e-02)
-    alphaJpsi = ROOT.RooRealVar("alphaJpsi", "alphaJpsi", 1.0632e+00)
-    nJpsi     = ROOT.RooRealVar("nJpsi", "nJpsi", 1.0000e+01)
+    meanJpsi  = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_val"][0])
+    sigmaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_val"][1])
+    alphaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_val"][2])
+    nJpsi     = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_val"][3])
     cbPdfJpsi = ROOT.RooCBShape("cbPdfJpsi", "Crystal Ball J/psi", mJpsi, meanJpsi, sigmaJpsi, alphaJpsi, nJpsi)
 
-    parsJpsi = [-9.8794e-01, 3.0372e-01, -8.5216e-02]
-    chebyParsJpsi = [ROOT.RooRealVar(f"cheb_coeff_jpsi_{i}", f"Coeff_jpsi_{i}", parsJpsi[i]) for i in range(3)]
-    chebyPdfJpsi = ROOT.RooChebychev("chebyPdfJpsi", "Cheby for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
+    chebyParsJpsi = [ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_val"][i]) for i in range(3)]
+    chebyPdfJpsi  = ROOT.RooChebychev("chebyPdfJpsi", "Cheby for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
 
-    meanD0  = ROOT.RooRealVar("meanD0", "meanD0", 1.8600e+00)
-    sigmaD0 = ROOT.RooRealVar("sigmaD0", "sigmaD0", 2.2635e-02)
-    gausPdfD0 = ROOT.RooGaussian("gausPdfD0", "Gaussian D0", mD0, meanD0, sigmaD0)
+    meanD0  = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_val"][0])
+    sigmaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_val"][1])
+    alphaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_val"][2])
+    nD0     = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_val"][3])
+    cbPdfD0 = ROOT.RooCBShape("cbPdfD0", "Crystal Ball D0", mD0, meanD0, sigmaD0, alphaD0, nD0)
 
-    parsD0 = [-1.7735e-01, -2.5525e-02, 1.6542e-03]
-    chebyParsD0 = [ROOT.RooRealVar(f"cheb_coeff_d0_{i}", f"Coeff_d0_{i}", parsD0[i]) for i in range(3)]
-    chebyPdfD0 = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg2", mD0, ROOT.RooArgList(*chebyParsD0))
+    chebyParsD0 = [ROOT.RooRealVar(config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_val"][i]) for i in range(3)]
+    chebyPdfD0  = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg1", mD0, ROOT.RooArgList(*chebyParsD0))
 
     # Product of Pdfs
-    sigD0_sigJpsiPdf = ROOT.RooProdPdf("sigD0_sigJpsiPdf", "Jpsi Pdf * D0 Pdf", ROOT.RooArgList(gausPdfD0, cbPdfJpsi))
+    sigD0_sigJpsiPdf = ROOT.RooProdPdf("sigD0_sigJpsiPdf", "Jpsi Pdf * D0 Pdf", ROOT.RooArgList(cbPdfD0, cbPdfJpsi))
     bkgD0_sigJpsiPdf = ROOT.RooProdPdf("bkgD0_sigJpsiPdf", "Jpsi Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, cbPdfJpsi))
-    bkgJpsi_sigD0Pdf = ROOT.RooProdPdf("bkgJpsi_sigD0Pdf", "D0 Pdf * Bkg1 Pdf", ROOT.RooArgList(chebyPdfJpsi, gausPdfD0))
+    bkgJpsi_sigD0Pdf = ROOT.RooProdPdf("bkgJpsi_sigD0Pdf", "D0 Pdf * Bkg1 Pdf", ROOT.RooArgList(chebyPdfJpsi, cbPdfD0))
     bkgD0_bkgJpsiPdf = ROOT.RooProdPdf("bkgD0_bkgJpsiPdf", "Bkg1 Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, chebyPdfJpsi))
 
     # Sum all Pdfs
@@ -191,8 +209,7 @@ def fit(config):
             sample = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     else:
         if config["fit"]["unbinned"]:
-            prefilter(config)
-            fIn = ROOT.TFile(config["inputs"]["data"].replace(".root", "_filtered.root"), "READ")
+            fIn = ROOT.TFile(config["inputs"]["data"], "READ")
             sample = fIn.Get(config["inputs"]["tree"])
         else:
             fIn = ROOT.TFile(config["inputs"]["data"], "READ")
@@ -208,10 +225,6 @@ def fit(config):
     modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     modelHist.SetLineColor(ROOT.kRed)
     modelHist.SetLineWidth(1)
-
-    #modelFunc = model.asTF([mD0, mJpsi])
-    #modelFunc.SetLineColor(ROOT.kRed)
-    #modelFunc.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title="Dimuon")
     sampleToFit.plotOn(mJpsiframe)
@@ -264,10 +277,22 @@ def fit(config):
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gPad.SetLeftMargin(0.15)
-    #sample.GetXaxis().SetTitleOffset(2.0)
-    #sample.GetYaxis().SetTitleOffset(2.0)
-    #sample.GetZaxis().SetTitleOffset(2.0)
-    sample.Draw("LEGO2")
+    
+    if config["fit"]["unbinned"]:
+        sample.Draw("fMass : fMassD0 >> hist_fMass_fMassD0", "", "LEGO2")
+        htemp = gPad.GetPrimitive("hist_fMass_fMassD0")
+        htemp.GetXaxis().SetTitleOffset(2.0)
+        htemp.GetYaxis().SetTitleOffset(2.0)
+        htemp.GetZaxis().SetTitleOffset(2.0)
+        htemp.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
+        htemp.GetYaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
+        htemp.Draw("LEGO2")
+    else:
+        sample.GetXaxis().SetTitleOffset(2.0)
+        sample.GetYaxis().SetTitleOffset(2.0)
+        sample.GetZaxis().SetTitleOffset(2.0)
+        sample.Draw("LEGO2")
+    
     modelHist.Draw("SURF SAME")
     canvasFitHist3D.Update()
 
