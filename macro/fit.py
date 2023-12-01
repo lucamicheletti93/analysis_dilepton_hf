@@ -32,6 +32,9 @@ def main():
         prefilter(inputCfg)
 
 def prefilter(config):
+    """
+    function to apply pre-filters on D0 tree according to BDT output (see config_fit.yml)
+    """
     fIn = ROOT.TFile(config["prefilter"]["data"], "READ")
     tree = fIn.Get(config["prefilter"]["tree"])
     rDataFrame = ROOT.RDataFrame(tree).Filter(config["prefilter"]["cuts"])
@@ -40,6 +43,9 @@ def prefilter(config):
     fIn.Close()
 
 def prefit():
+    """
+    function to fit the integrated spectrum for D0 and J/psi to extract shape parameters
+    """
     LoadStyle()
     ROOT.gStyle.SetPalette(ROOT.kBird)
 
@@ -151,6 +157,11 @@ def prefit():
     exit()
 
 def fit(config):
+    """
+    function to fit the 2D distribution of D0 - J/psi masses
+    - toy_mc:   True/False (enable the generation of toy MC sample to validate the result)
+    - unbinned: True/False (enable the fit of unbinned datasets)
+    """
     # Variables
     mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
     mJpsi = ROOT.RooRealVar("fMass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
@@ -227,7 +238,7 @@ def fit(config):
     modelHist.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title="Dimuon")
-    sampleToFit.plotOn(mJpsiframe)
+    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Binning(20))
     model.plotOn(mJpsiframe)
     model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
     model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
@@ -235,7 +246,7 @@ def fit(config):
     model.plotOn(mJpsiframe, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kMagenta)
 
     mD0frame = mD0.frame(Title="D-meson")
-    sampleToFit.plotOn(mD0frame)
+    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Binning(10))
     model.plotOn(mD0frame)
     model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
     model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
@@ -264,16 +275,6 @@ def fit(config):
     canvasFit.Update()
     canvasFit.SaveAs(f'{config["output"]["figures"]}/projected_fit.pdf')
 
-    #canvasFitHist2D = ROOT.TCanvas("canvasFitHist2D", "canvasFitHist2D", 1000, 1000)
-    #ROOT.gStyle.SetOptStat(0)
-    #ROOT.gPad.SetLeftMargin(0.15)
-    #sample.GetXaxis().SetTitleOffset(1.5)
-    #sample.GetYaxis().SetTitleOffset(2.0)
-    #sample.GetZaxis().SetTitleOffset(2.0)
-    #sample.Draw("COLZ")
-    #modelFunc.Draw("SAME")
-    #canvasFitHist2D.Update()
-
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gPad.SetLeftMargin(0.15)
@@ -286,6 +287,7 @@ def fit(config):
         htemp.GetZaxis().SetTitleOffset(2.0)
         htemp.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
         htemp.GetYaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
+        htemp.Rebin2D(2, 2)
         htemp.Draw("LEGO2")
     else:
         sample.GetXaxis().SetTitleOffset(2.0)
