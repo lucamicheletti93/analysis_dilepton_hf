@@ -5,11 +5,11 @@ inputs:
   data: [data_shared/AO2D_data_train129478.root]
 
 selections: (fPt > 4 and fCpa > 0.90 and fCpaXY > 0.90 and fDecayLength < 2) or (fPt < 4 and fCpa > 0.85 and fCpaXY > 0.85 and fDecayLength < 2)
-columns_to_keep: [fM, fPt, fDecayLength, fDecayLengthXY, fImpactParameter0, fImpactParameter1, fCpa, fCpaXY]
+columns_to_keep: [fM, fPt, fDecayLength, fDecayLengthXY, fImpactParameter0, fImpactParameter1, fImpactParameterProduct, fCpa, fCpaXY]
 
 output:
   directory: data_shared
   suffix:
     prompt: _train129895
     nonprompt: _train129893
-    data: _train129478.root
+    data: _train129478
