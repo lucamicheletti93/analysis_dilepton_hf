@@ -22,26 +22,34 @@ prefilter:
 fit:
   toy_mc: False
   unbinned: True
+  min_fit_range_d0: 1.72
+  max_fit_range_d0: 2.00
+  min_fit_range_jpsi: 2.50
+  max_fit_range_jpsi: 4.00
 
   cb_par_jpsi_name: [meanJpsi, sigmaJpsi, alphaJpsi, nJpsi]
   cb_par_jpsi_val: [3.0744e+00, 9.5466e-02, 1.0725e+00, 1.0000e+01]
-  cb_par_jpsi_lw_lim: [3.0744e+00, 9.5466e-02, 1.0725e+00, 1.0000e+01]
-  cb_par_jpsi_up_lim: [3.0744e+00, 9.5466e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_jpsi_lw_lim: [2.9000e+00, 8.5466e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_jpsi_up_lim: [3.2000e+00, 10.5466e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_jpsi_is_const: [False, False, True, True]
 
   cheby_par_jpsi_name: [cheb_coeff_jpsi_0, cheb_coeff_jpsi_1, cheb_coeff_jpsi_2]
   cheby_par_jpsi_val: [-9.8811e-01, 3.0284e-01, -8.3266e-02]
-  cheby_par_jpsi_lw_lim: [-9.8811e-01, 3.0284e-01, -8.3266e-02]
-  cheby_par_jpsi_up_lim: [-9.8811e-01, 3.0284e-01, -8.3266e-02]
+  cheby_par_jpsi_lw_lim: [-10, 0, -10]
+  cheby_par_jpsi_up_lim: [10, 1, 10]
+  cheby_par_jpsi_is_const: [False, False, False]
 
   cb_par_d0_name: [meanD0, sigmaD0, alphaD0, nD0]
   cb_par_d0_val: [1.8592e+00, 2.1980e-02, 3.2386e+00, 2.3591e-09]
-  cb_par_d0_lw_lim: [1.8592e+00, 2.1980e-02, 3.2386e+00, 2.3591e-09]
-  cb_par_d0_up_lim: [1.8592e+00, 2.1980e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_lw_lim: [1.7592e+00, 1.1980e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_up_lim: [1.9592e+00, 5.1980e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_is_const: [False, False, True, True]
 
   cheby_par_d0_name: [cheb_coeff_d0_0, cheb_coeff_d0_1, cheb_coeff_d0_2]
   cheby_par_d0_val: [-3.8663e-01, 5.8992e-03, 3.4230e-04]
-  cheby_par_d0_lw_lim: [-3.8663e-01, 5.8992e-03, 3.4230e-04]
-  cheby_par_d0_up_lim: [-3.8663e-01, 5.8992e-03, 3.4230e-04]
+  cheby_par_d0_lw_lim: [-10, 0, 0]
+  cheby_par_d0_up_lim: [10, 1, 1]
+  cheby_par_d0_is_const: [False, False, False]
 
 output:
   directory: outputs
