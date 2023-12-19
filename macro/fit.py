@@ -13,6 +13,7 @@ def main():
     parser.add_argument("--do_fit", help="Do the fit to data / toy MC", action="store_true")
     parser.add_argument("--do_upper_limit", help="Do the calculation of the upper limit", action="store_true")
     parser.add_argument("--do_prefilter", help="Apply selections", action="store_true")
+    parser.add_argument("--do_plot_results", help="Plot results", action="store_true")
     args = parser.parse_args()
     
 
@@ -30,6 +31,9 @@ def main():
 
     if args.do_prefilter:
         prefilter(inputCfg)
+
+    if args.do_plot_results:
+        plot_results()
 
 def prefilter(config):
     """
@@ -259,20 +263,34 @@ def fit(config):
     legend.AddEntry(mJpsiframe.findObject("bkgD0_bkgJpsiPdf"), "bkg. J/#psi - bkg. D0", "L")
     legend.Draw()
 
-    canvasFit = ROOT.TCanvas("canvasFit", "canvasFit", 1200, 600)
-    canvasFit.Divide(2, 1)
-
-    canvasFit.cd(1)
+    canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 600)
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.Draw()
     legend.Draw()
+    canvasFitJpsi.Update()
+    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit.pdf')
 
-    canvasFit.cd(2)
+    canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 600)
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.Draw()
     legend.Draw()
-    canvasFit.Update()
-    canvasFit.SaveAs(f'{config["output"]["figures"]}/projected_fit.pdf')
+    canvasFitD0.Update()
+    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_d0_fit.pdf')
+
+    #canvasFit = ROOT.TCanvas("canvasFit", "canvasFit", 1200, 600)
+    #canvasFit.Divide(2, 1)
+
+    #canvasFit.cd(1)
+    #mJpsiframe.GetYaxis().SetTitleOffset(1.4)
+    #mJpsiframe.Draw()
+    #legend.Draw()
+
+    #canvasFit.cd(2)
+    #mD0frame.GetYaxis().SetTitleOffset(1.4)
+    #mD0frame.Draw()
+    #legend.Draw()
+    #canvasFit.Update()
+    #canvasFit.SaveAs(f'{config["output"]["figures"]}/projected_fit.pdf')
 
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
@@ -300,7 +318,9 @@ def fit(config):
     fitResult.Print()
 
     fOut = ROOT.TFile(f'{config["output"]["directory"]}/myTest.root', "RECREATE")
-    #canvasFitHist2D.Write()
+    #canvasFit.Write()
+    canvasFitJpsi.Write()
+    canvasFitD0.Write()
     canvasFitHist3D.Write()
     fOut.Close()
 
@@ -433,6 +453,142 @@ def upper_limit():
     dataCanvas.SaveAs("figures/upper_limit.pdf")
     input()
     exit()
+
+def plot_results():
+    LoadStyle()
+
+    letexTitle = ROOT.TLatex()
+    letexTitle.SetTextSize(0.05)
+    letexTitle.SetNDC()
+    letexTitle.SetTextFont(42)
+
+    fIn = ROOT.TFile("outputs/myTest.root", "READ")
+    canvasInJpsi = fIn.Get("canvasFitJpsi")
+    canvasInD0 = fIn.Get("canvasFitD0")
+    listOfPrimitivesJpsi = canvasInJpsi.GetListOfPrimitives()
+    listOfPrimitivesD0 = canvasInD0.GetListOfPrimitives()
+
+    frameJpsi = listOfPrimitivesJpsi.At(1)
+    frameJpsi.SetTitle(" ")
+    frameJpsi.GetXaxis().SetRangeUser(2.55, 4.00)
+    frameJpsi.GetXaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
+    frameJpsi.GetXaxis().SetTitleOffset(1.1)
+    frameJpsi.GetXaxis().SetTitleSize(0.05)
+    frameJpsi.GetXaxis().SetLabelSize(0.045)
+    frameJpsi.GetYaxis().SetRangeUser(0, 800)
+    frameJpsi.GetYaxis().SetTitle("Counts")
+    frameJpsi.GetYaxis().SetTitleOffset(1.3)
+    frameJpsi.GetYaxis().SetTitleSize(0.05)
+    frameJpsi.GetYaxis().SetLabelSize(0.045)
+
+    # Histograms
+    histDataJpsi = listOfPrimitivesJpsi.At(2)
+
+    # PDFs
+    pdfJpsi = listOfPrimitivesJpsi.At(3)
+    pdfJpsiS1S2 = listOfPrimitivesJpsi.At(4)
+    pdfJpsiS1B2 = listOfPrimitivesJpsi.At(5)
+    pdfJpsiB1S2 = listOfPrimitivesJpsi.At(6)
+    pdfJpsiB1B2 = listOfPrimitivesJpsi.At(7)
+
+    pdfJpsiS1S2.SetLineColor(ROOT.kRed+1)
+    pdfJpsiS1B2.SetLineColor(ROOT.kAzure+4)
+    pdfJpsiB1S2.SetLineColor(ROOT.kGreen+1)
+    pdfJpsiB1B2.SetLineColor(ROOT.kOrange+7)
+
+    canvasOutJpsi = TCanvas("canvasOutJpsi", "canvasOutJpsi", 600, 600)
+    canvasOutJpsi.SetTickx(1)
+    canvasOutJpsi.SetTicky(1)
+    frameJpsi.Draw()
+    histDataJpsi.Draw("EP SAME")
+    pdfJpsi.Draw("SAME")
+    pdfJpsiS1S2.Draw("SAME")
+    pdfJpsiS1B2.Draw("SAME")
+    pdfJpsiB1S2.Draw("SAME")
+    pdfJpsiB1B2.Draw("SAME")
+
+    legend1 = TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
+    SetLegend(legend1)
+    legend1.SetTextSize(0.045)
+    legend1.AddEntry(histDataJpsi, "Data", "EP")
+    legend1.AddEntry(pdfJpsi, "Total fit", "L")
+    legend1.Draw()
+
+    legend2 = TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
+    SetLegend(legend2)
+    legend2.SetTextSize(0.045)
+    legend2.AddEntry(pdfJpsiS1S2, "J/#psi + D^{0}", "L")
+    legend2.AddEntry(pdfJpsiS1B2, "J/#psi + bkg", "L")
+    legend2.AddEntry(pdfJpsiB1S2, "Bkg + D^{0}", "L")
+    legend2.AddEntry(pdfJpsiB1B2, "Bkg + bkg", "L")
+    legend2.Draw()
+
+    letexTitle.DrawLatex(0.20, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV, 6#times 10^{11} events")
+
+    canvasOutJpsi.Update()
+    canvasOutJpsi.SaveAs("figures/fit_jpsi_projection.pdf")
+
+    frameD0 = listOfPrimitivesD0.At(1)
+    frameD0.SetTitle(" ")
+    frameD0.GetXaxis().SetRangeUser(1.73, 2.00)
+    frameD0.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
+    frameD0.GetXaxis().SetTitleOffset(1.1)
+    frameD0.GetXaxis().SetTitleSize(0.05)
+    frameD0.GetXaxis().SetLabelSize(0.045)
+    frameD0.GetYaxis().SetRangeUser(0, 800)
+    frameD0.GetYaxis().SetTitle("Counts")
+    frameD0.GetYaxis().SetTitleOffset(1.3)
+    frameD0.GetYaxis().SetTitleSize(0.05)
+    frameD0.GetYaxis().SetLabelSize(0.045)
+
+    # Histograms
+    histDataD0 = listOfPrimitivesD0.At(2)
+
+    # PDFs
+    pdfD0 = listOfPrimitivesD0.At(3)
+    pdfD0S1S2 = listOfPrimitivesD0.At(4)
+    pdfD0S1B2 = listOfPrimitivesD0.At(5)
+    pdfD0B1S2 = listOfPrimitivesD0.At(6)
+    pdfD0B1B2 = listOfPrimitivesD0.At(7)
+
+    pdfD0S1S2.SetLineColor(ROOT.kRed+1)
+    pdfD0S1B2.SetLineColor(ROOT.kAzure+4)
+    pdfD0B1S2.SetLineColor(ROOT.kGreen+1)
+    pdfD0B1B2.SetLineColor(ROOT.kOrange+7)
+
+    canvasOutD0 = TCanvas("canvasOutD0", "canvasOutD0", 600, 600)
+    canvasOutD0.SetTickx(1)
+    canvasOutD0.SetTicky(1)
+    frameD0.Draw()
+    histDataD0.Draw("EP SAME")
+    pdfD0.Draw("SAME")
+    pdfD0S1S2.Draw("SAME")
+    pdfD0S1B2.Draw("SAME")
+    pdfD0B1S2.Draw("SAME")
+    pdfD0B1B2.Draw("SAME")
+
+    legend1 = TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
+    SetLegend(legend1)
+    legend1.SetTextSize(0.045)
+    legend1.AddEntry(histDataD0, "Data", "EP")
+    legend1.AddEntry(pdfD0, "Total fit", "L")
+    legend1.Draw()
+
+    legend2 = TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
+    SetLegend(legend2)
+    legend2.SetTextSize(0.045)
+    legend2.AddEntry(pdfD0S1S2, "J/#psi + D^{0}", "L")
+    legend2.AddEntry(pdfD0S1B2, "J/#psi + bkg", "L")
+    legend2.AddEntry(pdfD0B1S2, "Bkg + D^{0}", "L")
+    legend2.AddEntry(pdfD0B1B2, "Bkg + bkg", "L")
+    legend2.Draw()
+
+    letexTitle.DrawLatex(0.20, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV, 6#times 10^{11} events")
+
+    canvasOutD0.Update()
+    canvasOutD0.SaveAs("figures/fit_d0_projection.pdf")
+
+    input()
 
 if __name__ == '__main__':
     main()
