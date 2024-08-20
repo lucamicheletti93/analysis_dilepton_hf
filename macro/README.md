@@ -10,7 +10,7 @@ other options:
   python fit.py config_fit.yml --do_prefilter
   ```
   A new sample with the given `suffix` will be created
-- If you want to fit the J/$\psi$ and D0 distributions to extract their shape run:
+- If you want to fit the J/&#968; and D0 distributions to extract their shape run:
   ```ruby
   python fit.py config_fit.yml --do_prefit
   ```
