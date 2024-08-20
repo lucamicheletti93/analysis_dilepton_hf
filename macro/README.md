@@ -1,6 +1,6 @@
 # Fit code: how to use
 
-Run J/$\psi - D0 fit with the command:
+Run J/$\psi$ - D0 fit with the command:
   ```ruby
   python fit.py config_fit.yml --do_fit
   ```
@@ -10,7 +10,7 @@ other options:
   python fit.py config_fit.yml --do_prefilter
   ```
   A new sample with the given `suffix` will be created
-- If you want to fit the J/$\psi and D0 distributions to extract their shape run:
+- If you want to fit the J/$\psi$ and D0 distributions to extract their shape run:
   ```ruby
   python fit.py config_fit.yml --do_prefit
   ```
