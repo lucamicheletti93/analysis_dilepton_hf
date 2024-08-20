@@ -1,6 +1,6 @@
 # Fit code: how to use
 
-Run J/&psi - D0 fit with the command:
+Run J/$$\psi$$ - D0 fit with the command:
   ```ruby
   python fit.py config_fit.yml --do_fit
   ```
