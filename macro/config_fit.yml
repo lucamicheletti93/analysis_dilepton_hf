@@ -1,13 +1,25 @@
 ---
 inputs:
   #data: data/histograms.root
-  data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged_train_144726_BDT_modular_cut.root
+  #data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC23_pass4_BDT_modular_cut.root # file name for 2023
+  data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC24_pass1_BDT_modular_cut.root # file name for 2024
   hist: hSparseJPsiDmeson_proj_3_2
-  tree: treeJpsiD0
+  #tree: treeJpsiD0
+  #tree: "DF_2234646036382668/O2rtdilptdmesall"
+  #tree: "DF_2303125544446624/O2rtdilptdmesall" # tree name for 2023
+  tree: "DF_2363808317917888/O2rtdilptdmesall" # tree name for 2024
 
 prefilter:
-  data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged.root
-  tree: treeJpsiD0
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged.root
+  #tree: treeJpsiD0
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged_train_144726.root
+  #tree: "DF_2234646036382668/O2rtdilptdmesall"
+  #data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC24_pass1.root # file name for 2023
+  #tree: "DF_2303125544446624/O2rtdilptdmesall" # tree name for 2023
+  data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC24_pass1.root # file name for 2024
+  tree: "DF_2363808317917888/O2rtdilptdmesall" # tree name for 2024
   cuts: "(fPtD0 >= 0.  && fPtD0 < 1.  && fBdtBkg < 0.050) ||
          (fPtD0 >= 1.  && fPtD0 < 2.  && fBdtBkg < 0.050) ||
          (fPtD0 >= 2.  && fPtD0 < 3.  && fBdtBkg < 0.100) ||
@@ -23,10 +35,16 @@ prefilter:
 fit:
   toy_mc: False
   unbinned: True
-  min_fit_range_d0: 1.72
+  min_fit_range_d0: 1.70
   max_fit_range_d0: 2.00
   min_fit_range_jpsi: 2.50
   max_fit_range_jpsi: 4.00
+
+  norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg]
+  norm_par_sig_val: [5000, 1000, 2000, 10000]
+  norm_par_sig_lw_lim: [50, 10, 20, 100]
+  norm_par_sig_up_lim: [50000, 10000, 20000, 100000]
+  norm_par_sig_is_const: [False, False, False, False]
 
   cb_par_jpsi_name: [meanJpsi, sigmaJpsi, alphaJpsi, nJpsi]
   cb_par_jpsi_val: [3.0744e+00, 9.5466e-02, 1.0725e+00, 1.0000e+01]
@@ -53,5 +71,5 @@ fit:
   cheby_par_d0_is_const: [False, False, False]
 
 output:
-  directory: outputs
-  figures: figures
+  directory: outputs_skimming
+  figures: figures_skimming
