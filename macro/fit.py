@@ -2,7 +2,6 @@ import sys
 import argparse
 import yaml
 import ROOT
-from ROOT import *
 sys.path.append('../utils')
 from plot_library import LoadStyle, SetGraStat, SetGraSyst, SetLegend
 
@@ -298,7 +297,7 @@ def fit(config):
     
     if config["fit"]["unbinned"]:
         sample.Draw("fMass : fMassD0 >> hist_fMass_fMassD0", f'fMass > {minFitRangeJpsi} && fMass < {maxFitRangeJpsi} && fMassD0 > {minFitRangeD0} && fMassD0 < {maxFitRangeD0}', "LEGO2")
-        htemp = gPad.GetPrimitive("hist_fMass_fMassD0")
+        htemp = ROOT.gPad.GetPrimitive("hist_fMass_fMassD0")
         htemp.GetXaxis().SetTitleOffset(2.0)
         htemp.GetYaxis().SetTitleOffset(2.0)
         htemp.GetZaxis().SetTitleOffset(2.0)
