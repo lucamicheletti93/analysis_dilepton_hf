@@ -168,15 +168,20 @@ def fit(config):
 
     # Yields parameters
     genJpsiD0  = config["fit"]["norm_par_sig_val"][0]
-    genBkgJpsi = config["fit"]["norm_par_sig_val"][1]
-    genBkgD0   = config["fit"]["norm_par_sig_val"][2]
-    genBkgBkg  = config["fit"]["norm_par_sig_val"][3]
+    genPsi2SD0  = config["fit"]["norm_par_sig_val"][1]
+    genBkgJpsi = config["fit"]["norm_par_sig_val"][2]
+    genBkgPsi2S = config["fit"]["norm_par_sig_val"][3]
+    genBkgD0   = config["fit"]["norm_par_sig_val"][4]
+    genBkgBkg  = config["fit"]["norm_par_sig_val"][5]
+    
 
     nJPsiD0  = ROOT.RooRealVar("nJPsiD0", "number of JPsi-D0", genJpsiD0, config["fit"]["norm_par_sig_lw_lim"][0], config["fit"]["norm_par_sig_up_lim"][0])
-    nBkgJPsi = ROOT.RooRealVar("nBkgJPsi", "number of JPsi-Bkg", genBkgJpsi, config["fit"]["norm_par_sig_lw_lim"][1], config["fit"]["norm_par_sig_up_lim"][1])
-    nBkgD0   = ROOT.RooRealVar("nBkgD0", "number of D0-Bkg", genBkgD0, config["fit"]["norm_par_sig_lw_lim"][2], config["fit"]["norm_par_sig_up_lim"][2])
-    nBkgBkg  = ROOT.RooRealVar("nBkgBkg", "number of Bkg-Bkg", genBkgBkg, config["fit"]["norm_par_sig_lw_lim"][3], config["fit"]["norm_par_sig_up_lim"][3])
-
+    nPsi2SD0  = ROOT.RooRealVar("nPsi2SD0", "number of Psi2S-D0", genPsi2SD0, config["fit"]["norm_par_sig_lw_lim"][1], config["fit"]["norm_par_sig_up_lim"][1])
+    nBkgJPsi = ROOT.RooRealVar("nBkgJPsi", "number of JPsi-Bkg", genBkgJpsi, config["fit"]["norm_par_sig_lw_lim"][2], config["fit"]["norm_par_sig_up_lim"][2])
+    nBkgPsi2S = ROOT.RooRealVar("nBkgPsi2S", "number of Psi2S-Bkg", genBkgPsi2S, config["fit"]["norm_par_sig_lw_lim"][3], config["fit"]["norm_par_sig_up_lim"][3])
+    nBkgD0   = ROOT.RooRealVar("nBkgD0", "number of D0-Bkg", genBkgD0, config["fit"]["norm_par_sig_lw_lim"][4], config["fit"]["norm_par_sig_up_lim"][4])
+    nBkgBkg  = ROOT.RooRealVar("nBkgBkg", "number of Bkg-Bkg", genBkgBkg, config["fit"]["norm_par_sig_lw_lim"][5], config["fit"]["norm_par_sig_up_lim"][5])
+    
     # Pdfs
     meanJpsi  = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_val"][0], config["fit"]["cb_par_jpsi_lw_lim"][0], config["fit"]["cb_par_jpsi_up_lim"][0]); meanJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][0])
     sigmaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_val"][1], config["fit"]["cb_par_jpsi_lw_lim"][1], config["fit"]["cb_par_jpsi_up_lim"][1]); sigmaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][1])
@@ -184,6 +189,14 @@ def fit(config):
     nJpsi     = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_val"][3], config["fit"]["cb_par_jpsi_lw_lim"][3], config["fit"]["cb_par_jpsi_up_lim"][3]); nJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][3])
     cbPdfJpsi = ROOT.RooCBShape("cbPdfJpsi", "Crystal Ball J/psi", mJpsi, meanJpsi, sigmaJpsi, alphaJpsi, nJpsi)
 
+    ## adding the psi2S
+    meanPsi2S  = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_val"][0], config["fit"]["cb_par_psi2s_lw_lim"][0], config["fit"]["cb_par_psi2s_up_lim"][0]); meanPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][0])
+    sigmaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_val"][1], config["fit"]["cb_par_psi2s_lw_lim"][1], config["fit"]["cb_par_psi2s_up_lim"][1]); sigmaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][1])
+    alphaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_val"][2], config["fit"]["cb_par_psi2s_lw_lim"][2], config["fit"]["cb_par_psi2s_up_lim"][2]); alphaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][2])
+    nPsi2S     = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_val"][3], config["fit"]["cb_par_psi2s_lw_lim"][3], config["fit"]["cb_par_psi2s_up_lim"][3]); nPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][3])
+    cbPdfPsi2S = ROOT.RooCBShape("cbPdfPsi2S", "Crystal Ball J/psi", mJpsi, meanPsi2S, sigmaJpsi, alphaPsi2S, nPsi2S)
+
+    ##same bkg for both
     chebyParsJpsi = [ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_val"][i], config["fit"]["cheby_par_jpsi_lw_lim"][i], config["fit"]["cheby_par_jpsi_up_lim"][i]) for i in range(3)]
     for i in range(0, 3): chebyParsJpsi[i].setConstant(config["fit"]["cheby_par_jpsi_is_const"][i])
     chebyPdfJpsi  = ROOT.RooChebychev("chebyPdfJpsi", "Cheby for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
@@ -198,14 +211,46 @@ def fit(config):
     for i in range(0, 3): chebyParsD0[i].setConstant(config["fit"]["cheby_par_d0_is_const"][i])
     chebyPdfD0  = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg1", mD0, ROOT.RooArgList(*chebyParsD0))
 
+    # reflection
+    fRefl = ROOT.TFile(config["reflections"]["data"], "READ")
+    hRefl = fRefl.Get(config["reflections"]["refl"])
+    hSig = fRefl.Get(config["reflections"]["signal"])
+    bin_min_refl = hRefl.FindBin(config["fit"]["min_fit_range_d0"])
+    bin_max_refl = hRefl.FindBin(config["fit"]["max_fit_range_d0"])
+    bin_min_sig = hSig.FindBin(config["fit"]["min_fit_range_d0"])
+    bin_max_sig = hSig.FindBin(config["fit"]["max_fit_range_d0"])
+
+    integral_hRefl = hRefl.Integral(bin_min_refl, bin_max_refl)
+    integral_hSig = hSig.Integral(bin_min_sig, bin_max_sig)
+
+    if integral_hSig != 0:
+        reflRatio = integral_hRefl / integral_hSig
+    else:
+        print(f"Error: The integral of hSig in the mass range is zero.")
+        sys.exit(1)  # Exit the script with a non-zero status to indicate an error
+
+    reflFracD0 = ROOT.RooRealVar("reflFracD0", "reflFracD0", reflRatio); reflFracD0.setConstant(True)
+    
+    refl_template_D0 = ROOT.RooDataHist("refl_template_D0", "refl_template_D0", ROOT.RooArgList(mD0), hRefl)
+    templatePdfReflD0 = ROOT.RooHistPdf("templatePdfReflD0", "templatePdfReflD0", ROOT.RooArgList(mD0), refl_template_D0)
+    nReflJPsi = ROOT.RooFormulaVar("nReflJPsi", "reflFracD0 * nJPsiD0", ROOT.RooArgList(reflFracD0,nJPsiD0))
+    nReflPsi2S = ROOT.RooFormulaVar("nReflPsi2S", "reflFracD0 * nPsi2SD0", ROOT.RooArgList(reflFracD0,nPsi2SD0))
+    nReflBkg  = ROOT.RooFormulaVar("nReflBkg", "reflFracD0 * nBkgD0", ROOT.RooArgList(reflFracD0,nBkgD0))
+    
     # Product of Pdfs
     sigD0_sigJpsiPdf = ROOT.RooProdPdf("sigD0_sigJpsiPdf", "Jpsi Pdf * D0 Pdf", ROOT.RooArgList(cbPdfD0, cbPdfJpsi))
+    sigD0_sigPsi2SPdf = ROOT.RooProdPdf("sigD0_sigPsi2SPdf", "Psi2S Pdf * D0 Pdf", ROOT.RooArgList(cbPdfD0, cbPdfPsi2S))
     bkgD0_sigJpsiPdf = ROOT.RooProdPdf("bkgD0_sigJpsiPdf", "Jpsi Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, cbPdfJpsi))
+    bkgD0_sigPsi2SPdf = ROOT.RooProdPdf("bkgD0_sigPsi2SPdf", "Psi2S Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, cbPdfPsi2S))
+    reflD0_sigJpsiPdf = ROOT.RooProdPdf("reflD0_sigJpsiPdf", "Jpsi Pdf * refl Pdf", ROOT.RooArgList(templatePdfReflD0, cbPdfJpsi))
+    reflD0_sigPsi2SPdf = ROOT.RooProdPdf("reflD0_sigPsi2SPdf", "Psi2S Pdf * refl Pdf", ROOT.RooArgList(templatePdfReflD0, cbPdfPsi2S))
+    
     bkgJpsi_sigD0Pdf = ROOT.RooProdPdf("bkgJpsi_sigD0Pdf", "D0 Pdf * Bkg1 Pdf", ROOT.RooArgList(chebyPdfJpsi, cbPdfD0))
     bkgD0_bkgJpsiPdf = ROOT.RooProdPdf("bkgD0_bkgJpsiPdf", "Bkg1 Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, chebyPdfJpsi))
+    reflD0_bkgJpsiPdf = ROOT.RooProdPdf("reflD0_bkgJpsiPdf", "Bkg1 Pdf * refl Pdf", ROOT.RooArgList(templatePdfReflD0, chebyPdfJpsi))
 
     # Sum all Pdfs
-    model = ROOT.RooAddPdf("model", "sigD0_sigJpsiPdf + bkgD0_sigJpsiPdf + bkgJpsi_sigD0Pdf + bkgD0_bkgJpsiPdf", ROOT.RooArgList(sigD0_sigJpsiPdf, bkgD0_sigJpsiPdf, bkgJpsi_sigD0Pdf, bkgD0_bkgJpsiPdf), ROOT.RooArgList(nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg))
+    model = ROOT.RooAddPdf("model", "sigD0_sigJpsiPdf + bkgD0_sigJpsiPdf + reflD0_sigJpsiPdf + sigD0_sigPsi2SPdf + bkgD0_sigPsi2SPdf + reflD0_sigPsi2SPdf + bkgJpsi_sigD0Pdf + bkgD0_bkgJpsiPdf + reflD0_bkgJpsiPdf", ROOT.RooArgList(sigD0_sigJpsiPdf, bkgD0_sigJpsiPdf, reflD0_sigJpsiPdf, sigD0_sigPsi2SPdf, bkgD0_sigPsi2SPdf, reflD0_sigPsi2SPdf,bkgJpsi_sigD0Pdf, bkgD0_bkgJpsiPdf, reflD0_bkgJpsiPdf), ROOT.RooArgList(nJPsiD0, nBkgJPsi, nReflJPsi, nPsi2SD0, nBkgPsi2S, nReflPsi2S,nBkgD0, nBkgBkg, nReflBkg))
 
     if config["fit"]["toy_mc"]:
         # Generate toy sample
@@ -240,26 +285,43 @@ def fit(config):
     modelHist.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title="Dimuon")
-    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Binning(20))
+    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Binning(50))
     model.plotOn(mJpsiframe)
     model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
+    model.plotOn(mJpsiframe, Name={"sigD0_sigPsi2SPdf"}, Components={sigD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
     model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
+    model.plotOn(mJpsiframe, Name={"bkgD0_sigPsi2SPdf"}, Components={bkgD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kAzure+4)
     model.plotOn(mJpsiframe, Name={"bkgJpsi_sigD0Pdf"}, Components={bkgJpsi_sigD0Pdf}, LineStyle="--", LineColor=ROOT.kGreen+1)
     model.plotOn(mJpsiframe, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kMagenta)
+    model.plotOn(mJpsiframe, Name={"reflD0_sigJpsiPdf"}, Components={reflD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kYellow+2)
+    model.plotOn(mJpsiframe, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kYellow+2)
+    model.plotOn(mJpsiframe, Name={"reflD0_bkgJpsiPdf"}, Components={reflD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kGray+1)
 
     mD0frame = mD0.frame(Title="D-meson")
-    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Binning(10))
+    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Binning(50))
     model.plotOn(mD0frame)
     model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
+    model.plotOn(mD0frame, Name={"sigD0_sigPsi2SPdf"}, Components={sigD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
     model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
+    model.plotOn(mD0frame, Name={"bkgD0_sigPsi2SPdf"}, Components={bkgD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kAzure+4)
     model.plotOn(mD0frame, Name={"bkgJpsi_sigD0Pdf"}, Components={bkgJpsi_sigD0Pdf}, LineStyle="--", LineColor=ROOT.kGreen+1)
     model.plotOn(mD0frame, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kMagenta)
+    model.plotOn(mD0frame, Name={"reflD0_sigJpsiPdf"}, Components={reflD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kYellow+2)
+    model.plotOn(mD0frame, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kYellow+2)
+    model.plotOn(mD0frame, Name={"reflD0_bkgJpsiPdf"}, Components={reflD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kGray+1)
 
-    legend = ROOT.TLegend(0.59, 0.69, 0.89, 0.89)
+    legend = ROOT.TLegend(0.59, 0.59, 0.89, 0.89)
+    legend.SetBorderSize(0)
+    legend.SetFillStyle(0)
     legend.AddEntry(mJpsiframe.findObject("sigD0_sigJpsiPdf"), "sig. J/#psi - sig. D0", "L")
+    legend.AddEntry(mJpsiframe.findObject("sigD0_sigPsi2SPdf"), "sig. #psi(2S) - sig. D0", "L")
     legend.AddEntry(mJpsiframe.findObject("bkgD0_sigJpsiPdf"), "sig. J/#psi - bkg. D0", "L")
-    legend.AddEntry(mJpsiframe.findObject("bkgJpsi_sigD0Pdf"), "bkg. J/#psi - sig. D0", "L")
-    legend.AddEntry(mJpsiframe.findObject("bkgD0_bkgJpsiPdf"), "bkg. J/#psi - bkg. D0", "L")
+    legend.AddEntry(mJpsiframe.findObject("bkgD0_sigPsi2SPdf"), "sig. #psi(2S) - bkg. D0", "L")
+    legend.AddEntry(mJpsiframe.findObject("reflD0_sigJpsiPdf"), "sig. J/#psi - refl. D0", "L")
+    legend.AddEntry(mJpsiframe.findObject("reflD0_sigPsi2SPdf"), "sig. #psi(2S) - refl. D0", "L")
+    legend.AddEntry(mJpsiframe.findObject("bkgJpsi_sigD0Pdf"), "bkg. #psi - sig. D0", "L")
+    legend.AddEntry(mJpsiframe.findObject("bkgD0_bkgJpsiPdf"), "bkg. #psi - bkg. D0", "L")
+    legend.AddEntry(mJpsiframe.findObject("reflD0_bkgJpsiPdf"), "bkg. #psi - refl. D0", "L")
     legend.Draw()
 
     canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 600)
@@ -268,6 +330,11 @@ def fit(config):
     legend.Draw()
     canvasFitJpsi.Update()
     canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit.pdf')
+    
+    canvasFitJpsi.SetLogy()
+    mJpsiframe.GetYaxis().SetRangeUser(1, sampleToFit.numEntries())
+    canvasFitJpsi.Update()
+    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit_logy.pdf')
 
     canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 600)
     mD0frame.GetYaxis().SetTitleOffset(1.4)
@@ -529,7 +596,7 @@ def plot_results():
 
     frameD0 = listOfPrimitivesD0.At(1)
     frameD0.SetTitle(" ")
-    frameD0.GetXaxis().SetRangeUser(1.73, 2.00)
+    frameD0.GetXaxis().SetRangeUser(1.70, 2.05)
     frameD0.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
     frameD0.GetXaxis().SetTitleOffset(1.1)
     frameD0.GetXaxis().SetTitleSize(0.05)
