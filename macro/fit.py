@@ -165,6 +165,8 @@ def fit(config):
 
     mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
     mJpsi = ROOT.RooRealVar("fMass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", minFitRangeJpsi, maxFitRangeJpsi)
+    ptD0   = ROOT.RooRealVar("fPtD0", "#it{p}_{T,#pi#it{K}} (GeV/#it{c}^{2})", 0, 100)
+    ptJpsi = ROOT.RooRealVar("fPtJpsi", "#it{p}_{T,#mu#mu} (GeV/#it{c}^{2})", 0, 100)
 
     # Yields parameters
     genJpsiD0  = config["fit"]["norm_par_sig_val"][0]
@@ -273,13 +275,51 @@ def fit(config):
             fIn = ROOT.TFile(config["inputs"]["data"], "READ")
             sample = fIn.Get(config["inputs"]["hist"])
     if config["fit"]["unbinned"]:
-        sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi], Import=sample)
+        sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi], Import=sample)
     else:
-        sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi], Import=sample)
+        sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi, ptD0, ptJpsi], Import=sample)
 
     # Fit
     fitResult = model.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
-
+    
+    # Create sPlot
+    sampleToFit_sPlot = sampleToFit.Clone("sampleToFit_sPlot") # cloning the original dataset
+    #sData = ROOT.RooStats.SPlot("sData", "An SPlot", sampleToFit_sPlot, model, ROOT.RooArgList(nJPsiD0, nBkgJPsi, nReflJPsi, nPsi2SD0, nBkgPsi2S, nReflPsi2S, nBkgD0, nBkgBkg, nReflBkg))
+    sData = ROOT.RooStats.SPlot("sData", "An SPlot", sampleToFit_sPlot, model, ROOT.RooArgList(nJPsiD0, nBkgJPsi, nPsi2SD0, nBkgPsi2S, nBkgD0, nBkgBkg)) # The line creates an SPlot 'sData' and adds columns to 'sampleToFit_sPlot' that represent the weights for various components of the model
+    
+    nJPsiD0_sw = ROOT.RooRealVar("nJPsiD0_sw","sWeights for JpsiD0", 0, 1000)
+    nBkgJPsi_sw = ROOT.RooRealVar("nBkgJPsi_sw","sWeights for BkgJpsi",0 ,1000)
+    #nReflJPsi_sw = ROOT.RooRealVar("nReflJPsi_sw","sWeights for ReflJPsi", 0 ,1000)
+    nPsi2SD0_sw = ROOT.RooRealVar("nPsi2SD0_sw","sWeights for Psi2SD0", 0 ,1000)
+    nBkgPsi2S_sw = ROOT.RooRealVar("nBkgPsi2S_sw","sWeights for BkgPsi2S", 0 ,1000)
+    #nReflPsi2S_sw = ROOT.RooRealVar("nReflPsi2S_sw","sWeights for ReflPsi2S", 0 ,1000)
+    nBkgD0_sw = ROOT.RooRealVar("nBkgD0_sw","sWeights for BkgD0", 0 ,1000)
+    nBkgBkg_sw = ROOT.RooRealVar("nBkgBkg_sw","sWeights for BkgBkg", 0 ,1000)
+    #nReflBkg_sw = ROOT.RooRealVar("nReflBkg_sw","sWeights for ReflBkg", 0 ,1000)
+    
+    dataw_JPsiD0 = ROOT.RooDataSet("dataw_JPsiD0", "dataw_JPsiD0", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nJPsiD0_sw), "", "nJPsiD0_sw")
+    dataw_BkgJPsi = ROOT.RooDataSet("dataw_BkgJPsi", "dataw_BkgJPsi", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nBkgJPsi_sw), "", "nBkgJPsi_sw")
+    #dataw_ReflJPsi = ROOT.RooDataSet("dataw_ReflJPsi", "dataw_ReflJPsi", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nReflJPsi_sw), "", "nReflJPsi_sw")
+    dataw_Psi2SD0 = ROOT.RooDataSet("dataw_Psi2SD0", "dataw_Psi2SD0", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nPsi2SD0_sw), "", "nPsi2SD0_sw")
+    dataw_BkgPsi2S = ROOT.RooDataSet("dataw_BkgPsi2S", "dataw_BkgPsi2S", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nBkgPsi2S_sw), "", "nBkgPsi2S_sw")
+    #dataw_ReflPsi2S = ROOT.RooDataSet("dataw_ReflPsi2S", "dataw_ReflPsi2S", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nReflPsi2S_sw), "", "nReflPsi2S_sw")
+    dataw_BkgD0 = ROOT.RooDataSet("dataw_BkgD0", "dataw_BkgD0", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nBkgD0_sw), "", "nBkgD0_sw")
+    dataw_BkgBkg = ROOT.RooDataSet("dataw_BkgBkg", "dataw_BkgBkg", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nBkgBkg_sw), "", "nBkgBkg_sw")
+    #dataw_ReflBkg = ROOT.RooDataSet("dataw_ReflBkg", "dataw_ReflBkg", sampleToFit_sPlot, ROOT.RooArgSet(ptD0, ptJpsi, nReflBkg_sw), "", "nReflBkg_sw")
+    fOut = ROOT.TFile(f'{config["output"]["directory"]}/datasets_splot.root', "RECREATE")
+    sampleToFit_sPlot.Write()
+    dataw_JPsiD0.Write()
+    dataw_BkgJPsi.Write()
+    #dataw_ReflJPsi.Write()
+    dataw_Psi2SD0.Write()
+    dataw_BkgPsi2S.Write()
+    #dataw_ReflPsi2S.Write()
+    dataw_BkgD0.Write()
+    dataw_BkgBkg.Write()
+    #dataw_ReflBkg.Write()
+    fOut.Close()
+    
+    #drawing
     modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
     modelHist.SetLineColor(ROOT.kRed)
     modelHist.SetLineWidth(1)
