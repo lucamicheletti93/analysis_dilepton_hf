@@ -50,6 +50,8 @@ fit:
   max_fit_range_d0: 2.05
   min_fit_range_jpsi: 2.50
   max_fit_range_jpsi: 4.00
+  JpsiChannel: "Jpsi2ee"
+  add_psi2s: False ## if true, the psi2s is added to the fit
 
   norm_par_sig_name: [nJPsiD0, nPsi2SD0, nBkgJPsi, nBkgPsi2S, nBkgD0, nBkgBkg]
   norm_par_sig_val: [5000, 30, 10000, 300, 2000, 10000]
