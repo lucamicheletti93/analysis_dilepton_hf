@@ -51,11 +51,17 @@ fit:
   min_fit_range_jpsi: 2.50
   max_fit_range_jpsi: 4.00
 
-  norm_par_sig_name: [nJPsiD0, nPsi2SD0, nBkgJPsi, nBkgPsi2S, nBkgD0, nBkgBkg]
-  norm_par_sig_val: [5000, 30, 10000, 300, 2000, 10000]
-  norm_par_sig_lw_lim: [50, 20, 1000, 100, 20, 100]
-  norm_par_sig_up_lim: [500000, 50, 100000, 1000, 200000, 1000000]
-  norm_par_sig_is_const: [False, False, False, False, False, False]
+  #norm_par_sig_name: [nJPsiD0, nPsi2SD0, nBkgJPsi, nBkgPsi2S, nBkgD0, nBkgBkg]
+  #norm_par_sig_val: [5000, 30, 10000, 350, 2000, 10000]
+  #norm_par_sig_lw_lim: [50, 20, 1000, 100, 20, 100]
+  #norm_par_sig_up_lim: [500000, 50, 100000, 1000, 200000, 1000000]
+  #norm_par_sig_is_const: [False, True, False, True, False, False]
+
+  norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg, rPsi2sJPsi]
+  norm_par_sig_val: [5000, 10000, 2000, 10000, 0.023]
+  norm_par_sig_lw_lim: [50, 1000, 20, 100, 0.02]
+  norm_par_sig_up_lim: [500000, 100000, 200000, 1000000, 0.03]
+  norm_par_sig_is_const: [False, False, False, False, True]
 
   cb_par_jpsi_name: [meanJpsi, sigmaJpsi, alphaJpsi, nJpsi]
   cb_par_jpsi_val: [3.0744e+00, 9.5466e-02, 1.0725e+00, 1.0000e+01]
