@@ -353,16 +353,12 @@ def fit(config):
         model.plotOn(mD0frame, Name={"sigD0_sigPsi2SPdf"}, Components={sigD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kRed+1)
         model.plotOn(mD0frame, Name={"bkgD0_sigPsi2SPdf"}, Components={bkgD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kAzure+1)
         model.plotOn(mD0frame, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kYellow+2)
-
-    legend_tot = ROOT.TLegend(0.15, 0.65, 0.39, 0.75)
-    legend_tot.SetBorderSize(0)
-    legend_tot.SetFillStyle(0)
-    legend_tot.AddEntry(mD0frame.findObject("data"), "data", "PE")
-    legend_tot.AddEntry(mD0frame.findObject("model"), "total fit", "L")
     
     legend_comp = ROOT.TLegend(0.59, 0.59, 0.89, 0.89)
     legend_comp.SetBorderSize(0)
     legend_comp.SetFillStyle(0)
+    legend_comp.AddEntry(mD0frame.findObject("data"), "data", "PE")
+    legend_comp.AddEntry(mD0frame.findObject("model"), "total fit", "L")
 
     if config["fit"]["add_psi2s"]:
         hist_Jpsi = ROOT.TH1F("hist_Jpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_Jpsi.SetLineWidth(3); hist_Jpsi.SetLineStyle(5); hist_Jpsi.SetLineColor(ROOT.kBlack)
@@ -385,6 +381,8 @@ def fit(config):
         legend_comp2 = ROOT.TLegend(0.64, 0.59, 0.99, 0.89)
         legend_comp2.SetBorderSize(0)
         legend_comp2.SetFillStyle(0)
+        legend_comp2.AddEntry(hist_sigD0_sigJpsi, "", "") #dummy entries to get the right position
+        legend_comp2.AddEntry(hist_sigD0_sigJpsi, "", "")
         legend_comp2.AddEntry(hist_sigD0_sigJpsi, "", "")
         legend_comp2.AddEntry(hist_bkgD0_sigJpsi, "", "")
         legend_comp2.AddEntry(hist_reflD0_sigJpsi, "", "")
@@ -410,18 +408,29 @@ def fit(config):
     latexTitle.SetTextSize(0.05)
     latexTitle.SetNDC()
     latexTitle.SetTextFont(42)
+
+    latexRap = ROOT.TLatex()
+    latexRap.SetTextSize(0.03)
+    latexRap.SetNDC()
+    latexRap.SetTextFont(42)
+
     
     
     canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 800)
     mJpsiframe.GetYaxis().SetRangeUser(0, 0.08*sampleToFit.numEntries())
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.Draw()
-    legend_tot.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.84, "ALICE performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
+        
     canvasFitJpsi.Update()
     canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit.pdf')
     
@@ -435,12 +444,17 @@ def fit(config):
     mD0frame.GetYaxis().SetLabelSize(0.03)
     mD0frame.GetYaxis().SetRangeUser(0, 0.05*sampleToFit.numEntries())
     mD0frame.Draw()
-    legend_tot.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.84, "ALICE performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
+
     canvasFitD0.Update()
     canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_d0_fit.pdf')
 
@@ -492,6 +506,11 @@ def fit(config):
     canvasFitHist3D.SetTitle(" ")
     latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.72, 0.88, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.72, 0.84, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.72, 0.84, "|#eta_{ee}| < 0.9")
 
     canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D.pdf')
     
