@@ -504,14 +504,18 @@ def fit(config):
     modelHist.Draw("SURF SAME")
     canvasFitHist3D.Update()
     canvasFitHist3D.SetTitle(" ")
+    canvasFitHist3D.SetPhi(20)
+    canvasFitHist3D.SetTheta(30)
+    
     latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.72, 0.88, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.73, 0.9, "|#eta_{#pi#it{K}}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.72, 0.84, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.73, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
-        latexRap.DrawLatex(0.72, 0.84, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.73, 0.86, "|#eta_{ee}| < 0.9")
 
+    canvasFitHist3D.Update()
     canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D.pdf')
     
     fitResult.Print()
