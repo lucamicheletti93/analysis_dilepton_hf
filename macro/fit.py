@@ -32,7 +32,7 @@ def main():
         prefilter(inputCfg)
 
     if args.do_plot_results:
-        plot_results()
+        plot_results(inputCfg)
 
 def prefilter(config):
     """
@@ -86,7 +86,7 @@ def prefit():
     dataHistD0.plotOn(mD0frame)
     modelD0.plotOn(mD0frame)
     modelD0.plotOn(mD0frame, Name={"Sig"}, Components={cbPdfD0}, LineStyle="--", LineColor=ROOT.kRed+1)
-    modelD0.plotOn(mD0frame, Name={"Bkg"}, Components={chebyPdfD0}, LineStyle="--", LineColor=ROOT.kAzure+4)
+    modelD0.plotOn(mD0frame, Name={"Bkg"}, Components={chebyPdfD0}, LineStyle="--", LineColor=ROOT.kAzure+1)
 
     # Pre-fit J/psi
     # Load data for pre-fit for J/psi - Taken from AnalysisResults
@@ -117,7 +117,7 @@ def prefit():
     dataHistJpsi.plotOn(mJpsiframe)
     modelJpsi.plotOn(mJpsiframe)
     modelJpsi.plotOn(mJpsiframe, Name={"Sig"}, Components={cbPdfJpsi}, LineStyle="--", LineColor=ROOT.kRed+1)
-    modelJpsi.plotOn(mJpsiframe, Name={"Bkg"}, Components={chebyPdfJpsi}, LineStyle="--", LineColor=ROOT.kAzure+4)
+    modelJpsi.plotOn(mJpsiframe, Name={"Bkg"}, Components={chebyPdfJpsi}, LineStyle="--", LineColor=ROOT.kAzure+1)
 
     canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 600)
     canvasFitD0.SetTickx(1)
@@ -326,53 +326,111 @@ def fit(config):
     modelHist.SetLineColor(ROOT.kRed)
     modelHist.SetLineWidth(1)
 
-    mJpsiframe = mJpsi.frame(Title="J/#psi")
-    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Binning(50))
-    model.plotOn(mJpsiframe)
-    model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
-    model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
-    model.plotOn(mJpsiframe, Name={"bkgJpsi_sigD0Pdf"}, Components={bkgJpsi_sigD0Pdf}, LineStyle="--", LineColor=ROOT.kGreen+1)
-    model.plotOn(mJpsiframe, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kMagenta)
-    model.plotOn(mJpsiframe, Name={"reflD0_sigJpsiPdf"}, Components={reflD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kYellow+2)
-    model.plotOn(mJpsiframe, Name={"reflD0_bkgJpsiPdf"}, Components={reflD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kGray+1)
+    mJpsiframe = mJpsi.frame(Title=" ")
+    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(50))
+    model.plotOn(mJpsiframe, Name={"model"})
+    model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
+    model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kAzure+1)
+    model.plotOn(mJpsiframe, Name={"bkgJpsi_sigD0Pdf"}, Components={bkgJpsi_sigD0Pdf}, LineStyle=2, LineColor=ROOT.kGreen+1)
+    model.plotOn(mJpsiframe, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle=2, LineColor=ROOT.kMagenta+1)
+    model.plotOn(mJpsiframe, Name={"reflD0_sigJpsiPdf"}, Components={reflD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kYellow+2)
+    model.plotOn(mJpsiframe, Name={"reflD0_bkgJpsiPdf"}, Components={reflD0_bkgJpsiPdf}, LineStyle=2, LineColor=ROOT.kGray+1)
     if config["fit"]["add_psi2s"]:
-        model.plotOn(mJpsiframe, Name={"sigD0_sigPsi2SPdf"}, Components={sigD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
-        model.plotOn(mJpsiframe, Name={"bkgD0_sigPsi2SPdf"}, Components={bkgD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kAzure+4)
-        model.plotOn(mJpsiframe, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kYellow+2)
+        model.plotOn(mJpsiframe, Name={"sigD0_sigPsi2SPdf"}, Components={sigD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kRed+1)
+        model.plotOn(mJpsiframe, Name={"bkgD0_sigPsi2SPdf"}, Components={bkgD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kAzure+1)
+        model.plotOn(mJpsiframe, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kYellow+2)
 
-    mD0frame = mD0.frame(Title="D-meson")
-    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Binning(50))
-    model.plotOn(mD0frame)
-    model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kRed+1)
-    model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kAzure+4)
-    model.plotOn(mD0frame, Name={"bkgJpsi_sigD0Pdf"}, Components={bkgJpsi_sigD0Pdf}, LineStyle="--", LineColor=ROOT.kGreen+1)
-    model.plotOn(mD0frame, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kMagenta)
-    model.plotOn(mD0frame, Name={"reflD0_sigJpsiPdf"}, Components={reflD0_sigJpsiPdf}, LineStyle="--", LineColor=ROOT.kYellow+2)
-    model.plotOn(mD0frame, Name={"reflD0_bkgJpsiPdf"}, Components={reflD0_bkgJpsiPdf}, LineStyle="--", LineColor=ROOT.kGray+1)
+    mD0frame = mD0.frame(Title=" ")
+    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(50))
+    model.plotOn(mD0frame, Name={"model"})
+    model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
+    model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kAzure+1)
+    model.plotOn(mD0frame, Name={"bkgJpsi_sigD0Pdf"}, Components={bkgJpsi_sigD0Pdf}, LineStyle=2, LineColor=ROOT.kGreen+1)
+    model.plotOn(mD0frame, Name={"bkgD0_bkgJpsiPdf"}, Components={bkgD0_bkgJpsiPdf}, LineStyle=2, LineColor=ROOT.kMagenta+1)
+    model.plotOn(mD0frame, Name={"reflD0_sigJpsiPdf"}, Components={reflD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kYellow+2)
+    model.plotOn(mD0frame, Name={"reflD0_bkgJpsiPdf"}, Components={reflD0_bkgJpsiPdf}, LineStyle=2, LineColor=ROOT.kGray+1)
     if config["fit"]["add_psi2s"]:
-        model.plotOn(mD0frame, Name={"sigD0_sigPsi2SPdf"}, Components={sigD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
-        model.plotOn(mD0frame, Name={"bkgD0_sigPsi2SPdf"}, Components={bkgD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kAzure+4)
-        model.plotOn(mD0frame, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=5, LineColor=ROOT.kYellow+2)
+        model.plotOn(mD0frame, Name={"sigD0_sigPsi2SPdf"}, Components={sigD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kRed+1)
+        model.plotOn(mD0frame, Name={"bkgD0_sigPsi2SPdf"}, Components={bkgD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kAzure+1)
+        model.plotOn(mD0frame, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kYellow+2)
+    
+    legend_comp = ROOT.TLegend(0.59, 0.59, 0.89, 0.89)
+    legend_comp.SetBorderSize(0)
+    legend_comp.SetFillStyle(0)
+    legend_comp.AddEntry(mD0frame.findObject("data"), "data", "PE")
+    legend_comp.AddEntry(mD0frame.findObject("model"), "total fit", "L")
 
-    legend = ROOT.TLegend(0.59, 0.59, 0.89, 0.89)
-    legend.SetBorderSize(0)
-    legend.SetFillStyle(0)
-    legend.AddEntry(mJpsiframe.findObject("sigD0_sigJpsiPdf"), "sig. J/#psi - sig. D0", "L")
-    legend.AddEntry(mJpsiframe.findObject("bkgD0_sigJpsiPdf"), "sig. J/#psi - bkg. D0", "L")
-    legend.AddEntry(mJpsiframe.findObject("reflD0_sigJpsiPdf"), "sig. J/#psi - refl. D0", "L")
-    legend.AddEntry(mJpsiframe.findObject("bkgJpsi_sigD0Pdf"), "bkg. #psi - sig. D0", "L")
-    legend.AddEntry(mJpsiframe.findObject("bkgD0_bkgJpsiPdf"), "bkg. #psi - bkg. D0", "L")
-    legend.AddEntry(mJpsiframe.findObject("reflD0_bkgJpsiPdf"), "bkg. #psi - refl. D0", "L")
     if config["fit"]["add_psi2s"]:
-        legend.AddEntry(mJpsiframe.findObject("sigD0_sigPsi2SPdf"), "sig. #psi(2S) - sig. D0", "L")
-        legend.AddEntry(mJpsiframe.findObject("bkgD0_sigPsi2SPdf"), "sig. #psi(2S) - bkg. D0", "L")
-        legend.AddEntry(mJpsiframe.findObject("reflD0_sigPsi2SPdf"), "sig. #psi(2S) - refl. D0", "L")
-    legend.Draw()
+        hist_Jpsi = ROOT.TH1F("hist_Jpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_Jpsi.SetLineWidth(3); hist_Jpsi.SetLineStyle(5); hist_Jpsi.SetLineColor(ROOT.kBlack)
+        hist_psi2s = ROOT.TH1F("hist_psi2s","", 100, minFitRangeD0, maxFitRangeD0); hist_psi2s.SetLineWidth(3); hist_psi2s.SetLineStyle(3); hist_psi2s.SetLineColor(ROOT.kBlack)
+        hist_sigD0_sigJpsi = ROOT.TH1F("hist_sigD0_sigJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_sigD0_sigJpsi.SetLineWidth(3); hist_sigD0_sigJpsi.SetLineStyle(1); hist_sigD0_sigJpsi.SetLineColor(ROOT.kRed+1)
+        hist_bkgD0_sigJpsi = ROOT.TH1F("hist_bkgD0_sigJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_bkgD0_sigJpsi.SetLineWidth(3); hist_bkgD0_sigJpsi.SetLineStyle(1); hist_bkgD0_sigJpsi.SetLineColor(ROOT.kAzure+1)
+        hist_bkgJpsi_sigD0 = ROOT.TH1F("hist_bkgJpsi_sigD0","", 100, minFitRangeD0, maxFitRangeD0); hist_bkgJpsi_sigD0.SetLineWidth(3); hist_bkgJpsi_sigD0.SetLineStyle(2); hist_bkgJpsi_sigD0.SetLineColor(ROOT.kGreen+1)
+        hist_bkgD0_bkgJpsi = ROOT.TH1F("hist_bkgD0_bkgJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_bkgD0_bkgJpsi.SetLineWidth(3); hist_bkgD0_bkgJpsi.SetLineStyle(2); hist_bkgD0_bkgJpsi.SetLineColor(ROOT.kMagenta+1)
+        hist_reflD0_sigJpsi = ROOT.TH1F("hist_reflD0_sigJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_reflD0_sigJpsi.SetLineWidth(3); hist_reflD0_sigJpsi.SetLineStyle(1); hist_reflD0_sigJpsi.SetLineColor(ROOT.kYellow+2)
+        hist_reflD0_bkgJpsi = ROOT.TH1F("hist_reflD0_bkgJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_reflD0_bkgJpsi.SetLineWidth(3); hist_reflD0_bkgJpsi.SetLineStyle(2); hist_reflD0_bkgJpsi.SetLineColor(ROOT.kGray+1)
+        legend_comp.AddEntry(hist_sigD0_sigJpsi, "sig. #psi - sig. D0", "L")
+        legend_comp.AddEntry(hist_bkgD0_sigJpsi, "sig. #psi - bkg. D0", "L")
+        legend_comp.AddEntry(hist_reflD0_sigJpsi, "sig. #psi - refl. D0", "L")
+        legend_comp.AddEntry(hist_Jpsi,"","")
+        legend_comp.AddEntry(hist_psi2s,"","")
+        legend_comp.AddEntry(hist_bkgJpsi_sigD0, "bkg. #psi - sig. D0", "L")
+        legend_comp.AddEntry(hist_bkgD0_bkgJpsi, "bkg. #psi - bkg. D0", "L")
+        legend_comp.AddEntry(hist_reflD0_bkgJpsi, "bkg. #psi - refl. D0", "L")
 
-    canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 600)
+        legend_comp2 = ROOT.TLegend(0.64, 0.59, 0.99, 0.89)
+        legend_comp2.SetBorderSize(0)
+        legend_comp2.SetFillStyle(0)
+        legend_comp2.AddEntry(hist_sigD0_sigJpsi, "", "") #dummy entries to get the right position
+        legend_comp2.AddEntry(hist_sigD0_sigJpsi, "", "")
+        legend_comp2.AddEntry(hist_sigD0_sigJpsi, "", "")
+        legend_comp2.AddEntry(hist_bkgD0_sigJpsi, "", "")
+        legend_comp2.AddEntry(hist_reflD0_sigJpsi, "", "")
+        legend_comp2.AddEntry(hist_Jpsi,"J/#psi","L")
+        legend_comp2.AddEntry(hist_psi2s,"#psi(2S)","L")
+        legend_comp2.AddEntry(hist_bkgJpsi_sigD0, "", "")
+        legend_comp2.AddEntry(hist_bkgD0_bkgJpsi, "", "")
+        legend_comp2.AddEntry(hist_reflD0_bkgJpsi, "", "")
+
+
+    else: #if the psi2s is not included just use the same for D0
+        legend_comp.AddEntry(mD0frame.findObject("sigD0_sigJpsiPdf"), "sig. J/#psi - sig. D0", "L")
+        legend_comp.AddEntry(mD0frame.findObject("bkgD0_sigJpsiPdf"), "sig. J/#psi - bkg. D0", "L")
+        legend_comp.AddEntry(mD0frame.findObject("reflD0_sigJpsiPdf"), "sig. J/#psi - refl. D0", "L")
+        legend_comp.AddEntry(mD0frame.findObject("bkgJpsi_sigD0Pdf"), "bkg. J/#psi - sig. D0", "L")
+        legend_comp.AddEntry(mD0frame.findObject("bkgD0_bkgJpsiPdf"), "bkg. J/#psi - bkg. D0", "L")
+        legend_comp.AddEntry(mD0frame.findObject("reflD0_bkgJpsiPdf"), "bkg. J/#psi - refl. D0", "L")
+
+    
+    #legend_comp.Draw()
+
+    latexTitle = ROOT.TLatex()
+    latexTitle.SetTextSize(0.05)
+    latexTitle.SetNDC()
+    latexTitle.SetTextFont(42)
+
+    latexRap = ROOT.TLatex()
+    latexRap.SetTextSize(0.03)
+    latexRap.SetNDC()
+    latexRap.SetTextFont(42)
+
+    
+    
+    canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 800)
+    mJpsiframe.GetYaxis().SetRangeUser(0, 0.08*sampleToFit.numEntries())
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.Draw()
-    legend.Draw()
+    legend_comp.Draw()
+    if config["fit"]["add_psi2s"]:
+        legend_comp2.Draw()
+    latexTitle.DrawLatex(0.15, 0.84, "ALICE performance")
+    latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
+        
     canvasFitJpsi.Update()
     canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit.pdf')
     
@@ -381,13 +439,29 @@ def fit(config):
     canvasFitJpsi.Update()
     canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit_logy.pdf')
 
-    canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 600)
+    canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 800)
     mD0frame.GetYaxis().SetTitleOffset(1.4)
+    mD0frame.GetYaxis().SetLabelSize(0.03)
+    mD0frame.GetYaxis().SetRangeUser(0, 0.05*sampleToFit.numEntries())
     mD0frame.Draw()
-    legend.Draw()
+    legend_comp.Draw()
+    if config["fit"]["add_psi2s"]:
+        legend_comp2.Draw()
+    latexTitle.DrawLatex(0.15, 0.84, "ALICE performance")
+    latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
+
     canvasFitD0.Update()
     canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_d0_fit.pdf')
 
+    canvasFitD0.SetLogy()
+    mD0frame.GetYaxis().SetRangeUser(1, sampleToFit.numEntries())
+    canvasFitD0.Update()
+    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_d0_fit_logy.pdf')
     #canvasFit = ROOT.TCanvas("canvasFit", "canvasFit", 1200, 600)
     #canvasFit.Divide(2, 1)
 
@@ -410,9 +484,13 @@ def fit(config):
     if config["fit"]["unbinned"]:
         sample.Draw("fMass : fMassD0 >> hist_fMass_fMassD0", f'fMass > {minFitRangeJpsi} && fMass < {maxFitRangeJpsi} && fMassD0 > {minFitRangeD0} && fMassD0 < {maxFitRangeD0}', "LEGO2")
         htemp = ROOT.gPad.GetPrimitive("hist_fMass_fMassD0")
+        htemp.SetTitle(" ")
         htemp.GetXaxis().SetTitleOffset(2.0)
+        htemp.GetXaxis().SetLabelSize(0.03)
         htemp.GetYaxis().SetTitleOffset(2.0)
+        htemp.GetYaxis().SetLabelSize(0.03)
         htemp.GetZaxis().SetTitleOffset(2.0)
+        htemp.GetZaxis().SetLabelSize(0.03)
         htemp.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
         htemp.GetYaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
         htemp.Rebin2D(2, 2)
@@ -424,6 +502,19 @@ def fit(config):
         sample.Draw("LEGO2")
     
     modelHist.Draw("SURF SAME")
+    canvasFitHist3D.Update()
+    canvasFitHist3D.SetTitle(" ")
+    canvasFitHist3D.SetPhi(20)
+    canvasFitHist3D.SetTheta(30)
+    
+    latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
+    latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.73, 0.9, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.73, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.73, 0.86, "|#eta_{ee}| < 0.9")
+
     canvasFitHist3D.Update()
     canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D.pdf')
     
@@ -562,11 +653,11 @@ def upper_limit():
         fculLine.Draw("same")
         dataCanvas.Update()
 
-    dataCanvas.SaveAs("figures/upper_limit.pdf")
+    dataCanvas.SaveAs(f'{config["output"]["figures"]}/upper_limit.pdf')
     input()
     exit()
 
-def plot_results():
+def plot_results(config):
     LoadStyle()
 
     letexTitle = ROOT.TLatex()
@@ -574,7 +665,7 @@ def plot_results():
     letexTitle.SetNDC()
     letexTitle.SetTextFont(42)
 
-    fIn = ROOT.TFile("outputs/myTest.root", "READ")
+    fIn = ROOT.TFile(f'{config["output"]["directory"]}/myTest.root', "READ")
     canvasInJpsi = fIn.Get("canvasFitJpsi")
     canvasInD0 = fIn.Get("canvasFitD0")
     listOfPrimitivesJpsi = canvasInJpsi.GetListOfPrimitives()
@@ -604,11 +695,11 @@ def plot_results():
     pdfJpsiB1B2 = listOfPrimitivesJpsi.At(7)
 
     pdfJpsiS1S2.SetLineColor(ROOT.kRed+1)
-    pdfJpsiS1B2.SetLineColor(ROOT.kAzure+4)
+    pdfJpsiS1B2.SetLineColor(ROOT.kAzure+1)
     pdfJpsiB1S2.SetLineColor(ROOT.kGreen+1)
     pdfJpsiB1B2.SetLineColor(ROOT.kOrange+7)
 
-    canvasOutJpsi = TCanvas("canvasOutJpsi", "canvasOutJpsi", 600, 600)
+    canvasOutJpsi = ROOT.TCanvas("canvasOutJpsi", "canvasOutJpsi", 600, 600)
     canvasOutJpsi.SetTickx(1)
     canvasOutJpsi.SetTicky(1)
     frameJpsi.Draw()
@@ -619,14 +710,14 @@ def plot_results():
     pdfJpsiB1S2.Draw("SAME")
     pdfJpsiB1B2.Draw("SAME")
 
-    legend1 = TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
+    legend1 = ROOT.TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
     SetLegend(legend1)
     legend1.SetTextSize(0.045)
     legend1.AddEntry(histDataJpsi, "Data", "EP")
     legend1.AddEntry(pdfJpsi, "Total fit", "L")
     legend1.Draw()
 
-    legend2 = TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
+    legend2 = ROOT.TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
     SetLegend(legend2)
     legend2.SetTextSize(0.045)
     legend2.AddEntry(pdfJpsiS1S2, "J/#psi + D^{0}", "L")
@@ -638,7 +729,7 @@ def plot_results():
     letexTitle.DrawLatex(0.20, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV, 6#times 10^{11} events")
 
     canvasOutJpsi.Update()
-    canvasOutJpsi.SaveAs("figures/fit_jpsi_projection.pdf")
+    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_jpsi_projection.pdf')
 
     frameD0 = listOfPrimitivesD0.At(1)
     frameD0.SetTitle(" ")
@@ -664,11 +755,11 @@ def plot_results():
     pdfD0B1B2 = listOfPrimitivesD0.At(7)
 
     pdfD0S1S2.SetLineColor(ROOT.kRed+1)
-    pdfD0S1B2.SetLineColor(ROOT.kAzure+4)
+    pdfD0S1B2.SetLineColor(ROOT.kAzure+1)
     pdfD0B1S2.SetLineColor(ROOT.kGreen+1)
     pdfD0B1B2.SetLineColor(ROOT.kOrange+7)
 
-    canvasOutD0 = TCanvas("canvasOutD0", "canvasOutD0", 600, 600)
+    canvasOutD0 = ROOT.TCanvas("canvasOutD0", "canvasOutD0", 600, 600)
     canvasOutD0.SetTickx(1)
     canvasOutD0.SetTicky(1)
     frameD0.Draw()
@@ -679,14 +770,14 @@ def plot_results():
     pdfD0B1S2.Draw("SAME")
     pdfD0B1B2.Draw("SAME")
 
-    legend1 = TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
+    legend1 = ROOT.TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
     SetLegend(legend1)
     legend1.SetTextSize(0.045)
     legend1.AddEntry(histDataD0, "Data", "EP")
     legend1.AddEntry(pdfD0, "Total fit", "L")
     legend1.Draw()
 
-    legend2 = TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
+    legend2 = ROOT.TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
     SetLegend(legend2)
     legend2.SetTextSize(0.045)
     legend2.AddEntry(pdfD0S1S2, "J/#psi + D^{0}", "L")
@@ -698,7 +789,7 @@ def plot_results():
     letexTitle.DrawLatex(0.20, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV, 6#times 10^{11} events")
 
     canvasOutD0.Update()
-    canvasOutD0.SaveAs("figures/fit_d0_projection.pdf")
+    canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_d0_projection.pdf')
 
     input()
 
