@@ -1,0 +1,113 @@
+---
+inputs:
+  #data: data/histograms.root
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged_train_144726_BDT_modular_cut.root
+  #data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC23_pass4_BDT_modular_cut.root # file name for 2023
+  #data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC24_pass1_BDT_modular_cut.root # file name for 2024
+  #tree: treeJpsiD0
+  #tree: "DF_2234646036382668/O2rtdilptdmesall"
+  #tree: "DF_2303125544446624/O2rtdilptdmesall" # tree name for 2023
+  #tree: "DF_2363808317917888/O2rtdilptdmesall" # tree name for 2024
+  
+  data: /lustre/alice/users/plu/work2/runAnalysis/DQ/Jpsi-D0Correlation/outputTableFiles/HF_LHC24_pass1_skimmed_2P3PDstar_TriggerDiElectronDMuon_Train252237_And_HF_LHC23_pass4_skimmed_2P3PDstar_TriggerDiElectronDiMuon_Train252226/outputTreeJpsiD0_BDT_modular_cut.root
+  hist: hSparseJPsiDmeson_proj_3_2
+  tree: treeJpsiD0
+
+reflections:
+  data: ./reflections_D0_cuts.root
+  refl: hist_refl_smooth
+  signal: hist_signal
+
+prefilter:
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged.root
+  #tree: treeJpsiD0
+  #data: /Users/lucamicheletti/cernbox/Jpsi_D0_analysis/train_137585/tree_jpsi_d0_reduced_data_merged_train_144726.root
+  #tree: "DF_2234646036382668/O2rtdilptdmesall"
+  #data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC24_pass1.root # file name for 2023
+  #tree: "DF_2303125544446624/O2rtdilptdmesall" # tree name for 2023
+  #data: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/performance_plot/reducedAO2D_LHC24_pass1.root # file name for 2024
+  #tree: "DF_2363808317917888/O2rtdilptdmesall" # tree name for 2024
+  
+  data: /lustre/alice/users/plu/work2/runAnalysis/DQ/Jpsi-D0Correlation/outputTableFiles/HF_LHC24_pass1_skimmed_2P3PDstar_TriggerDiElectronDMuon_Train252237_And_HF_LHC23_pass4_skimmed_2P3PDstar_TriggerDiElectronDiMuon_Train252226/outputTreeJpsiD0.root
+  tree: treeJpsiD0
+  cuts: "(fPtD0 >= 0.  && fPtD0 < 1.  && fBdtBkg < 0.050) ||
+         (fPtD0 >= 1.  && fPtD0 < 2.  && fBdtBkg < 0.050) ||
+         (fPtD0 >= 2.  && fPtD0 < 3.  && fBdtBkg < 0.100) ||
+         (fPtD0 >= 3.  && fPtD0 < 4.  && fBdtBkg < 0.100) ||
+         (fPtD0 >= 4.  && fPtD0 < 6.  && fBdtBkg < 0.200) ||
+         (fPtD0 >= 6.  && fPtD0 < 8.  && fBdtBkg < 0.300) ||
+         (fPtD0 >= 8.  && fPtD0 < 10. && fBdtBkg < 0.300) ||
+         (fPtD0 >= 10. && fPtD0 < 20. && fBdtBkg < 0.500) ||
+         (fPtD0 >= 20. && fPtD0 < 50. && fBdtBkg < 0.500)"
+  suffix: _BDT_modular_cut
+
+
+fit:
+  toy_mc: False
+  unbinned: True
+  min_fit_range_d0: 1.70
+  max_fit_range_d0: 2.05
+  min_fit_range_jpsi: 2.00
+  max_fit_range_jpsi: 4.00
+  JpsiChannel: "Jpsi2ee"
+  add_psi2s: False ## if true, the psi2s is added to the fit
+
+  norm_par_sig_name: [nJPsiD0, nPsi2SD0, nBkgJPsi, nBkgPsi2S, nBkgD0, nBkgBkg]
+  norm_par_sig_val: [5000, 90, 1000, 100, 2000, 10000]
+  norm_par_sig_lw_lim: [50, 10, 10, 10, 20, 100]
+  norm_par_sig_up_lim: [500000, 200, 100000, 700, 200000, 1000000]
+  norm_par_sig_is_const: [False, False, False, False, False, False]
+
+  cb_par_jpsi_name: [meanJpsi, sigmaJpsi, alphaJpsi, nJpsi]
+  cb_par_jpsi_val: [3.0555e+00, 6.0000e-02, 5.4314e-01, 5.7487e-01]
+  cb_par_jpsi_lw_lim: [2.9000e+00, 5.0000e-02, 5.4314e-01, 5.7487e-01]
+  cb_par_jpsi_up_lim: [3.2000e+00, 7.0000e-02, 5.4314e-01, 5.7487e-01]
+  cb_par_jpsi_is_const: [False, False, True, True]
+
+  cb_par_psi2s_name: [meanPsi2s, sigmaPsi2s, alphaPsi2s, nPsi2s]
+  cb_par_psi2s_val: [3.68609e+00, 6.0000e-02, 5.4314e-01, 5.7487e-01]
+  cb_par_psi2s_lw_lim: [3.4000e+00, 5.0000e-02, 5.4314e-01, 5.7487e-01]
+  cb_par_psi2s_up_lim: [3.8000e+00, 7.0000e-02, 5.4314e-01, 5.7487e-01]
+  cb_par_psi2s_is_const: [False, False, True, True]
+
+  cheby_par_jpsi_name: [cheb_coeff_jpsi_0, cheb_coeff_jpsi_1, cheb_coeff_jpsi_2]
+  cheby_par_jpsi_val: [-3.2203e-01, -1.1782e-01, 3.4540e-02]
+  cheby_par_jpsi_lw_lim: [-10, -10, -10]
+  cheby_par_jpsi_up_lim: [10, 10, 10]
+  cheby_par_jpsi_is_const: [False, False, False]
+
+  cb_par_d0_name: [meanD0, sigmaD0, alphaD0, nD0]
+  cb_par_d0_val: [1.8592e+00, 2.1980e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_lw_lim: [1.7592e+00, 1.0e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_up_lim: [1.9592e+00, 3.0e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_is_const: [False, False, True, True]
+
+  cheby_par_d0_name: [cheb_coeff_d0_0, cheb_coeff_d0_1, cheb_coeff_d0_2]
+  cheby_par_d0_val: [-3.8663e-01, 5.8992e-03, 3.4230e-04]
+  cheby_par_d0_lw_lim: [-10, 0, 0]
+  cheby_par_d0_up_lim: [10, 1, 1]
+  cheby_par_d0_is_const: [False, False, False]
+
+plot_results:
+  jpsiFrame:
+    x_title: "#it{m}_{e^{+}e^{-}} (GeV/#it{c}^{2})"
+    y_title: ## if you want to use the default title, just leave it empty
+    x_title_offset: 1.1
+    y_title_offset: 2.1
+    x_range: [2.0, 4.0]
+    y_range: [0.1, 1.e+4]
+    y_range_log: [1.1, 5.e+5]
+    y_title_offset_log: 1.5
+  d0Frame:
+    x_title: "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})"
+    y_title: ## if you want to use the default title, just leave it empty
+    x_title_offset: 1.1
+    y_title_offset: 2.1
+    x_range: [1.7, 2.05]
+    y_range: [0.1, 8500]
+
+
+output:
+  directory: outputs_skimming
+  figures: figures_skimming

@@ -26,7 +26,7 @@ def main():
         fit(inputCfg)
 
     if args.do_upper_limit:
-        upper_limit()
+        upper_limit(inputCfg)
 
     if args.do_prefilter:
         prefilter(inputCfg)
@@ -52,10 +52,10 @@ def prefit():
     LoadStyle()
     ROOT.gStyle.SetPalette(ROOT.kBird)
 
-    letexTitle = ROOT.TLatex()
-    letexTitle.SetTextSize(0.040)
-    letexTitle.SetNDC()
-    letexTitle.SetTextFont(42)
+    latexTitle = ROOT.TLatex()
+    latexTitle.SetTextSize(0.040)
+    latexTitle.SetNDC()
+    latexTitle.SetTextFont(42)
 
     # Variables
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.76, 2.00)
@@ -125,9 +125,9 @@ def prefit():
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.Draw()
 
-    letexTitle.DrawLatex(0.65, 0.74, "#it{N}_{D0} = %1.0f #pm %1.0f" % (nSigD0.getVal(), nSigD0.getError()))
-    letexTitle.DrawLatex(0.65, 0.68, "#it{#mu}_{D0} = %4.3f #pm %4.3f" % (meanD0.getVal(), meanD0.getError()))
-    letexTitle.DrawLatex(0.65, 0.62, "#it{#sigma}_{D0} = %4.3f #pm %4.3f" % (sigmaD0.getVal(), sigmaD0.getError()))
+    latexTitle.DrawLatex(0.65, 0.74, "#it{N}_{D0} = %1.0f #pm %1.0f" % (nSigD0.getVal(), nSigD0.getError()))
+    latexTitle.DrawLatex(0.65, 0.68, "#it{#mu}_{D0} = %4.3f #pm %4.3f" % (meanD0.getVal(), meanD0.getError()))
+    latexTitle.DrawLatex(0.65, 0.62, "#it{#sigma}_{D0} = %4.3f #pm %4.3f" % (sigmaD0.getVal(), sigmaD0.getError()))
     
     canvasFitD0.Update()
 
@@ -137,9 +137,9 @@ def prefit():
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.Draw()
 
-    letexTitle.DrawLatex(0.65, 0.74, "#it{N}_{J/#psi} = %1.0f #pm %1.0f" % (nSigJpsi.getVal(), nSigJpsi.getError()))
-    letexTitle.DrawLatex(0.65, 0.68, "#it{#mu}_{J/#psi} = %4.3f #pm %4.3f" % (meanJpsi.getVal(), meanJpsi.getError()))
-    letexTitle.DrawLatex(0.65, 0.62, "#it{#sigma}_{J/#psi} = %4.3f #pm %4.3f" % (sigmaJpsi.getVal(), sigmaJpsi.getError()))
+    latexTitle.DrawLatex(0.65, 0.74, "#it{N}_{J/#psi} = %1.0f #pm %1.0f" % (nSigJpsi.getVal(), nSigJpsi.getError()))
+    latexTitle.DrawLatex(0.65, 0.68, "#it{#mu}_{J/#psi} = %4.3f #pm %4.3f" % (meanJpsi.getVal(), meanJpsi.getError()))
+    latexTitle.DrawLatex(0.65, 0.62, "#it{#sigma}_{J/#psi} = %4.3f #pm %4.3f" % (sigmaJpsi.getVal(), sigmaJpsi.getError()))
     
     canvasFitJpsi.Update()
 
@@ -530,7 +530,7 @@ def fit(config):
     input()
     exit()
 
-def upper_limit():
+def upper_limit(config):
     toy_mc = False
     # Variables
     mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
@@ -660,29 +660,38 @@ def upper_limit():
 def plot_results(config):
     LoadStyle()
 
-    letexTitle = ROOT.TLatex()
-    letexTitle.SetTextSize(0.05)
-    letexTitle.SetNDC()
-    letexTitle.SetTextFont(42)
+    latexTitle = ROOT.TLatex()
+    latexTitle.SetTextSize(0.05)
+    latexTitle.SetNDC()
+    latexTitle.SetTextFont(42)
+    
+    latexRap = ROOT.TLatex()
+    latexRap.SetTextSize(0.03)
+    latexRap.SetNDC()
+    latexRap.SetTextFont(42)
 
     fIn = ROOT.TFile(f'{config["output"]["directory"]}/myTest.root', "READ")
     canvasInJpsi = fIn.Get("canvasFitJpsi")
     canvasInD0 = fIn.Get("canvasFitD0")
+    canvasIn3D = fIn.Get("canvasFitHist3D")
     listOfPrimitivesJpsi = canvasInJpsi.GetListOfPrimitives()
     listOfPrimitivesD0 = canvasInD0.GetListOfPrimitives()
-
+    listOfPrimitives3D = canvasIn3D.GetListOfPrimitives()
+    
+    ## plot Jpsi results
     frameJpsi = listOfPrimitivesJpsi.At(1)
     frameJpsi.SetTitle(" ")
-    frameJpsi.GetXaxis().SetRangeUser(2.55, 4.00)
-    frameJpsi.GetXaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
-    frameJpsi.GetXaxis().SetTitleOffset(1.1)
-    frameJpsi.GetXaxis().SetTitleSize(0.05)
-    frameJpsi.GetXaxis().SetLabelSize(0.045)
-    frameJpsi.GetYaxis().SetRangeUser(0, 800)
-    frameJpsi.GetYaxis().SetTitle("Counts")
-    frameJpsi.GetYaxis().SetTitleOffset(1.3)
-    frameJpsi.GetYaxis().SetTitleSize(0.05)
-    frameJpsi.GetYaxis().SetLabelSize(0.045)
+    frameJpsi.GetXaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["x_range"][0], config["plot_results"]["jpsiFrame"]["x_range"][1])
+    frameJpsi.GetXaxis().SetTitle(config["plot_results"]["jpsiFrame"]["x_title"])
+    frameJpsi.GetXaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["x_title_offset"])
+    # frameJpsi.GetXaxis().SetTitleSize(0.05)
+    # frameJpsi.GetXaxis().SetLabelSize(0.045)
+    frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    if config["plot_results"]["jpsiFrame"]["y_title"]:
+        frameJpsi.GetYaxis().SetTitle(config["plot_results"]["jpsiFrame"]["y_title"])
+    frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset"])
+    # frameJpsi.GetYaxis().SetTitleSize(0.05)
+    # frameJpsi.GetYaxis().SetLabelSize(0.045)
 
     # Histograms
     histDataJpsi = listOfPrimitivesJpsi.At(2)
@@ -693,56 +702,93 @@ def plot_results(config):
     pdfJpsiS1B2 = listOfPrimitivesJpsi.At(5)
     pdfJpsiB1S2 = listOfPrimitivesJpsi.At(6)
     pdfJpsiB1B2 = listOfPrimitivesJpsi.At(7)
+    pdfJpsiS1F2 = listOfPrimitivesJpsi.At(8)
+    pdfJpsiB1F2 = listOfPrimitivesJpsi.At(9)
+    if config["fit"]["add_psi2s"]:
+        pdfJpsiS2S3 = listOfPrimitivesJpsi.At(10)
+        pdfJpsiB2S3 = listOfPrimitivesJpsi.At(11)
+        pdfJpsiF2S3 = listOfPrimitivesJpsi.At(12)
 
-    pdfJpsiS1S2.SetLineColor(ROOT.kRed+1)
-    pdfJpsiS1B2.SetLineColor(ROOT.kAzure+1)
-    pdfJpsiB1S2.SetLineColor(ROOT.kGreen+1)
-    pdfJpsiB1B2.SetLineColor(ROOT.kOrange+7)
+    # pdfJpsiS1S2.SetLineColor(ROOT.kRed+1)
+    # pdfJpsiS1B2.SetLineColor(ROOT.kAzure+1)
+    # pdfJpsiB1S2.SetLineColor(ROOT.kGreen+1)
+    # pdfJpsiB1B2.SetLineColor(ROOT.kOrange+7)
+    pdfJpsiS1S2.SetLineStyle(5)
+    pdfJpsiS1B2.SetLineStyle(5)
+    pdfJpsiB1S2.SetLineStyle(5)
+    pdfJpsiB1B2.SetLineStyle(5)
+    pdfJpsiS1F2.SetLineStyle(5)
+    pdfJpsiB1F2.SetLineStyle(5)
+    if config["fit"]["add_psi2s"]:
+        pdfJpsiS2S3.SetLineStyle(5)
+        pdfJpsiB2S3.SetLineStyle(5)
+        pdfJpsiF2S3.SetLineStyle(5)
 
-    canvasOutJpsi = ROOT.TCanvas("canvasOutJpsi", "canvasOutJpsi", 600, 600)
+    canvasOutJpsi = ROOT.TCanvas("canvasOutJpsi", "canvasOutJpsi", 800, 800)
     canvasOutJpsi.SetTickx(1)
     canvasOutJpsi.SetTicky(1)
-    frameJpsi.Draw()
+    frameJpsi.Draw("AXIS")
     histDataJpsi.Draw("EP SAME")
     pdfJpsi.Draw("SAME")
     pdfJpsiS1S2.Draw("SAME")
     pdfJpsiS1B2.Draw("SAME")
     pdfJpsiB1S2.Draw("SAME")
     pdfJpsiB1B2.Draw("SAME")
+    pdfJpsiS1F2.Draw("SAME")
+    pdfJpsiB1F2.Draw("SAME")
+    if config["fit"]["add_psi2s"]:
+        pdfJpsiS2S3.Draw("SAME")
+        pdfJpsiB2S3.Draw("SAME")
+        pdfJpsiF2S3.Draw("SAME")
 
-    legend1 = ROOT.TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
+    legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.94, " ", "brNDC")
     SetLegend(legend1)
-    legend1.SetTextSize(0.045)
-    legend1.AddEntry(histDataJpsi, "Data", "EP")
-    legend1.AddEntry(pdfJpsi, "Total fit", "L")
+    legend1.SetTextSize(0.030)
+    legend1.AddEntry(histDataJpsi, "data", "EP")
+    legend1.AddEntry(pdfJpsi, "total fit", "L")
+    legend1.AddEntry(pdfJpsiS1S2, "sig. J/#psi - sig. D^{0}", "L")
+    legend1.AddEntry(pdfJpsiS1B2, "sig. J/#psi - bkg. D^{0}", "L")
+    legend1.AddEntry(pdfJpsiS1F2, "sig. J/#psi - refl. D^{0}", "L")
+    legend1.AddEntry(pdfJpsiB1S2, "bkg. J/#psi - sig. D^{0}", "L")
+    legend1.AddEntry(pdfJpsiB1B2, "bkg. J/#psi - bkg. D^{0}", "L")
+    legend1.AddEntry(pdfJpsiB1F2, "bkg. J/#psi - refl. D^{0}", "L")
+    if config["fit"]["add_psi2s"]:
+        legend1.AddEntry(pdfJpsiS2S3, "sig. #psi(2S) - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB2S3, "sig. #psi(2S) - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiF2S3, "sig. #psi(2S) - refl. D^{0}", "L")
     legend1.Draw()
 
-    legend2 = ROOT.TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
-    SetLegend(legend2)
-    legend2.SetTextSize(0.045)
-    legend2.AddEntry(pdfJpsiS1S2, "J/#psi + D^{0}", "L")
-    legend2.AddEntry(pdfJpsiS1B2, "J/#psi + bkg", "L")
-    legend2.AddEntry(pdfJpsiB1S2, "Bkg + D^{0}", "L")
-    legend2.AddEntry(pdfJpsiB1B2, "Bkg + bkg", "L")
-    legend2.Draw()
-
-    letexTitle.DrawLatex(0.20, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV, 6#times 10^{11} events")
+    latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
+    latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.18, 0.79, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.18, 0.75, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
 
     canvasOutJpsi.Update()
     canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_jpsi_projection.pdf')
+    
+    canvasOutJpsi.SetLogy()
+    frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
+    frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset_log"])
+    canvasOutJpsi.Update()
+    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_jpsi_projection_logy.pdf')
 
+    ## plot D0 results
     frameD0 = listOfPrimitivesD0.At(1)
     frameD0.SetTitle(" ")
-    frameD0.GetXaxis().SetRangeUser(1.70, 2.05)
-    frameD0.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
-    frameD0.GetXaxis().SetTitleOffset(1.1)
-    frameD0.GetXaxis().SetTitleSize(0.05)
-    frameD0.GetXaxis().SetLabelSize(0.045)
-    frameD0.GetYaxis().SetRangeUser(0, 800)
-    frameD0.GetYaxis().SetTitle("Counts")
-    frameD0.GetYaxis().SetTitleOffset(1.3)
-    frameD0.GetYaxis().SetTitleSize(0.05)
-    frameD0.GetYaxis().SetLabelSize(0.045)
+    frameD0.GetXaxis().SetRangeUser(config["plot_results"]["d0Frame"]["x_range"][0], config["plot_results"]["d0Frame"]["x_range"][1])
+    frameD0.GetXaxis().SetTitle(config["plot_results"]["d0Frame"]["x_title"])
+    frameD0.GetXaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["x_title_offset"])
+    # frameD0.GetXaxis().SetTitleSize(0.05)
+    # frameD0.GetXaxis().SetLabelSize(0.045)
+    frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
+    if config["plot_results"]["d0Frame"]["y_title"]:
+        frameD0.GetYaxis().SetTitle(config["plot_results"]["d0Frame"]["y_title"])
+    frameD0.GetYaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["y_title_offset"])
+    # frameD0.GetYaxis().SetTitleSize(0.05)
+    # frameD0.GetYaxis().SetLabelSize(0.045)
 
     # Histograms
     histDataD0 = listOfPrimitivesD0.At(2)
@@ -753,44 +799,101 @@ def plot_results(config):
     pdfD0S1B2 = listOfPrimitivesD0.At(5)
     pdfD0B1S2 = listOfPrimitivesD0.At(6)
     pdfD0B1B2 = listOfPrimitivesD0.At(7)
+    pdfD0S1F2 = listOfPrimitivesD0.At(8)
+    pdfD0B1F2 = listOfPrimitivesD0.At(9)
+    if config["fit"]["add_psi2s"]:
+        pdfD0S2S3 = listOfPrimitivesD0.At(10)
+        pdfD0B2S3 = listOfPrimitivesD0.At(11)
+        pdfD0F2S3 = listOfPrimitivesD0.At(12)
 
-    pdfD0S1S2.SetLineColor(ROOT.kRed+1)
-    pdfD0S1B2.SetLineColor(ROOT.kAzure+1)
-    pdfD0B1S2.SetLineColor(ROOT.kGreen+1)
-    pdfD0B1B2.SetLineColor(ROOT.kOrange+7)
+    # pdfD0S1S2.SetLineColor(ROOT.kRed+1)
+    # pdfD0S1B2.SetLineColor(ROOT.kAzure+1)
+    # pdfD0B1S2.SetLineColor(ROOT.kGreen+1)
+    # pdfD0B1B2.SetLineColor(ROOT.kOrange+7)
+    
+    pdfD0S1S2.SetLineStyle(5)
+    pdfD0S1B2.SetLineStyle(5)
+    pdfD0B1S2.SetLineStyle(5)
+    pdfD0B1B2.SetLineStyle(5)
+    pdfD0S1F2.SetLineStyle(5)
+    pdfD0B1F2.SetLineStyle(5)
+    if config["fit"]["add_psi2s"]:
+        pdfD0S2S3.SetLineStyle(5)
+        pdfD0B2S3.SetLineStyle(5)
+        pdfD0F2S3.SetLineStyle(5)
 
-    canvasOutD0 = ROOT.TCanvas("canvasOutD0", "canvasOutD0", 600, 600)
+    canvasOutD0 = ROOT.TCanvas("canvasOutD0", "canvasOutD0", 800, 800)
     canvasOutD0.SetTickx(1)
     canvasOutD0.SetTicky(1)
-    frameD0.Draw()
+    frameD0.Draw("AXIS")
     histDataD0.Draw("EP SAME")
     pdfD0.Draw("SAME")
     pdfD0S1S2.Draw("SAME")
     pdfD0S1B2.Draw("SAME")
     pdfD0B1S2.Draw("SAME")
     pdfD0B1B2.Draw("SAME")
-
-    legend1 = ROOT.TLegend(0.20, 0.72, 0.55, 0.90, " ", "brNDC")
+    pdfD0S1F2.Draw("SAME")
+    pdfD0B1F2.Draw("SAME")
+    if config["fit"]["add_psi2s"]:
+        pdfD0S2S3.Draw("SAME")
+        pdfD0B2S3.Draw("SAME")
+        pdfD0F2S3.Draw("SAME")
+    
+    legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.94, " ", "brNDC")
     SetLegend(legend1)
-    legend1.SetTextSize(0.045)
-    legend1.AddEntry(histDataD0, "Data", "EP")
-    legend1.AddEntry(pdfD0, "Total fit", "L")
+    legend1.SetTextSize(0.030)
+    legend1.AddEntry(histDataD0, "data", "EP")
+    legend1.AddEntry(pdfD0, "total fit", "L")
+    legend1.AddEntry(pdfD0S1S2, "sig. J/#psi - sig. D^{0}", "L")
+    legend1.AddEntry(pdfD0S1B2, "sig. J/#psi - bkg. D^{0}", "L")
+    legend1.AddEntry(pdfD0S1F2, "sig. J/#psi - refl. D^{0}", "L")
+    legend1.AddEntry(pdfD0B1S2, "bkg. J/#psi - sig. D^{0}", "L")
+    legend1.AddEntry(pdfD0B1B2, "bkg. J/#psi - bkg. D^{0}", "L")
+    legend1.AddEntry(pdfD0B1F2, "bkg. J/#psi - refl. D^{0}", "L")
+    if config["fit"]["add_psi2s"]:
+        legend1.AddEntry(pdfD0S2S3, "sig. #psi(2S) - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B2S3, "sig. #psi(2S) - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfD0F2S3, "sig. #psi(2S) - refl. D^{0}", "L")
     legend1.Draw()
-
-    legend2 = ROOT.TLegend(0.64, 0.62, 0.89, 0.90, " ", "brNDC")
-    SetLegend(legend2)
-    legend2.SetTextSize(0.045)
-    legend2.AddEntry(pdfD0S1S2, "J/#psi + D^{0}", "L")
-    legend2.AddEntry(pdfD0S1B2, "J/#psi + bkg", "L")
-    legend2.AddEntry(pdfD0B1S2, "Bkg + D^{0}", "L")
-    legend2.AddEntry(pdfD0B1B2, "Bkg + bkg", "L")
-    legend2.Draw()
-
-    letexTitle.DrawLatex(0.20, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV, 6#times 10^{11} events")
-
+    
+    latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
+    latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.DrawLatex(0.18, 0.79, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.18, 0.75, "-4 < #eta_{#mu#mu} < -2.5")
+    else:
+        latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
+        
     canvasOutD0.Update()
     canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_d0_projection.pdf')
+    
+    ## plot the 2D results
+    hist3D = listOfPrimitives3D.At(0)
+    hist3D.SetTitle(";#it{m}_{#pi#it{K}} (GeV/#it{c}^{2});#it{m}_{ee} (GeV/#it{c}^{2});")
+    model = listOfPrimitives3D.At(1)
+    
+    canvasOut3D = ROOT.TCanvas("canvasOut3D", "canvasOut3D", 1200, 1000)
+    # canvasOut3D.SetMargin(0.15, 0.15, 0.15, 0.15)
+    canvasOut3D.SetTopMargin(0.15)
+    ROOT.gStyle.SetOptStat(0)
+    hist3D.Draw("LEGO2")
+    model.Draw("SURF SAME")
+    
+    canvasOut3D.SetPhi(230)
+    canvasOut3D.SetTheta(20)
+    
+    latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
+    latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexRap.SetTextSize(0.04)
+    latexRap.DrawLatex(0.7, 0.92, "|#eta_{#pi#it{K}}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.7, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.7, 0.86, "|#eta_{ee}| < 0.9")
 
+    canvasOut3D.Update()
+    canvasOut3D.SaveAs(f'{config["output"]["figures"]}/fit_2d.pdf')
+    
     input()
 
 if __name__ == '__main__':
