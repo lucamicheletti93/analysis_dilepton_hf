@@ -89,6 +89,24 @@ fit:
   cheby_par_d0_up_lim: [10, 1, 1]
   cheby_par_d0_is_const: [False, False, False]
 
+plot_results:
+  jpsiFrame:
+    x_title: "#it{m}_{#mu^{+}#mu^{-}} (GeV/#it{c}^{2})"
+    y_title: ## if you want to use the default title, just leave it empty
+    x_title_offset: 1.1
+    y_title_offset: 2.1
+    x_range: [2.0, 4.0]
+    y_range: [0.1, 1.e+4]
+    y_range_log: [1.1, 5.e+5]
+    y_title_offset_log: 1.5
+  d0Frame:
+    x_title: "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})"
+    y_title: ## if you want to use the default title, just leave it empty
+    x_title_offset: 1.1
+    y_title_offset: 2.1
+    x_range: [1.7, 2.05]
+    y_range: [0.1, 8500]
+
 output:
   directory: outputs_skimming
   figures: figures_skimming
