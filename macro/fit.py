@@ -520,7 +520,7 @@ def fit(config):
         latexRap.DrawLatex(0.73, 0.86, "|#eta_{ee}| < 0.9")
 
     canvasFitHist3D.Update()
-    canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D.pdf')
+    canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D_fit.pdf')
     
     fitResult.Print()
 
