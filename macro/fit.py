@@ -434,12 +434,12 @@ def fit(config):
         latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
         
     canvasFitJpsi.Update()
-    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit.pdf')
+    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit.pdf')
     
     canvasFitJpsi.SetLogy()
     mJpsiframe.GetYaxis().SetRangeUser(1, sampleToFit.numEntries())
     canvasFitJpsi.Update()
-    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_jpsi_fit_logy.pdf')
+    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_logy.pdf')
 
     canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 800)
     canvasFitD0.SetTickx(1)
@@ -460,12 +460,12 @@ def fit(config):
         latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
 
     canvasFitD0.Update()
-    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_d0_fit.pdf')
+    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit.pdf')
 
     canvasFitD0.SetLogy()
     mD0frame.GetYaxis().SetRangeUser(1, sampleToFit.numEntries())
     canvasFitD0.Update()
-    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_d0_fit_logy.pdf')
+    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_logy.pdf')
     #canvasFit = ROOT.TCanvas("canvasFit", "canvasFit", 1200, 600)
     #canvasFit.Divide(2, 1)
 
@@ -520,7 +520,7 @@ def fit(config):
         latexRap.DrawLatex(0.73, 0.86, "|#eta_{ee}| < 0.9")
 
     canvasFitHist3D.Update()
-    canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D_fit.pdf')
+    canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D_{config["fit"]["JpsiChannel"]}_fitSave.pdf')
     
     fitResult.Print()
 
@@ -771,13 +771,13 @@ def plot_results(config):
         latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
 
     canvasOutJpsi.Update()
-    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_jpsi_projection.pdf')
+    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection.pdf')
     
     canvasOutJpsi.SetLogy()
     frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
     frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset_log"])
     canvasOutJpsi.Update()
-    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_jpsi_projection_logy.pdf')
+    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_logy.pdf')
 
     ## plot D0 results
     frameD0 = listOfPrimitivesD0.At(1)
@@ -869,7 +869,7 @@ def plot_results(config):
         latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
         
     canvasOutD0.Update()
-    canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_d0_projection.pdf')
+    canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_d0_projection.pdf')
     
     ## plot the 2D results
     hist3D = listOfPrimitives3D.At(0)
@@ -896,7 +896,7 @@ def plot_results(config):
         latexRap.DrawLatex(0.7, 0.86, "|#eta_{ee}| < 0.9")
 
     canvasOut3D.Update()
-    canvasOut3D.SaveAs(f'{config["output"]["figures"]}/fit_2d.pdf')
+    canvasOut3D.SaveAs(f'{config["output"]["figures"]}/fit_2d_{config["fit"]["JpsiChannel"]}.pdf')
     
     input()
 
