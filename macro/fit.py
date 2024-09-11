@@ -421,7 +421,7 @@ def fit(config):
     canvasFitJpsi.SetTicky(1)
     mJpsiframe.GetYaxis().SetRangeUser(0, 0.08*sampleToFit.numEntries())
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
-    mJpsiframe.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
+    mJpsiframe.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mJpsiframe.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
@@ -448,7 +448,7 @@ def fit(config):
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.GetYaxis().SetLabelSize(0.03)
     mD0frame.GetYaxis().SetRangeUser(0, 0.05*sampleToFit.numEntries())
-    mD0frame.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
+    mD0frame.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mD0frame.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
@@ -672,7 +672,7 @@ def plot_results(config):
     latexTitle.SetTextFont(42)
     
     latexRap = ROOT.TLatex()
-    latexRap.SetTextSize(0.03)
+    latexRap.SetTextSize(0.04)
     latexRap.SetNDC()
     latexRap.SetTextFont(42)
 
@@ -693,7 +693,7 @@ def plot_results(config):
     # frameJpsi.GetXaxis().SetTitleSize(0.05)
     # frameJpsi.GetXaxis().SetLabelSize(0.045)
     frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
-    frameJpsi.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
+    frameJpsi.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     
     if config["plot_results"]["jpsiFrame"]["y_title"]:
         frameJpsi.GetYaxis().SetTitle(config["plot_results"]["jpsiFrame"]["y_title"])
@@ -703,7 +703,6 @@ def plot_results(config):
 
     # Histograms
     histDataJpsi = listOfPrimitivesJpsi.At(2)
-    #frameJpsi.GetYaxis().SetTitle(f'Counts/{1000*histDataJpsi.GetXaxis().GetBinWidth(1):.1f} MeV/#it{{c}}^{{2}}')
     # PDFs
     pdfJpsi = listOfPrimitivesJpsi.At(3)
     pdfJpsiS1S2 = listOfPrimitivesJpsi.At(4)
@@ -805,11 +804,11 @@ def plot_results(config):
 
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.79, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#pi#it{K}}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.75, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.18, 0.73, "|#eta_{ee}| < 0.9")
 
     canvasOutJpsi.Update()
     canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection.pdf')
@@ -829,8 +828,7 @@ def plot_results(config):
     # frameD0.GetXaxis().SetTitleSize(0.05)
     # frameD0.GetXaxis().SetLabelSize(0.045)
     frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
-    #frameD0.GetYaxis().SetTitle(f'Counts/{1000*frameD0.GetXaxis().GetBinWidth(1):.1f} MeV/#it{{c}}^{{2}}')
-    frameD0.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
+    frameD0.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     if config["plot_results"]["d0Frame"]["y_title"]:
         frameD0.GetYaxis().SetTitle(config["plot_results"]["d0Frame"]["y_title"])
     frameD0.GetYaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["y_title_offset"])
@@ -939,11 +937,11 @@ def plot_results(config):
     
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.79, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#pi#it{K}}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.75, "-4 < #eta_{#mu#mu} < -2.5")
+        latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5")
     else:
-        latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.18, 0.73, "|#eta_{ee}| < 0.9")
         
     canvasOutD0.Update()
     canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_d0_projection.pdf')
@@ -958,7 +956,7 @@ def plot_results(config):
     else:
         hist3D.SetTitle(f';#it{{m}}_{{#pi#it{{K}}}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{ee}} (GeV/#it{{c}}^{{2}})')
 
-    hist3D.GetZaxis().SetTitle(f'Counts / ({round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}#times {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}})')
+    hist3D.GetZaxis().SetTitle(f'Counts per ({round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}#times {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}})')
     model = listOfPrimitives3D.At(1)
     
     canvasOut3D = ROOT.TCanvas("canvasOut3D", "canvasOut3D", 1200, 1000)
