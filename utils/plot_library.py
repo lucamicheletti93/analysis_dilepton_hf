@@ -17,7 +17,7 @@ def SetLatex(latex):
 def SetLegend(legend):
     legend.SetBorderSize(0)
     legend.SetFillColor(10)
-    legend.SetFillStyle(1)
+    legend.SetFillStyle(0)
     legend.SetLineStyle(0)
     legend.SetLineColor(0)
     legend.SetTextFont(42)

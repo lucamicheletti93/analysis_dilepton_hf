@@ -58,7 +58,7 @@ def prefit():
     latexTitle.SetTextFont(42)
 
     # Variables
-    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.76, 2.00)
+    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#piK} (GeV/#it{c}^{2})", 1.76, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
     # Pre-fit D0
@@ -171,11 +171,11 @@ def fit(config):
         print("Error: JpsiChannel not defined in the configuration file.")
         sys.exit(1)
         
-    mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
+    mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
     mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", minFitRangeJpsi, maxFitRangeJpsi)
-    ptD0   = ROOT.RooRealVar("fPtD0", "#it{p}_{T,#pi#it{K}} (GeV/#it{c}^{2})", 0, 100)
+    ptD0   = ROOT.RooRealVar("fPtD0", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100)
     ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", 0, 100)
-    dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#pi#it{{K}}}}", -5, -1)
+    dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", -5, -1)
     
     # Yields parameters
     genJpsiD0  = config["fit"]["norm_par_sig_val"][0]
@@ -282,7 +282,7 @@ def fit(config):
         data.append(bkg1bkg2Sample)
 
         if not config["fit"]["unbinned"]:
-            sample = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+            sample = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=config["plot_results"]["dataBins"], YVar=dict(var=mJpsi, Binning=config["plot_results"]["dataBins"]))
     else:
         if config["fit"]["unbinned"]:
             fIn = ROOT.TFile(config["inputs"]["data"], "READ")
@@ -322,12 +322,12 @@ def fit(config):
     fOut.Close()
     
     #drawing
-    modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+    modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=config["plot_results"]["dataBins"], YVar=dict(var=mJpsi, Binning=config["plot_results"]["dataBins"]))
     modelHist.SetLineColor(ROOT.kRed)
     modelHist.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title=" ")
-    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(50))
+    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
     model.plotOn(mJpsiframe, Name={"model"})
     model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
     model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kAzure+1)
@@ -341,7 +341,7 @@ def fit(config):
         model.plotOn(mJpsiframe, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kYellow+2)
 
     mD0frame = mD0.frame(Title=" ")
-    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(50))
+    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
     model.plotOn(mD0frame, Name={"model"})
     model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
     model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kAzure+1)
@@ -421,13 +421,14 @@ def fit(config):
     canvasFitJpsi.SetTicky(1)
     mJpsiframe.GetYaxis().SetRangeUser(0, 0.08*sampleToFit.numEntries())
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
+    mJpsiframe.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mJpsiframe.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.835, "ALICE performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -447,13 +448,14 @@ def fit(config):
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.GetYaxis().SetLabelSize(0.03)
     mD0frame.GetYaxis().SetRangeUser(0, 0.05*sampleToFit.numEntries())
+    mD0frame.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mD0frame.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.835, "ALICE performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -495,7 +497,7 @@ def fit(config):
         htemp.GetYaxis().SetLabelSize(0.03)
         htemp.GetZaxis().SetTitleOffset(2.0)
         htemp.GetZaxis().SetLabelSize(0.03)
-        htemp.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
+        htemp.GetXaxis().SetTitle("#it{m}_{#piK} (GeV/#it{c}^{2})")
         htemp.GetYaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
         htemp.Rebin2D(2, 2)
         htemp.Draw("LEGO2")
@@ -513,7 +515,7 @@ def fit(config):
     
     latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.73, 0.9, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.73, 0.9, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.73, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -537,7 +539,7 @@ def fit(config):
 def upper_limit(config):
     toy_mc = False
     # Variables
-    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
+    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#piK} (GeV/#it{c}^{2})", 1.75, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
     # Yields parameters
@@ -596,8 +598,8 @@ def upper_limit(config):
         data.append(sig1bkg1Sample)
         data.append(sig2bkg2Sample)
         data.append(bkg1bkg2Sample)
-
-        histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+        
+        histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=config["plot_results"]["dataBins"], YVar=dict(var=mJpsi, Binning=config["plot_results"]["dataBins"]))
     else:
         fIn = ROOT.TFile("data/histograms.root", "READ")
         histJpsiD0= fIn.Get("hSparseJPsiDmeson_proj_3_2")
@@ -670,7 +672,7 @@ def plot_results(config):
     latexTitle.SetTextFont(42)
     
     latexRap = ROOT.TLatex()
-    latexRap.SetTextSize(0.03)
+    latexRap.SetTextSize(0.04)
     latexRap.SetNDC()
     latexRap.SetTextFont(42)
 
@@ -691,6 +693,8 @@ def plot_results(config):
     # frameJpsi.GetXaxis().SetTitleSize(0.05)
     # frameJpsi.GetXaxis().SetLabelSize(0.045)
     frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    frameJpsi.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
+    
     if config["plot_results"]["jpsiFrame"]["y_title"]:
         frameJpsi.GetYaxis().SetTitle(config["plot_results"]["jpsiFrame"]["y_title"])
     frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset"])
@@ -699,7 +703,6 @@ def plot_results(config):
 
     # Histograms
     histDataJpsi = listOfPrimitivesJpsi.At(2)
-
     # PDFs
     pdfJpsi = listOfPrimitivesJpsi.At(3)
     pdfJpsiS1S2 = listOfPrimitivesJpsi.At(4)
@@ -801,11 +804,11 @@ def plot_results(config):
 
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.79, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.75, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.18, 0.73, "|#eta_{ee}| < 0.9")
 
     canvasOutJpsi.Update()
     canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection.pdf')
@@ -825,6 +828,7 @@ def plot_results(config):
     # frameD0.GetXaxis().SetTitleSize(0.05)
     # frameD0.GetXaxis().SetLabelSize(0.045)
     frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
+    frameD0.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     if config["plot_results"]["d0Frame"]["y_title"]:
         frameD0.GetYaxis().SetTitle(config["plot_results"]["d0Frame"]["y_title"])
     frameD0.GetYaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["y_title_offset"])
@@ -933,18 +937,24 @@ def plot_results(config):
     
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.79, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.75, "-4 < #eta_{#mu#mu} < -2.5")
+        latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5")
     else:
-        latexRap.DrawLatex(0.18, 0.75, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.18, 0.73, "|#eta_{ee}| < 0.9")
         
     canvasOutD0.Update()
     canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_d0_projection.pdf')
     
     ## plot the 2D results
     hist3D = listOfPrimitives3D.At(0)
-    hist3D.SetTitle(";#it{m}_{#pi#it{K}} (GeV/#it{c}^{2});#it{m}_{ee} (GeV/#it{c}^{2});")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        hist3D.SetTitle(f';#it{{m}}_{{#piK}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{#mu#mu}} (GeV/#it{{c}}^{{2}})')
+        
+    else:
+        hist3D.SetTitle(f';#it{{m}}_{{#piK}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{ee}} (GeV/#it{{c}}^{{2}})')
+
+    hist3D.GetZaxis().SetTitle(f'Counts per ({round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}#times {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}})')
     model = listOfPrimitives3D.At(1)
     
     canvasOut3D = ROOT.TCanvas("canvasOut3D", "canvasOut3D", 1200, 1000)
@@ -960,7 +970,7 @@ def plot_results(config):
     latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.SetTextSize(0.04)
-    latexRap.DrawLatex(0.7, 0.92, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.7, 0.92, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.7, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -973,3 +983,4 @@ def plot_results(config):
 
 if __name__ == '__main__':
     main()
+
