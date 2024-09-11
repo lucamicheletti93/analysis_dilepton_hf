@@ -58,7 +58,7 @@ def prefit():
     latexTitle.SetTextFont(42)
 
     # Variables
-    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.76, 2.00)
+    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#piK} (GeV/#it{c}^{2})", 1.76, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
     # Pre-fit D0
@@ -171,11 +171,11 @@ def fit(config):
         print("Error: JpsiChannel not defined in the configuration file.")
         sys.exit(1)
         
-    mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
+    mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
     mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", minFitRangeJpsi, maxFitRangeJpsi)
-    ptD0   = ROOT.RooRealVar("fPtD0", "#it{p}_{T,#pi#it{K}} (GeV/#it{c}^{2})", 0, 100)
+    ptD0   = ROOT.RooRealVar("fPtD0", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100)
     ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", 0, 100)
-    dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#pi#it{{K}}}}", -5, -1)
+    dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", -5, -1)
     
     # Yields parameters
     genJpsiD0  = config["fit"]["norm_par_sig_val"][0]
@@ -428,7 +428,7 @@ def fit(config):
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.835, "ALICE performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -455,7 +455,7 @@ def fit(config):
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.835, "ALICE performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -497,7 +497,7 @@ def fit(config):
         htemp.GetYaxis().SetLabelSize(0.03)
         htemp.GetZaxis().SetTitleOffset(2.0)
         htemp.GetZaxis().SetLabelSize(0.03)
-        htemp.GetXaxis().SetTitle("#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})")
+        htemp.GetXaxis().SetTitle("#it{m}_{#piK} (GeV/#it{c}^{2})")
         htemp.GetYaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
         htemp.Rebin2D(2, 2)
         htemp.Draw("LEGO2")
@@ -515,7 +515,7 @@ def fit(config):
     
     latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.73, 0.9, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.73, 0.9, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.73, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -539,7 +539,7 @@ def fit(config):
 def upper_limit(config):
     toy_mc = False
     # Variables
-    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})", 1.75, 2.00)
+    mD0   = ROOT.RooRealVar("D-meson mass", "#it{m}_{#piK} (GeV/#it{c}^{2})", 1.75, 2.00)
     mJpsi = ROOT.RooRealVar("Dimuon mass", "#it{m}_{#mu#mu} (GeV/#it{c}^{2})", 2.50, 4.00)
 
     # Yields parameters
@@ -804,7 +804,7 @@ def plot_results(config):
 
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:
@@ -937,7 +937,7 @@ def plot_results(config):
     
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5")
     else:
@@ -948,13 +948,11 @@ def plot_results(config):
     
     ## plot the 2D results
     hist3D = listOfPrimitives3D.At(0)
-    #hist3D.SetTitle(";#it{m}_{#pi#it{K}} (GeV/#it{c}^{2});#it{m}_{ee} (GeV/#it{c}^{2})")
-    
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        hist3D.SetTitle(f';#it{{m}}_{{#pi#it{{K}}}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{#mu#mu}} (GeV/#it{{c}}^{{2}})')
+        hist3D.SetTitle(f';#it{{m}}_{{#piK}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{#mu#mu}} (GeV/#it{{c}}^{{2}})')
         
     else:
-        hist3D.SetTitle(f';#it{{m}}_{{#pi#it{{K}}}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{ee}} (GeV/#it{{c}}^{{2}})')
+        hist3D.SetTitle(f';#it{{m}}_{{#piK}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{ee}} (GeV/#it{{c}}^{{2}})')
 
     hist3D.GetZaxis().SetTitle(f'Counts per ({round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}#times {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}})')
     model = listOfPrimitives3D.At(1)
@@ -972,7 +970,7 @@ def plot_results(config):
     latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.SetTextSize(0.04)
-    latexRap.DrawLatex(0.7, 0.92, "|#eta_{#pi#it{K}}| < 0.8")
+    latexRap.DrawLatex(0.7, 0.92, "|#eta_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
         latexRap.DrawLatex(0.7, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
     else:

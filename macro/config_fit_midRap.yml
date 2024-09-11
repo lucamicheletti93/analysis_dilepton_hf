@@ -101,7 +101,7 @@ plot_results:
     y_range_log: [1.1, 5.e+5]
     y_title_offset_log: 1.5
   d0Frame:
-    x_title: "#it{m}_{#pi#it{K}} (GeV/#it{c}^{2})"
+    x_title: "#it{m}_{#piK} (GeV/#it{c}^{2})"
     y_title: ## if you want to use the default title, just leave it empty
     x_title_offset: 1.1
     y_title_offset: 2.1
