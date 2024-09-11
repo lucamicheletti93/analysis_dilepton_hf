@@ -378,7 +378,7 @@ def fit(config):
         legend_comp.AddEntry(hist_bkgD0_bkgJpsi, "bkg. #psi - bkg. D^{0}", "L")
         legend_comp.AddEntry(hist_reflD0_bkgJpsi, "bkg. #psi - refl. D^{0}", "L")
 
-        legend_comp2 = ROOT.TLegend(0.64, 0.57, 0.99, 0.87)
+        legend_comp2 = ROOT.TLegend(legend_comp.GetX1()+0.05, legend_comp.GetY1(), legend_comp.GetX2()+0.05, legend_comp.GetY2())
         legend_comp2.SetBorderSize(0)
         legend_comp2.SetFillStyle(0)
         legend_comp2.AddEntry(hist_sigD0_sigJpsi, "", "") #dummy entries to get the right position
@@ -724,9 +724,9 @@ def plot_results(config):
     pdfJpsiS1F2.SetLineStyle(5)
     pdfJpsiB1F2.SetLineStyle(5)
     if config["fit"]["add_psi2s"]:
-        pdfJpsiS2S3.SetLineStyle(5)
-        pdfJpsiB2S3.SetLineStyle(5)
-        pdfJpsiF2S3.SetLineStyle(5)
+        pdfJpsiS2S3.SetLineStyle(3)
+        pdfJpsiB2S3.SetLineStyle(3)
+        pdfJpsiF2S3.SetLineStyle(3)
 
     canvasOutJpsi = ROOT.TCanvas("canvasOutJpsi", "canvasOutJpsi", 800, 800)
     canvasOutJpsi.SetTickx(1)
@@ -745,22 +745,59 @@ def plot_results(config):
         pdfJpsiB2S3.Draw("SAME")
         pdfJpsiF2S3.Draw("SAME")
 
-    legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.94, " ", "brNDC")
-    SetLegend(legend1)
-    legend1.SetTextSize(0.030)
-    legend1.AddEntry(histDataJpsi, "data", "EP")
-    legend1.AddEntry(pdfJpsi, "total fit", "L")
-    legend1.AddEntry(pdfJpsiS1S2, "sig. J/#psi - sig. D^{0}", "L")
-    legend1.AddEntry(pdfJpsiS1B2, "sig. J/#psi - bkg. D^{0}", "L")
-    legend1.AddEntry(pdfJpsiS1F2, "sig. J/#psi - refl. D^{0}", "L")
-    legend1.AddEntry(pdfJpsiB1S2, "bkg. J/#psi - sig. D^{0}", "L")
-    legend1.AddEntry(pdfJpsiB1B2, "bkg. J/#psi - bkg. D^{0}", "L")
-    legend1.AddEntry(pdfJpsiB1F2, "bkg. J/#psi - refl. D^{0}", "L")
     if config["fit"]["add_psi2s"]:
-        legend1.AddEntry(pdfJpsiS2S3, "sig. #psi(2S) - sig. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB2S3, "sig. #psi(2S) - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiF2S3, "sig. #psi(2S) - refl. D^{0}", "L")
-    legend1.Draw()
+        legend1 = ROOT.TLegend(0.65, 0.6, 0.89, 0.95, " ", "brNDC")
+        SetLegend(legend1)
+        legend1.SetTextSize(0.030)
+        legend1.AddEntry(histDataJpsi, "data", "EP")
+        legend1.AddEntry(pdfJpsi, "total fit", "L")
+
+        pdfD0Jpsi = pdfJpsiS1S2.Clone() 
+        pdfD0Psi2S = pdfJpsiS2S3.Clone()
+        pdfD0Jpsi.SetLineColor(ROOT.kBlack)
+        pdfD0Psi2S.SetLineColor(ROOT.kBlack)
+        
+        legend1.AddEntry(pdfJpsiS1S2, "sig. #psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiS1B2, "sig. #psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiS1F2, "sig. #psi - refl. D^{0}", "L")
+        legend1.AddEntry(pdfD0Jpsi, " ", "") #to leave space
+        legend1.AddEntry(pdfD0Psi2S, " ", "") #to leave space
+        
+        legend1.AddEntry(pdfJpsiB1S2, "bkg. #psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1B2, "bkg. #psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1F2, "bkg. #psi - refl. D^{0}", "L")
+        legend2 = ROOT.TLegend(legend1.GetX1()+0.05, legend1.GetY1(), legend1.GetX2()+0.05, legend1.GetY2(), " ", "brNDC")
+        SetLegend(legend2)
+        legend2.SetTextSize(0.030)
+        legend2.AddEntry(histDataJpsi, " ", "")
+        legend2.AddEntry(pdfJpsi, " ", "")
+        
+        legend2.AddEntry(pdfJpsiS1S2, " ", "")
+        legend2.AddEntry(pdfJpsiS1B2, " ", "")
+        legend2.AddEntry(pdfJpsiS1F2, " ", "")
+        legend2.AddEntry(pdfD0Jpsi, "J/#psi", "L") #to leave space
+        legend2.AddEntry(pdfD0Psi2S, "#psi(2S)", "L") #to leave space
+        
+        legend2.AddEntry(pdfJpsiB1S2, " ", "")
+        legend2.AddEntry(pdfJpsiB1B2, " ", "")
+        legend2.AddEntry(pdfJpsiB1F2, " ", "")
+        legend2.Draw()
+        legend1.Draw()
+        
+    else:
+        legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.95, " ", "brNDC")
+        SetLegend(legend1)
+        legend1.SetTextSize(0.030)
+        legend1.AddEntry(histDataJpsi, "data", "EP")
+        legend1.AddEntry(pdfJpsi, "total fit", "L")
+        
+        legend1.AddEntry(pdfJpsiS1S2, "sig. J/#psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiS1B2, "sig. J/#psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiS1F2, "sig. J/#psi - refl. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1S2, "bkg. J/#psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1B2, "bkg. J/#psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1F2, "bkg. J/#psi - refl. D^{0}", "L")
+        legend1.Draw()
 
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
@@ -822,9 +859,9 @@ def plot_results(config):
     pdfD0S1F2.SetLineStyle(5)
     pdfD0B1F2.SetLineStyle(5)
     if config["fit"]["add_psi2s"]:
-        pdfD0S2S3.SetLineStyle(5)
-        pdfD0B2S3.SetLineStyle(5)
-        pdfD0F2S3.SetLineStyle(5)
+        pdfD0S2S3.SetLineStyle(3)
+        pdfD0B2S3.SetLineStyle(3)
+        pdfD0F2S3.SetLineStyle(3)
 
     canvasOutD0 = ROOT.TCanvas("canvasOutD0", "canvasOutD0", 800, 800)
     canvasOutD0.SetTickx(1)
@@ -843,22 +880,56 @@ def plot_results(config):
         pdfD0B2S3.Draw("SAME")
         pdfD0F2S3.Draw("SAME")
     
-    legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.94, " ", "brNDC")
-    SetLegend(legend1)
-    legend1.SetTextSize(0.030)
-    legend1.AddEntry(histDataD0, "data", "EP")
-    legend1.AddEntry(pdfD0, "total fit", "L")
-    legend1.AddEntry(pdfD0S1S2, "sig. J/#psi - sig. D^{0}", "L")
-    legend1.AddEntry(pdfD0S1B2, "sig. J/#psi - bkg. D^{0}", "L")
-    legend1.AddEntry(pdfD0S1F2, "sig. J/#psi - refl. D^{0}", "L")
-    legend1.AddEntry(pdfD0B1S2, "bkg. J/#psi - sig. D^{0}", "L")
-    legend1.AddEntry(pdfD0B1B2, "bkg. J/#psi - bkg. D^{0}", "L")
-    legend1.AddEntry(pdfD0B1F2, "bkg. J/#psi - refl. D^{0}", "L")
     if config["fit"]["add_psi2s"]:
-        legend1.AddEntry(pdfD0S2S3, "sig. #psi(2S) - sig. D^{0}", "L")
-        legend1.AddEntry(pdfD0B2S3, "sig. #psi(2S) - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfD0F2S3, "sig. #psi(2S) - refl. D^{0}", "L")
-    legend1.Draw()
+        legend1 = ROOT.TLegend(0.65, 0.6, 0.89, 0.95, " ", "brNDC")
+        SetLegend(legend1)
+        legend1.SetTextSize(0.030)
+        legend1.AddEntry(histDataD0, "data", "EP")
+        legend1.AddEntry(pdfD0, "total fit", "L")
+        pdfD0Jpsi = pdfD0S1S2.Clone() 
+        pdfD0Psi2S = pdfD0S2S3.Clone()
+        pdfD0Jpsi.SetLineColor(ROOT.kBlack)
+        pdfD0Psi2S.SetLineColor(ROOT.kBlack)
+        
+        legend1.AddEntry(pdfD0S1S2, "sig. #psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0S1B2, "sig. #psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfD0S1F2, "sig. #psi - refl. D^{0}", "L")
+        legend1.AddEntry(pdfD0Jpsi, " ", "") #to leave space
+        legend1.AddEntry(pdfD0Psi2S, " ", "") #to leave space
+        
+        legend1.AddEntry(pdfD0B1S2, "bkg. #psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1B2, "bkg. #psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1F2, "bkg. #psi - refl. D^{0}", "L")
+        legend2 = ROOT.TLegend(legend1.GetX1()+0.05, legend1.GetY1(), legend1.GetX2()+0.05, legend1.GetY2(), " ", "brNDC")
+        SetLegend(legend2)
+        legend2.SetTextSize(0.030)
+        legend2.AddEntry(histDataD0, " ", "")
+        legend2.AddEntry(pdfD0, " ", "")
+        
+        legend2.AddEntry(pdfD0S1S2, " ", "")
+        legend2.AddEntry(pdfD0S1B2, " ", "")
+        legend2.AddEntry(pdfD0S1F2, " ", "")
+        legend2.AddEntry(pdfD0Jpsi, "J/#psi", "L") #to leave space
+        legend2.AddEntry(pdfD0Psi2S, "#psi(2S)", "L") #to leave space
+        
+        legend2.AddEntry(pdfD0B1S2, " ", "")
+        legend2.AddEntry(pdfD0B1B2, " ", "")
+        legend2.AddEntry(pdfD0B1F2, " ", "")
+        legend2.Draw()
+        legend1.Draw()
+    else:
+        legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.94, " ", "brNDC")
+        SetLegend(legend1)
+        legend1.SetTextSize(0.030)
+        legend1.AddEntry(histDataD0, "data", "EP")
+        legend1.AddEntry(pdfD0, "total fit", "L")
+        legend1.AddEntry(pdfD0S1S2, "sig. J/#psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0S1B2, "sig. J/#psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfD0S1F2, "sig. J/#psi - refl. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1S2, "bkg. J/#psi - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1B2, "bkg. J/#psi - bkg. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1F2, "bkg. J/#psi - refl. D^{0}", "L")
+        legend1.Draw()
     
     latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
