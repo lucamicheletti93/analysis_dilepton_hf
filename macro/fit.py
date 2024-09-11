@@ -282,7 +282,7 @@ def fit(config):
         data.append(bkg1bkg2Sample)
 
         if not config["fit"]["unbinned"]:
-            sample = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+            sample = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=config["plot_results"]["dataBins"], YVar=dict(var=mJpsi, Binning=config["plot_results"]["dataBins"]))
     else:
         if config["fit"]["unbinned"]:
             fIn = ROOT.TFile(config["inputs"]["data"], "READ")
@@ -322,12 +322,12 @@ def fit(config):
     fOut.Close()
     
     #drawing
-    modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+    modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", mD0, Binning=config["plot_results"]["dataBins"], YVar=dict(var=mJpsi, Binning=config["plot_results"]["dataBins"]))
     modelHist.SetLineColor(ROOT.kRed)
     modelHist.SetLineWidth(1)
 
     mJpsiframe = mJpsi.frame(Title=" ")
-    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(50))
+    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
     model.plotOn(mJpsiframe, Name={"model"})
     model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
     model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kAzure+1)
@@ -341,7 +341,7 @@ def fit(config):
         model.plotOn(mJpsiframe, Name={"reflD0_sigPsi2SPdf"}, Components={reflD0_sigPsi2SPdf}, LineStyle=3, LineColor=ROOT.kYellow+2)
 
     mD0frame = mD0.frame(Title=" ")
-    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(50))
+    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
     model.plotOn(mD0frame, Name={"model"})
     model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={sigD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kRed+1)
     model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={bkgD0_sigJpsiPdf}, LineStyle=5, LineColor=ROOT.kAzure+1)
@@ -421,6 +421,7 @@ def fit(config):
     canvasFitJpsi.SetTicky(1)
     mJpsiframe.GetYaxis().SetRangeUser(0, 0.08*sampleToFit.numEntries())
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
+    mJpsiframe.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mJpsiframe.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
@@ -447,6 +448,7 @@ def fit(config):
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.GetYaxis().SetLabelSize(0.03)
     mD0frame.GetYaxis().SetRangeUser(0, 0.05*sampleToFit.numEntries())
+    mD0frame.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mD0frame.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
@@ -596,8 +598,8 @@ def upper_limit(config):
         data.append(sig1bkg1Sample)
         data.append(sig2bkg2Sample)
         data.append(bkg1bkg2Sample)
-
-        histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=50, YVar=dict(var=mJpsi, Binning=50))
+        
+        histJpsiD0 = data.createHistogram("data m_{J/#psi},m_{D0}", mD0, Binning=config["plot_results"]["dataBins"], YVar=dict(var=mJpsi, Binning=config["plot_results"]["dataBins"]))
     else:
         fIn = ROOT.TFile("data/histograms.root", "READ")
         histJpsiD0= fIn.Get("hSparseJPsiDmeson_proj_3_2")
@@ -691,6 +693,8 @@ def plot_results(config):
     # frameJpsi.GetXaxis().SetTitleSize(0.05)
     # frameJpsi.GetXaxis().SetLabelSize(0.045)
     frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    frameJpsi.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
+    
     if config["plot_results"]["jpsiFrame"]["y_title"]:
         frameJpsi.GetYaxis().SetTitle(config["plot_results"]["jpsiFrame"]["y_title"])
     frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset"])
@@ -699,7 +703,7 @@ def plot_results(config):
 
     # Histograms
     histDataJpsi = listOfPrimitivesJpsi.At(2)
-
+    #frameJpsi.GetYaxis().SetTitle(f'Counts/{1000*histDataJpsi.GetXaxis().GetBinWidth(1):.1f} MeV/#it{{c}}^{{2}}')
     # PDFs
     pdfJpsi = listOfPrimitivesJpsi.At(3)
     pdfJpsiS1S2 = listOfPrimitivesJpsi.At(4)
@@ -825,6 +829,8 @@ def plot_results(config):
     # frameD0.GetXaxis().SetTitleSize(0.05)
     # frameD0.GetXaxis().SetLabelSize(0.045)
     frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
+    #frameD0.GetYaxis().SetTitle(f'Counts/{1000*frameD0.GetXaxis().GetBinWidth(1):.1f} MeV/#it{{c}}^{{2}}')
+    frameD0.GetYaxis().SetTitle(f'Counts / {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     if config["plot_results"]["d0Frame"]["y_title"]:
         frameD0.GetYaxis().SetTitle(config["plot_results"]["d0Frame"]["y_title"])
     frameD0.GetYaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["y_title_offset"])
@@ -944,7 +950,15 @@ def plot_results(config):
     
     ## plot the 2D results
     hist3D = listOfPrimitives3D.At(0)
-    hist3D.SetTitle(";#it{m}_{#pi#it{K}} (GeV/#it{c}^{2});#it{m}_{ee} (GeV/#it{c}^{2});")
+    #hist3D.SetTitle(";#it{m}_{#pi#it{K}} (GeV/#it{c}^{2});#it{m}_{ee} (GeV/#it{c}^{2})")
+    
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        hist3D.SetTitle(f';#it{{m}}_{{#pi#it{{K}}}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{#mu#mu}} (GeV/#it{{c}}^{{2}})')
+        
+    else:
+        hist3D.SetTitle(f';#it{{m}}_{{#pi#it{{K}}}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{ee}} (GeV/#it{{c}}^{{2}})')
+
+    hist3D.GetZaxis().SetTitle(f'Counts / ({round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}#times {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}})')
     model = listOfPrimitives3D.At(1)
     
     canvasOut3D = ROOT.TCanvas("canvasOut3D", "canvasOut3D", 1200, 1000)
@@ -973,3 +987,4 @@ def plot_results(config):
 
 if __name__ == '__main__':
     main()
+

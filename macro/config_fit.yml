@@ -90,6 +90,7 @@ fit:
   cheby_par_d0_is_const: [False, False, False]
 
 plot_results:
+  dataBins: 50
   jpsiFrame:
     x_title: "#it{m}_{#mu^{+}#mu^{-}} (GeV/#it{c}^{2})"
     y_title: ## if you want to use the default title, just leave it empty
