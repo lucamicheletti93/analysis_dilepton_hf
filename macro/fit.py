@@ -426,13 +426,13 @@ def fit(config):
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
-    latexTitle.DrawLatex(0.15, 0.835, "ALICE performance")
+    latexTitle.DrawLatex(0.15, 0.835, "ALICE Performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#piK}| < 0.8")
+    latexRap.DrawLatex(0.15, 0.72, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.15, 0.68, "-4 < #it{#eta}_{#mu#mu} < -2.5") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.15, 0.68, "|#it{#eta}_{ee}| < 0.9")
         
     canvasFitJpsi.Update()
     canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit.pdf')
@@ -453,13 +453,13 @@ def fit(config):
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
-    latexTitle.DrawLatex(0.15, 0.835, "ALICE performance")
+    latexTitle.DrawLatex(0.15, 0.835, "ALICE Performance")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, "|#eta_{#piK}| < 0.8")
+    latexRap.DrawLatex(0.15, 0.72, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, 0.68, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.15, 0.68, "-4 < #it{#eta}_{#mu#mu} < -2.5") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, 0.68, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.15, 0.68, "|#it{#eta}_{ee}| < 0.9")
 
     canvasFitD0.Update()
     canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit.pdf')
@@ -513,13 +513,13 @@ def fit(config):
     canvasFitHist3D.SetPhi(230)
     canvasFitHist3D.SetTheta(20)
     
-    latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
+    latexTitle.DrawLatex(0.1, 0.94, "ALICE Performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.73, 0.9, "|#eta_{#piK}| < 0.8")
+    latexRap.DrawLatex(0.73, 0.9, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.73, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.73, 0.86, "-4 < #it{#eta}_{#mu#mu} < -2.5") #titleSuffix
     else:
-        latexRap.DrawLatex(0.73, 0.86, "|#eta_{ee}| < 0.9")
+        latexRap.DrawLatex(0.73, 0.86, "|#it{#eta}_{ee}| < 0.9")
 
     canvasFitHist3D.Update()
     canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D_{config["fit"]["JpsiChannel"]}_fitSave.pdf')
@@ -671,8 +671,13 @@ def plot_results(config):
     latexTitle.SetNDC()
     latexTitle.SetTextFont(42)
     
+    latexDecay = ROOT.TLatex()
+    latexDecay.SetTextSize(0.04)
+    latexDecay.SetNDC()
+    latexDecay.SetTextFont(42)
+
     latexRap = ROOT.TLatex()
-    latexRap.SetTextSize(0.04)
+    latexRap.SetTextSize(0.035)
     latexRap.SetNDC()
     latexRap.SetTextFont(42)
 
@@ -722,10 +727,10 @@ def plot_results(config):
     # pdfJpsiB1B2.SetLineColor(ROOT.kOrange+7)
     pdfJpsiS1S2.SetLineStyle(5)
     pdfJpsiS1B2.SetLineStyle(5)
-    pdfJpsiB1S2.SetLineStyle(5)
-    pdfJpsiB1B2.SetLineStyle(5)
+    pdfJpsiB1S2.SetLineStyle(2)
+    pdfJpsiB1B2.SetLineStyle(2)
     pdfJpsiS1F2.SetLineStyle(5)
-    pdfJpsiB1F2.SetLineStyle(5)
+    pdfJpsiB1F2.SetLineStyle(2)
     if config["fit"]["add_psi2s"]:
         pdfJpsiS2S3.SetLineStyle(3)
         pdfJpsiB2S3.SetLineStyle(3)
@@ -748,67 +753,46 @@ def plot_results(config):
         pdfJpsiB2S3.Draw("SAME")
         pdfJpsiF2S3.Draw("SAME")
 
+    legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.95, " ", "brNDC")
     if config["fit"]["add_psi2s"]:
-        legend1 = ROOT.TLegend(0.65, 0.6, 0.89, 0.95, " ", "brNDC")
-        SetLegend(legend1)
+        legend1 = ROOT.TLegend(0.6, 0.55, 0.8, 0.95, " ", "brNDC")
+    SetLegend(legend1)
+    legend1.SetTextSize(0.030)
+    if config["fit"]["add_psi2s"]:
         legend1.SetTextSize(0.030)
-        legend1.AddEntry(histDataJpsi, "data", "EP")
-        legend1.AddEntry(pdfJpsi, "total fit", "L")
+    legend1.AddEntry(histDataJpsi, "data", "EP")
+    legend1.AddEntry(pdfJpsi, "total fit", "L")
 
-        pdfD0Jpsi = pdfJpsiS1S2.Clone() 
-        pdfD0Psi2S = pdfJpsiS2S3.Clone()
-        pdfD0Jpsi.SetLineColor(ROOT.kBlack)
-        pdfD0Psi2S.SetLineColor(ROOT.kBlack)
-        
-        legend1.AddEntry(pdfJpsiS1S2, "sig. #psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiS1B2, "sig. #psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiS1F2, "sig. #psi - refl. D^{0}", "L")
-        legend1.AddEntry(pdfD0Jpsi, " ", "") #to leave space
-        legend1.AddEntry(pdfD0Psi2S, " ", "") #to leave space
-        
-        legend1.AddEntry(pdfJpsiB1S2, "bkg. #psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB1B2, "bkg. #psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB1F2, "bkg. #psi - refl. D^{0}", "L")
-        legend2 = ROOT.TLegend(legend1.GetX1()+0.05, legend1.GetY1(), legend1.GetX2()+0.05, legend1.GetY2(), " ", "brNDC")
-        SetLegend(legend2)
-        legend2.SetTextSize(0.030)
-        legend2.AddEntry(histDataJpsi, " ", "")
-        legend2.AddEntry(pdfJpsi, " ", "")
-        
-        legend2.AddEntry(pdfJpsiS1S2, " ", "")
-        legend2.AddEntry(pdfJpsiS1B2, " ", "")
-        legend2.AddEntry(pdfJpsiS1F2, " ", "")
-        legend2.AddEntry(pdfD0Jpsi, "J/#psi", "L") #to leave space
-        legend2.AddEntry(pdfD0Psi2S, "#psi(2S)", "L") #to leave space
-        
-        legend2.AddEntry(pdfJpsiB1S2, " ", "")
-        legend2.AddEntry(pdfJpsiB1B2, " ", "")
-        legend2.AddEntry(pdfJpsiB1F2, " ", "")
-        legend2.Draw()
-        legend1.Draw()
-        
+    legend1.AddEntry(pdfJpsiS1S2, "sig. J/#psi - sig. D^{0}", "L")
+    legend1.AddEntry(pdfJpsiS1B2, "sig. J/#psi - bkg. #piK", "L")
+    legend1.AddEntry(pdfJpsiS1F2, "sig. J/#psi - refl. #piK", "L")
+    if config["fit"]["add_psi2s"]:
+        legend1.AddEntry(pdfJpsiS2S3, "sig. #psi(2S) - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB2S3, "sig. #psi(2S) - bkg. #piK", "L")
+        legend1.AddEntry(pdfJpsiF2S3, "sig. #psi(2S) - refl. #piK", "L")
+        legend1.AddEntry(pdfJpsiB1S2, "bkg. #mu#mu - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1B2, "bkg. #mu#mu - bkg. #piK", "L")
+        legend1.AddEntry(pdfJpsiB1F2, "bkg. #mu#mu - refl. #piK", "L")
     else:
-        legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.95, " ", "brNDC")
-        SetLegend(legend1)
-        legend1.SetTextSize(0.030)
-        legend1.AddEntry(histDataJpsi, "data", "EP")
-        legend1.AddEntry(pdfJpsi, "total fit", "L")
+        legend1.AddEntry(pdfJpsiB1S2, "bkg. #mu#mu - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1B2, "bkg. #mu#mu - bkg. #piK", "L")
+        legend1.AddEntry(pdfJpsiB1F2, "bkg. #mu#mu - refl. #piK", "L")
         
-        legend1.AddEntry(pdfJpsiS1S2, "sig. J/#psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiS1B2, "sig. J/#psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiS1F2, "sig. J/#psi - refl. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB1S2, "bkg. J/#psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB1B2, "bkg. J/#psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB1F2, "bkg. J/#psi - refl. D^{0}", "L")
-        legend1.Draw()
+    legend1.Draw()
 
-    latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
+    latexTitle.DrawLatex(0.18, 0.89, "ALICE Performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#piK}| < 0.8")
+    latexDecay.DrawLatex(0.18, 0.77, "D^{0} #rightarrow #pi^{+}K^{#minus}")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow #mu^{+}#mu^{#minus}")
     else:
-        latexRap.DrawLatex(0.18, 0.73, "|#eta_{ee}| < 0.9")
+        latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow e^{+}e^{#minus}")
+    
+    latexRap.DrawLatex(0.18, 0.68, "|#it{#eta}_{#piK}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.18, 0.63, "#minus 4 < #it{#eta}_{#mu#mu} < #minus 2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.18, 0.63, "|#it{#eta}_{ee}| < 0.9")
 
     canvasOutJpsi.Update()
     canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection.pdf')
@@ -858,10 +842,10 @@ def plot_results(config):
     
     pdfD0S1S2.SetLineStyle(5)
     pdfD0S1B2.SetLineStyle(5)
-    pdfD0B1S2.SetLineStyle(5)
-    pdfD0B1B2.SetLineStyle(5)
+    pdfD0B1S2.SetLineStyle(2)
+    pdfD0B1B2.SetLineStyle(2)
     pdfD0S1F2.SetLineStyle(5)
-    pdfD0B1F2.SetLineStyle(5)
+    pdfD0B1F2.SetLineStyle(2)
     if config["fit"]["add_psi2s"]:
         pdfD0S2S3.SetLineStyle(3)
         pdfD0B2S3.SetLineStyle(3)
@@ -883,66 +867,47 @@ def plot_results(config):
         pdfD0S2S3.Draw("SAME")
         pdfD0B2S3.Draw("SAME")
         pdfD0F2S3.Draw("SAME")
-    
+
+        
+    legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.94, " ", "brNDC")
     if config["fit"]["add_psi2s"]:
-        legend1 = ROOT.TLegend(0.65, 0.6, 0.89, 0.95, " ", "brNDC")
-        SetLegend(legend1)
-        legend1.SetTextSize(0.030)
-        legend1.AddEntry(histDataD0, "data", "EP")
-        legend1.AddEntry(pdfD0, "total fit", "L")
-        pdfD0Jpsi = pdfD0S1S2.Clone() 
-        pdfD0Psi2S = pdfD0S2S3.Clone()
-        pdfD0Jpsi.SetLineColor(ROOT.kBlack)
-        pdfD0Psi2S.SetLineColor(ROOT.kBlack)
+        legend1 = ROOT.TLegend(0.6, 0.55, 0.8, 0.95, " ", "brNDC")
         
-        legend1.AddEntry(pdfD0S1S2, "sig. #psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfD0S1B2, "sig. #psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfD0S1F2, "sig. #psi - refl. D^{0}", "L")
-        legend1.AddEntry(pdfD0Jpsi, " ", "") #to leave space
-        legend1.AddEntry(pdfD0Psi2S, " ", "") #to leave space
-        
-        legend1.AddEntry(pdfD0B1S2, "bkg. #psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfD0B1B2, "bkg. #psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfD0B1F2, "bkg. #psi - refl. D^{0}", "L")
-        legend2 = ROOT.TLegend(legend1.GetX1()+0.05, legend1.GetY1(), legend1.GetX2()+0.05, legend1.GetY2(), " ", "brNDC")
-        SetLegend(legend2)
-        legend2.SetTextSize(0.030)
-        legend2.AddEntry(histDataD0, " ", "")
-        legend2.AddEntry(pdfD0, " ", "")
-        
-        legend2.AddEntry(pdfD0S1S2, " ", "")
-        legend2.AddEntry(pdfD0S1B2, " ", "")
-        legend2.AddEntry(pdfD0S1F2, " ", "")
-        legend2.AddEntry(pdfD0Jpsi, "J/#psi", "L") #to leave space
-        legend2.AddEntry(pdfD0Psi2S, "#psi(2S)", "L") #to leave space
-        
-        legend2.AddEntry(pdfD0B1S2, " ", "")
-        legend2.AddEntry(pdfD0B1B2, " ", "")
-        legend2.AddEntry(pdfD0B1F2, " ", "")
-        legend2.Draw()
-        legend1.Draw()
+    SetLegend(legend1)
+    legend1.SetTextSize(0.030)
+    legend1.AddEntry(histDataD0, "data", "EP")
+    legend1.AddEntry(pdfD0, "total fit", "L")
+    legend1.AddEntry(pdfD0S1S2, "sig. J/#psi - sig. D^{0}", "L")
+    legend1.AddEntry(pdfD0S1B2, "sig. J/#psi - bkg. #piK", "L")
+    legend1.AddEntry(pdfD0S1F2, "sig. J/#psi - refl. #piK", "L")
+    if config["fit"]["add_psi2s"]:
+        legend1.AddEntry(pdfD0S2S3, "sig. #psi(2S) - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B2S3, "sig. #psi(2S) - bkg. #piK", "L")
+        legend1.AddEntry(pdfD0F2S3, "sig. #psi(2S) - refl. #piK", "L")
+        legend1.AddEntry(pdfD0B1S2, "bkg. #mu#mu - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1B2, "bkg. #mu#mu - bkg. #piK", "L")
+        legend1.AddEntry(pdfD0B1F2, "bkg. #mu#mu - refl. #piK", "L")
     else:
-        legend1 = ROOT.TLegend(0.65, 0.65, 0.89, 0.94, " ", "brNDC")
-        SetLegend(legend1)
-        legend1.SetTextSize(0.030)
-        legend1.AddEntry(histDataD0, "data", "EP")
-        legend1.AddEntry(pdfD0, "total fit", "L")
-        legend1.AddEntry(pdfD0S1S2, "sig. J/#psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfD0S1B2, "sig. J/#psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfD0S1F2, "sig. J/#psi - refl. D^{0}", "L")
-        legend1.AddEntry(pdfD0B1S2, "bkg. J/#psi - sig. D^{0}", "L")
-        legend1.AddEntry(pdfD0B1B2, "bkg. J/#psi - bkg. D^{0}", "L")
-        legend1.AddEntry(pdfD0B1F2, "bkg. J/#psi - refl. D^{0}", "L")
-        legend1.Draw()
+        legend1.AddEntry(pdfD0B1S2, "bkg. #mu#mu - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1B2, "bkg. #mu#mu - bkg. #piK", "L")
+        legend1.AddEntry(pdfD0B1F2, "bkg. #mu#mu - refl. #piK", "L")
+
+    legend1.Draw()
     
-    latexTitle.DrawLatex(0.18, 0.89, "ALICE performance")
+    latexTitle.DrawLatex(0.18, 0.89, "ALICE Performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.18, 0.78, "|#eta_{#piK}| < 0.8")
+    latexDecay.DrawLatex(0.18, 0.77, "D^{0} #rightarrow #pi^{+}K^{#minus}")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.73, "-4 < #eta_{#mu#mu} < -2.5")
+        latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow #mu^{+}#mu^{#minus}")
     else:
-        latexRap.DrawLatex(0.18, 0.73, "|#eta_{ee}| < 0.9")
-        
+        latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow e^{+}e^{#minus}")
+    
+    latexRap.DrawLatex(0.18, 0.68, "|#it{#eta}_{#piK}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.18, 0.63, "#minus 4 < #it{#eta}_{#mu#mu} < #minus 2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.18, 0.63, "|#it{#eta}_{ee}| < 0.9")
+
     canvasOutD0.Update()
     canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_d0_projection.pdf')
     
@@ -967,14 +932,21 @@ def plot_results(config):
     canvasOut3D.SetPhi(230)
     canvasOut3D.SetTheta(20)
     
-    latexTitle.DrawLatex(0.1, 0.94, "ALICE performance")
+    latexTitle.DrawLatex(0.1, 0.94, "ALICE Performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.SetTextSize(0.04)
-    latexRap.DrawLatex(0.7, 0.92, "|#eta_{#piK}| < 0.8")
+
+    latexDecay.DrawLatex(0.1, 0.82, "D^{0} #rightarrow #pi^{+}K^{#minus}")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.7, 0.86, "-4 < #eta_{#mu#mu} < -2.5") #titleSuffix
+        latexDecay.DrawLatex(0.1, 0.78, "J/#psi #rightarrow #mu^{+}#mu^{#minus}")
     else:
-        latexRap.DrawLatex(0.7, 0.86, "|#eta_{ee}| < 0.9")
+        latexDecay.DrawLatex(0.1, 0.78, "J/#psi #rightarrow e^{+}e^{#minus}")
+
+    latexRap.SetTextSize(0.04)
+    latexRap.DrawLatex(0.7, 0.92, "|#it{#eta}_{#piK}| < 0.8")
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        latexRap.DrawLatex(0.7, 0.86, "#minus 4 < #it{#eta}_{#mu#mu} < #minus 2.5") #titleSuffix
+    else:
+        latexRap.DrawLatex(0.7, 0.86, "|#it{#eta}_{ee}| < 0.9")
 
     canvasOut3D.Update()
     canvasOut3D.SaveAs(f'{config["output"]["figures"]}/fit_2d_{config["fit"]["JpsiChannel"]}.pdf')
