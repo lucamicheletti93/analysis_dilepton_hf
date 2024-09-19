@@ -681,6 +681,11 @@ def plot_results(config):
     latexRap.SetNDC()
     latexRap.SetTextFont(42)
 
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        decayLabel = "#mu#mu"
+    else:
+        decayLabel = "ee"
+        
     fIn = ROOT.TFile(f'{config["output"]["directory"]}/myTest.root', "READ")
     canvasInJpsi = fIn.Get("canvasFitJpsi")
     canvasInD0 = fIn.Get("canvasFitD0")
@@ -758,25 +763,26 @@ def plot_results(config):
         legend1 = ROOT.TLegend(0.6, 0.55, 0.8, 0.95, " ", "brNDC")
     SetLegend(legend1)
     legend1.SetTextSize(0.030)
-    if config["fit"]["add_psi2s"]:
-        legend1.SetTextSize(0.030)
+    
     legend1.AddEntry(histDataJpsi, "data", "EP")
     legend1.AddEntry(pdfJpsi, "total fit", "L")
 
     legend1.AddEntry(pdfJpsiS1S2, "sig. J/#psi - sig. D^{0}", "L")
     legend1.AddEntry(pdfJpsiS1B2, "sig. J/#psi - bkg. #piK", "L")
     legend1.AddEntry(pdfJpsiS1F2, "sig. J/#psi - refl. #piK", "L")
+    
     if config["fit"]["add_psi2s"]:
         legend1.AddEntry(pdfJpsiS2S3, "sig. #psi(2S) - sig. D^{0}", "L")
         legend1.AddEntry(pdfJpsiB2S3, "sig. #psi(2S) - bkg. #piK", "L")
         legend1.AddEntry(pdfJpsiF2S3, "sig. #psi(2S) - refl. #piK", "L")
-        legend1.AddEntry(pdfJpsiB1S2, "bkg. #mu#mu - sig. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB1B2, "bkg. #mu#mu - bkg. #piK", "L")
-        legend1.AddEntry(pdfJpsiB1F2, "bkg. #mu#mu - refl. #piK", "L")
+        
+        legend1.AddEntry(pdfJpsiB1S2, "bkg. "+decayLabel+" - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1B2, "bkg. "+decayLabel+" - bkg. #piK", "L")
+        legend1.AddEntry(pdfJpsiB1F2, "bkg. "+decayLabel+" - refl. #piK", "L")
     else:
-        legend1.AddEntry(pdfJpsiB1S2, "bkg. #mu#mu - sig. D^{0}", "L")
-        legend1.AddEntry(pdfJpsiB1B2, "bkg. #mu#mu - bkg. #piK", "L")
-        legend1.AddEntry(pdfJpsiB1F2, "bkg. #mu#mu - refl. #piK", "L")
+        legend1.AddEntry(pdfJpsiB1S2, "bkg. "+decayLabel+" - sig. D^{0}", "L")
+        legend1.AddEntry(pdfJpsiB1B2, "bkg. "+decayLabel+" - bkg. #piK", "L")
+        legend1.AddEntry(pdfJpsiB1F2, "bkg. "+decayLabel+" - refl. #piK", "L")
         
     legend1.Draw()
 
@@ -884,13 +890,13 @@ def plot_results(config):
         legend1.AddEntry(pdfD0S2S3, "sig. #psi(2S) - sig. D^{0}", "L")
         legend1.AddEntry(pdfD0B2S3, "sig. #psi(2S) - bkg. #piK", "L")
         legend1.AddEntry(pdfD0F2S3, "sig. #psi(2S) - refl. #piK", "L")
-        legend1.AddEntry(pdfD0B1S2, "bkg. #mu#mu - sig. D^{0}", "L")
-        legend1.AddEntry(pdfD0B1B2, "bkg. #mu#mu - bkg. #piK", "L")
-        legend1.AddEntry(pdfD0B1F2, "bkg. #mu#mu - refl. #piK", "L")
+        legend1.AddEntry(pdfD0B1S2, "bkg. "+decayLabel+" - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1B2, "bkg. "+decayLabel+" - bkg. #piK", "L")
+        legend1.AddEntry(pdfD0B1F2, "bkg. "+decayLabel+" - refl. #piK", "L")
     else:
-        legend1.AddEntry(pdfD0B1S2, "bkg. #mu#mu - sig. D^{0}", "L")
-        legend1.AddEntry(pdfD0B1B2, "bkg. #mu#mu - bkg. #piK", "L")
-        legend1.AddEntry(pdfD0B1F2, "bkg. #mu#mu - refl. #piK", "L")
+        legend1.AddEntry(pdfD0B1S2, "bkg. "+decayLabel+" - sig. D^{0}", "L")
+        legend1.AddEntry(pdfD0B1B2, "bkg. "+decayLabel+" - bkg. #piK", "L")
+        legend1.AddEntry(pdfD0B1F2, "bkg. "+decayLabel+" - refl. #piK", "L")
 
     legend1.Draw()
     
