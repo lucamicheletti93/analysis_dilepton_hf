@@ -2,6 +2,7 @@ import sys
 import argparse
 import yaml
 import ROOT
+import numpy as np
 sys.path.append('../utils')
 from plot_library import LoadStyle, SetGraStat, SetGraSyst, SetLegend
 
@@ -9,6 +10,7 @@ def main():
     parser = argparse.ArgumentParser(description='Arguments to pass')
     parser.add_argument('cfgFileName', metavar='text', default='config.yml', help='config file name')
     parser.add_argument("--do_prefit", help="Do the pre-fit to data", action="store_true")
+    parser.add_argument("--do_weightdata", help="Weight unbinned data sample with Axe", action="store_true")
     parser.add_argument("--do_fit", help="Do the fit to data / toy MC", action="store_true")
     parser.add_argument("--do_upper_limit", help="Do the calculation of the upper limit", action="store_true")
     parser.add_argument("--do_prefilter", help="Apply selections", action="store_true")
@@ -21,6 +23,9 @@ def main():
 
     if args.do_prefit:
         prefit()
+
+    if args.do_weightdata:
+        weightdata(inputCfg)
 
     if args.do_fit:
         fit(inputCfg)
@@ -43,6 +48,48 @@ def prefilter(config):
     rDataFrame = ROOT.RDataFrame(tree).Filter(config["prefilter"]["cuts"])
     fOutName = config["prefilter"]["data"].replace(".root", config["prefilter"]["suffix"] + ".root")
     rDataFrame.Snapshot(config["prefilter"]["tree"], fOutName)
+    fIn.Close()
+
+def weightdata(config):
+    """
+    function to assing weights to the data (see config_fit.yml)
+    """
+
+    fIn = ROOT.TFile(config["inputs"]["data"], "READ")
+    treeIn = fIn.Get(config["inputs"]["tree"])
+
+    fOut = ROOT.TFile("weightedTree.root", "RECREATE")
+    treeOut = treeIn.CloneTree(0)
+
+    fInAxeJpsi = ROOT.TFile(config["inputs"]["axeJpsi"], "READ")
+    histAxeJpsi = fInAxeJpsi.Get("histAxeJpsi")
+
+    fInAxeD0 = ROOT.TFile(config["inputs"]["axeD0"], "READ")
+    histAxeD0 = fInAxeD0.Get("histAxeD0")
+
+    weight = np.zeros(1, dtype=np.double)
+    treeOut.Branch("weight", weight, "weight/D")
+
+    for entry in range(treeIn.GetEntries()):
+        treeIn.GetEntry(entry)
+        
+        ptBinD0 = histAxeD0.GetXaxis().FindBin(treeIn.fPtD0)
+        rapBinD0 = histAxeD0.GetYaxis().FindBin(treeIn.fRapD0)
+        phiBinD0 = histAxeD0.GetZaxis().FindBin(treeIn.fPhiD0)
+
+        ptBinJpsi = histAxeJpsi.GetXaxis().FindBin(treeIn.fPtJpsi)
+        rapBinJpsi = histAxeJpsi.GetYaxis().FindBin(treeIn.fRapJpsi)
+        phiBinJpsi = histAxeJpsi.GetZaxis().FindBin(treeIn.fPhiJpsi)
+
+        weightD0 = histAxeD0.GetBinContent(ptBinD0, rapBinD0, phiBinD0)
+        weightJpsi = histAxeJpsi.GetBinContent(ptBinJpsi, rapBinJpsi, phiBinJpsi)
+        weight[0] = 1. / (weightD0 * weightJpsi)
+
+        treeOut.Fill()
+
+    fOut.cd()
+    treeOut.Write()
+    fOut.Close()
     fIn.Close()
 
 def prefit():
@@ -176,6 +223,8 @@ def fit(config):
     ptD0   = ROOT.RooRealVar("fPtD0", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100)
     ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", 0, 100)
     dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", -5, -1)
+    if config["fit"]["weighted"]:
+        weight = ROOT.RooRealVar("weight", "weight", 0, 1e10)
     
     # Yields parameters
     genJpsiD0  = config["fit"]["norm_par_sig_val"][0]
@@ -291,7 +340,11 @@ def fit(config):
             fIn = ROOT.TFile(config["inputs"]["data"], "READ")
             sample = fIn.Get(config["inputs"]["hist"])
     if config["fit"]["unbinned"]:
-        sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap], Import=sample)
+        if config["fit"]["weighted"]:
+            #sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap, weight], Import=sample, "", "weight")
+            sampleToFit = ROOT.RooDataSet("dataTree", "dataset with weights", sample, ROOT.RooArgSet(mD0, mJpsi, ptD0, ptJpsi, dRap, weight), "", "weight")
+        else:
+            sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap], Import=sample)
     else:
         sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi, ptD0, ptJpsi, dRap], Import=sample)
 

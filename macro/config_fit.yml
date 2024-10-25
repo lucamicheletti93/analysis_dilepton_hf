@@ -46,6 +46,7 @@ prefilter:
 fit:
   toy_mc: False
   unbinned: True
+  weighted: False
   min_fit_range_d0: 1.70
   max_fit_range_d0: 2.05
   min_fit_range_jpsi: 2.5
