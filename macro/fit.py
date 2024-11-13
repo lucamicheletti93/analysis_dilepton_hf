@@ -73,16 +73,22 @@ def weightdata(config):
     for entry in range(treeIn.GetEntries()):
         treeIn.GetEntry(entry)
         
+        if (abs(treeIn.fRapD0) > 0.6 or treeIn.fPtD0 > 30): continue
+        if (abs(treeIn.fRapJpsi) > 4 or abs(treeIn.fRapJpsi) < 2.5 or treeIn.fPtJpsi > 20): continue
+
         ptBinD0 = histAxeD0.GetXaxis().FindBin(treeIn.fPtD0)
         rapBinD0 = histAxeD0.GetYaxis().FindBin(treeIn.fRapD0)
-        phiBinD0 = histAxeD0.GetZaxis().FindBin(treeIn.fPhiD0)
+        #phiBinD0 = histAxeD0.GetZaxis().FindBin(treeIn.fPhiD0) #WARNING: for the moment (pT, y) correction is applied
 
         ptBinJpsi = histAxeJpsi.GetXaxis().FindBin(treeIn.fPtJpsi)
-        rapBinJpsi = histAxeJpsi.GetYaxis().FindBin(treeIn.fRapJpsi)
-        phiBinJpsi = histAxeJpsi.GetZaxis().FindBin(treeIn.fPhiJpsi)
+        rapBinJpsi = histAxeJpsi.GetYaxis().FindBin(abs(treeIn.fRapJpsi)) #WARNING: in the tree is negative, in Axe is positive
+        #phiBinJpsi = histAxeJpsi.GetZaxis().FindBin(treeIn.fPhiJpsi) #WARNING: for the moment (pT, y) correction is applied
 
-        weightD0 = histAxeD0.GetBinContent(ptBinD0, rapBinD0, phiBinD0)
-        weightJpsi = histAxeJpsi.GetBinContent(ptBinJpsi, rapBinJpsi, phiBinJpsi)
+        #weightD0 = histAxeD0.GetBinContent(ptBinD0, rapBinD0, phiBinD0) #WARNING: 3D histograms
+        #weightJpsi = histAxeJpsi.GetBinContent(ptBinJpsi, rapBinJpsi, phiBinJpsi) #WARNING: 3D histograms
+        weightD0 = histAxeD0.GetBinContent(ptBinD0, rapBinD0)
+        weightJpsi = histAxeJpsi.GetBinContent(ptBinJpsi, rapBinJpsi)
+        print(weightD0, weightJpsi)
         weight[0] = 1. / (weightD0 * weightJpsi)
 
         treeOut.Fill()

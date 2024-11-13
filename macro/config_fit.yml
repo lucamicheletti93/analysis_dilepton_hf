@@ -13,6 +13,8 @@ inputs:
   data: ~/alice/jpsiHF/mergedOutput_BDT_modular_cut.root
   hist: hSparseJPsiDmeson_proj_3_2
   tree: "DF_2303125544446624/O2rtdilptdmesall" # tree name for 2024
+  axeJpsi: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/macro/axeJpsi.root
+  axeD0: /Users/lucamicheletti/GITHUB/analysis_dilepton_hf/macro/axeD0.root
   
 reflections:
   data: ~/alice/jpsiHF/reflections_D0_cuts.root
