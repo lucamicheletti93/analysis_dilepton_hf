@@ -58,7 +58,8 @@ def weightdata(config):
     fIn = ROOT.TFile(config["inputs"]["data"], "READ")
     treeIn = fIn.Get(config["inputs"]["tree"])
 
-    fOut = ROOT.TFile("weightedTree.root", "RECREATE")
+    fOutName = config["inputs"]["data"]
+    fOut = ROOT.TFile(fOutName.replace(".root", "_weighted.root"), "RECREATE")
     treeOut = treeIn.CloneTree(0)
 
     fInAxeJpsi = ROOT.TFile(config["inputs"]["axeJpsi"], "READ")
@@ -73,11 +74,11 @@ def weightdata(config):
     for entry in range(treeIn.GetEntries()):
         treeIn.GetEntry(entry)
         
-        if (abs(treeIn.fRapD0) > 0.6 or treeIn.fPtD0 > 30): continue
+        if (abs(treeIn.fRapDmes) > 0.6 or treeIn.fPtDmes > 30): continue
         if (abs(treeIn.fRapJpsi) > 4 or abs(treeIn.fRapJpsi) < 2.5 or treeIn.fPtJpsi > 20): continue
 
-        ptBinD0 = histAxeD0.GetXaxis().FindBin(treeIn.fPtD0)
-        rapBinD0 = histAxeD0.GetYaxis().FindBin(treeIn.fRapD0)
+        ptBinD0 = histAxeD0.GetXaxis().FindBin(treeIn.fPtDmes)
+        rapBinD0 = histAxeD0.GetYaxis().FindBin(treeIn.fRapDmes)
         #phiBinD0 = histAxeD0.GetZaxis().FindBin(treeIn.fPhiD0) #WARNING: for the moment (pT, y) correction is applied
 
         ptBinJpsi = histAxeJpsi.GetXaxis().FindBin(treeIn.fPtJpsi)
@@ -224,9 +225,9 @@ def fit(config):
         print("Error: JpsiChannel not defined in the configuration file.")
         sys.exit(1)
         
-    mD0   = ROOT.RooRealVar("fMassD0", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
+    mD0   = ROOT.RooRealVar("fMassDmes", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
     mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", minFitRangeJpsi, maxFitRangeJpsi)
-    ptD0   = ROOT.RooRealVar("fPtD0", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100)
+    ptD0   = ROOT.RooRealVar("fPtDmes", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100)
     ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", 0, 100)
     dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", -5, -1)
     if config["fit"]["weighted"]:
@@ -478,7 +479,7 @@ def fit(config):
     canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 800)
     canvasFitJpsi.SetTickx(1)
     canvasFitJpsi.SetTicky(1)
-    mJpsiframe.GetYaxis().SetRangeUser(0, 0.08*sampleToFit.numEntries())
+    mJpsiframe.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mJpsiframe.Draw()
@@ -497,7 +498,7 @@ def fit(config):
     canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit.pdf')
     
     canvasFitJpsi.SetLogy()
-    mJpsiframe.GetYaxis().SetRangeUser(1, sampleToFit.numEntries())
+    mJpsiframe.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
     canvasFitJpsi.Update()
     canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_logy.pdf')
 
@@ -506,7 +507,7 @@ def fit(config):
     canvasFitD0.SetTicky(1)
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.GetYaxis().SetLabelSize(0.03)
-    mD0frame.GetYaxis().SetRangeUser(0, 0.05*sampleToFit.numEntries())
+    mD0frame.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
     mD0frame.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mD0frame.Draw()
     legend_comp.Draw()
@@ -524,31 +525,17 @@ def fit(config):
     canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit.pdf')
 
     canvasFitD0.SetLogy()
-    mD0frame.GetYaxis().SetRangeUser(1, sampleToFit.numEntries())
+    mD0frame.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range_log"][0], config["plot_results"]["d0Frame"]["y_range_log"][1])
     canvasFitD0.Update()
     canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_logy.pdf')
-    #canvasFit = ROOT.TCanvas("canvasFit", "canvasFit", 1200, 600)
-    #canvasFit.Divide(2, 1)
-
-    #canvasFit.cd(1)
-    #mJpsiframe.GetYaxis().SetTitleOffset(1.4)
-    #mJpsiframe.Draw()
-    #legend.Draw()
-
-    #canvasFit.cd(2)
-    #mD0frame.GetYaxis().SetTitleOffset(1.4)
-    #mD0frame.Draw()
-    #legend.Draw()
-    #canvasFit.Update()
-    #canvasFit.SaveAs(f'{config["output"]["figures"]}/projected_fit.pdf')
 
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gPad.SetLeftMargin(0.15)
     
     if config["fit"]["unbinned"]:
-        sample.Draw("fMass : fMassD0 >> hist_fMass_fMassD0", f'fMass > {minFitRangeJpsi} && fMass < {maxFitRangeJpsi} && fMassD0 > {minFitRangeD0} && fMassD0 < {maxFitRangeD0}', "LEGO2")
-        htemp = ROOT.gPad.GetPrimitive("hist_fMass_fMassD0")
+        sample.Draw("fMass : fMassDmes >> hist_fMass_fMassDmes", f'fMass > {minFitRangeJpsi} && fMass < {maxFitRangeJpsi} && fMassDmes > {minFitRangeD0} && fMassDmes < {maxFitRangeD0}', "LEGO2")
+        htemp = ROOT.gPad.GetPrimitive("hist_fMass_fMassDmes")
         htemp.SetTitle(" ")
         htemp.GetXaxis().SetTitleOffset(2.0)
         htemp.GetXaxis().SetLabelSize(0.03)
