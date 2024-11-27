@@ -1,0 +1,10 @@
+{ "OutputDirector": {
+  "debug_mode": true,
+  "resfile": "tree_jpsi_d0_reduced_data_merged",
+  "OutputDescriptors": [
+    {
+      "table": "AOD/RTDILPTDMESALL/0"
+    }
+  ],
+  "ntfmerge": 1
+} }
