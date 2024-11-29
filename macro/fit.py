@@ -572,7 +572,7 @@ def fit(config):
     
     fitResult.Print()
 
-    fOut = ROOT.TFile(f'{config["output"]["directory"]}/myTest.root', "RECREATE")
+    fOut = ROOT.TFile(f'{config["output"]["directory"]}/results.root', "RECREATE")
     #canvasFit.Write()
     canvasFitJpsi.Write()
     canvasFitD0.Write()
