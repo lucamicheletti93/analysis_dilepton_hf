@@ -1,4 +1,5 @@
 ### Links to the shared cernbox directories
+- LHC22 pass7 skimmed: https://cernbox.cern.ch/s/nJ8YNoR77FIDwvJ
 - LHC23 pass4 skimmed: https://cernbox.cern.ch/s/DYW65twa2sWH8qz
 - LHC24 pass1 skimmed: https://cernbox.cern.ch/s/gdXXO4gc1YBKlNX
 
