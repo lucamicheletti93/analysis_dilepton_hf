@@ -3,9 +3,11 @@ inputs:
   #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
   #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
   data: ../data_shared/2024_pass1_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
+  #data: ../data_shared/2022_pass7_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
   hist: hSparseJPsiDmeson_proj_3_2
   #tree: "DF_2298168342132800/O2rtdilptdmesall"
   tree: "DF_2363842916536384/O2rtdilptdmesall"
+  #tree: "DF_2248591514075879/O2rtdilptdmesall"
   axeJpsi: ../data_shared/axeJpsiToMuMu.root
   axeD0: ../data_shared/axeD0.root
   
@@ -15,10 +17,12 @@ reflections:
   signal: hist_signal
 
 prefilter:  
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
-  data: ../data_shared/2024_pass1_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
-  #tree: "DF_2298168342132800/O2rtdilptdmesall"
-  tree: "DF_2363842916536384/O2rtdilptdmesall"
+  data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
+  #data: ../data_shared/2024_pass1_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
+  #data: ../data_shared/2022_pass7_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
+  tree: "DF_2298168342132800/O2rtdilptdmesall"
+  #tree: "DF_2363842916536384/O2rtdilptdmesall"
+  #tree: "DF_2248591514075879/O2rtdilptdmesall"
   cuts: "(fPtDmes >= 0.  && fPtDmes < 1.  && fBdtBkg < 0.050) ||
          (fPtDmes >= 1.  && fPtDmes < 2.  && fBdtBkg < 0.050) ||
          (fPtDmes >= 2.  && fPtDmes < 3.  && fBdtBkg < 0.100) ||
@@ -86,8 +90,8 @@ plot_results:
     x_title_offset: 1.1
     y_title_offset: 2.1
     x_range: [2.51, 4.0]
-    y_range: [0.1, 4500]
-    y_range_log: [1.1, 1.e+6]
+    y_range: [2., 4500]
+    y_range_log: [2., 1.e+6]
     y_title_offset_log: 1.5
   d0Frame:
     x_title: "#it{m}_{#piK} (GeV/#it{c}^{2})"
@@ -95,8 +99,8 @@ plot_results:
     x_title_offset: 1.1
     y_title_offset: 2.1
     x_range: [1.7, 2.05]
-    y_range: [0.1, 3000]
-    y_range_log: [1.1, 1.e+6]
+    y_range: [2., 3000]
+    y_range_log: [2., 1.e+6]
 
 output:
   directory: output_2024_pass1_skimmed

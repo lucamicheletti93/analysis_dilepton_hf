@@ -486,7 +486,7 @@ def fit(config):
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
-    latexTitle.DrawLatex(0.15, 0.835, "ALICE Performance")
+    latexTitle.DrawLatex(0.15, 0.835, "Work in progress")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.DrawLatex(0.15, 0.72, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
@@ -513,7 +513,7 @@ def fit(config):
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
-    latexTitle.DrawLatex(0.15, 0.835, "ALICE Performance")
+    latexTitle.DrawLatex(0.15, 0.835, "Work in progress")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.DrawLatex(0.15, 0.72, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
@@ -559,7 +559,7 @@ def fit(config):
     canvasFitHist3D.SetPhi(230)
     canvasFitHist3D.SetTheta(20)
     
-    latexTitle.DrawLatex(0.1, 0.94, "ALICE Performance")
+    latexTitle.DrawLatex(0.1, 0.94, "Work in progress")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.DrawLatex(0.73, 0.9, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
@@ -832,7 +832,7 @@ def plot_results(config):
         
     legend1.Draw()
 
-    latexTitle.DrawLatex(0.18, 0.89, "ALICE Performance")
+    latexTitle.DrawLatex(0.18, 0.89, "Work in progress")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexDecay.DrawLatex(0.18, 0.77, "D^{0} #rightarrow #pi^{+}K^{#minus}")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
@@ -946,7 +946,7 @@ def plot_results(config):
 
     legend1.Draw()
     
-    latexTitle.DrawLatex(0.18, 0.89, "ALICE Performance")
+    latexTitle.DrawLatex(0.18, 0.89, "Work in progress")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexDecay.DrawLatex(0.18, 0.77, "D^{0} #rightarrow #pi^{+}K^{#minus}")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
@@ -984,7 +984,7 @@ def plot_results(config):
     canvasOut3D.SetPhi(230)
     canvasOut3D.SetTheta(20)
     
-    latexTitle.DrawLatex(0.1, 0.94, "ALICE Performance")
+    latexTitle.DrawLatex(0.1, 0.94, "Work in progress")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
 
     latexDecay.DrawLatex(0.1, 0.82, "D^{0} #rightarrow #pi^{+}K^{#minus}")
