@@ -66,7 +66,7 @@ def weightdata(config):
     histAxeJpsi = fInAxeJpsi.Get("histAxeJpsi")
 
     fInAxeD0 = ROOT.TFile(config["inputs"]["axeD0"], "READ")
-    histAxeD0 = fInAxeD0.Get("histAxeD0")
+    histAxeD0 = fInAxeD0.Get("histAxeD0_prompt")
 
     weight = np.zeros(1, dtype=np.double)
     treeOut.Branch("weight", weight, "weight/D")
