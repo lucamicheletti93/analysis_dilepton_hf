@@ -13,6 +13,9 @@ def get_reflections(config): #pylint:disable=too-many-locals,too-many-statements
     Main function for the preparation of the reflection templates
     """
 
+    ROOT.gStyle.SetPalette(ROOT.kRainBow)
+    ROOT.gStyle.SetOptStat(0)
+
     with open(config, 'r') as yml:
         cfg = yaml.load(yml, yaml.FullLoader)
     pt_mins = cfg['pt_mins']
@@ -22,10 +25,17 @@ def get_reflections(config): #pylint:disable=too-many-locals,too-many-statements
     input_weights = cfg["inputs"]["weights"]
 
     sparse_rec, sparse_gen = [], []
+    n_events = []
     for ifile, infile_name in enumerate(infile_names):
         infile = ROOT.TFile.Open(infile_name)
+        hist_events = infile.Get("hf-candidate-creator-2prong/hCollisions")
+        n_events.append(hist_events.GetBinContent(1)) # to reweight
         sparse_rec.append(infile.Get("hf-task-d0/hBdtScoreVsMassVsPtVsPtBVsYVsOriginVsD0Type"))
         sparse_gen.append(infile.Get("hf-task-d0/hSparseAcc"))
+
+    for ifile, nev in enumerate(n_events):
+        weights_ev_mc = sum(n_events)/nev # we normalise all the inputs to the same weight
+        input_weights[ifile] *= weights_ev_mc # we weight them according to the values in the config
 
     hist_refl, hist_signal = None, None
     hist_reco_p_toreb, hist_reco_np_toreb = None, None
@@ -155,8 +165,19 @@ def get_reflections(config): #pylint:disable=too-many-locals,too-many-statements
     hist_eff_np.Sumw2()
     hist_eff_np.Divide(hist_reco_np, hist_gen_np, 1., 1., "B")
 
+    canv = ROOT.TCanvas("canv", "", 1000, 500)
+    canv.Divide(2, 1)
+    canv.cd(1)
+    hist_eff_p.GetZaxis().SetTitle("(Acc #times #font[152]{e}) prompt D^{0}")
+    hist_eff_p.DrawCopy("colz")
+    canv.cd(2)
+    hist_eff_np.GetZaxis().SetTitle("(Acc #times #font[152]{e}) non-prompt D^{0}")
+    hist_eff_np.DrawCopy("colz")
+
     outfile_name_eff = cfg["outputs"]["efficiencies"]
+    canv.SaveAs(outfile_name_eff.replace(".root", ".pdf"))
     outfile = ROOT.TFile(outfile_name_eff, "recreate")
+    canv.Write()
     hist_reco_p.Write()
     hist_reco_np.Write()
     hist_gen_p.Write()
@@ -190,7 +211,7 @@ def get_reflections(config): #pylint:disable=too-many-locals,too-many-statements
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Arguments")
     parser.add_argument("--config", "-c", metavar="text",
-                        default="config_bdt_cuts.yml",
+                        default="config_eff_and_refl.yml",
                         help="config file with BDT cuts")
     args = parser.parse_args()
 

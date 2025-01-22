@@ -1,6 +1,6 @@
 inputs:
-    files: [../data_shared/effmaps/AnalysisResults_LHC24g5_trackTuner_ptSmearing1p5.root, ../data_shared/effmaps/AnalysisResults_LHC24h1_trackTuner_ptSmearing1p5.root]
-    weights: [1., 2.333] # weights to be assigned in case of different sampling used in different MC productions
+    files: [../data_shared/effmaps/AnalysisResults_LHC24g5_trackTuner_ptSmearing1p5.root, ../data_shared/effmaps/AnalysisResults_LHC24h1_trackTuner_ptSmearing1p5.root,  ../data_shared/effmaps/AnalysisResults_LHC24k3_trackTuner_ptSmearing1p5.root]
+    weights: [0.146, 0.107, 0.747] # weights to be assigned in case of different sampling used in different MC productions (values obtained from integrated luminosity)
 
 pt_mins: [0, 1, 2, 3, 4, 6, 8, 10, 20]
 pt_maxs: [1, 2, 3, 4, 6, 8, 10, 20, 50]
