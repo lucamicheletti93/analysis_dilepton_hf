@@ -6,6 +6,7 @@
 ## MC outputs for D<sup>0</sup>
 - LHC24g5 (anchored to LHC22 pass7): https://cernbox.cern.ch/s/n6fglJh0XOpbWni
 - LHC24h1 (anchored to LHC23 pass4): https://cernbox.cern.ch/s/HbZVGqFlnbHrQTU
+- LHC24k3 (anchored to LHC24 pass1): https://cernbox.cern.ch/s/NgrDNCw0xABYaof
 
 ### Useful commands
 
