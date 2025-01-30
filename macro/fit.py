@@ -230,6 +230,7 @@ def fit(config):
     ptD0   = ROOT.RooRealVar("fPtDmes", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100)
     ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", 0, 100)
     dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", -5, -1)
+    rapJpsi = ROOT.RooRealVar("fRapJpsi", f"y_{{{titleSuffix}}}", -5, -1)
     if config["fit"]["weighted"]:
         weight = ROOT.RooRealVar("weight", "weight", 0, 1e10)
     
@@ -348,12 +349,15 @@ def fit(config):
             sample = fIn.Get(config["inputs"]["hist"])
     if config["fit"]["unbinned"]:
         if config["fit"]["weighted"]:
-            #sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap, weight], Import=sample, "", "weight")
-            sampleToFit = ROOT.RooDataSet("dataTree", "dataset with weights", sample, ROOT.RooArgSet(mD0, mJpsi, ptD0, ptJpsi, dRap, weight), "", "weight")
+            #sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi, weight], Import=sample, "", "weight")
+            sampleToFit = ROOT.RooDataSet("dataTree", "dataset with weights", sample, ROOT.RooArgSet(mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi, weight), "", "weight")
         else:
-            sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap], Import=sample)
+            sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi], Import=sample)
     else:
-        sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi, ptD0, ptJpsi, dRap], Import=sample)
+        sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi], Import=sample)
+
+    if config["fit"]["unbinned"]:
+        sampleToFit = sampleToFit.reduce(f"fRapJpsi>{config['fit']['min_jpsi_rap']} && fRapJpsi<{config['fit']['max_jpsi_rap']}")
 
     # Fit
     fitResult = model.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
@@ -490,17 +494,17 @@ def fit(config):
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.DrawLatex(0.15, 0.72, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, 0.68, "-4 < #it{#eta}_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.15, 0.68, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, 0.68, "|#it{#eta}_{ee}| < 0.9")
+        latexRap.DrawLatex(0.15, 0.68, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
         
     canvasFitJpsi.Update()
-    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit.pdf')
+    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit.png')
     
     canvasFitJpsi.SetLogy()
     mJpsiframe.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
     canvasFitJpsi.Update()
-    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_logy.pdf')
+    canvasFitJpsi.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_logy.png')
 
     canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 800)
     canvasFitD0.SetTickx(1)
@@ -517,17 +521,17 @@ def fit(config):
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.DrawLatex(0.15, 0.72, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, 0.68, "-4 < #it{#eta}_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.15, 0.68, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, 0.68, "|#it{#eta}_{ee}| < 0.9")
+        latexRap.DrawLatex(0.15, 0.68, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
 
     canvasFitD0.Update()
-    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit.pdf')
+    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit.png')
 
     canvasFitD0.SetLogy()
     mD0frame.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range_log"][0], config["plot_results"]["d0Frame"]["y_range_log"][1])
     canvasFitD0.Update()
-    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_logy.pdf')
+    canvasFitD0.SaveAs(f'{config["output"]["figures"]}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_logy.png')
 
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
@@ -563,12 +567,12 @@ def fit(config):
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexRap.DrawLatex(0.73, 0.9, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.73, 0.86, "-4 < #it{#eta}_{#mu#mu} < -2.5") #titleSuffix
+        latexRap.DrawLatex(0.73, 0.86, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.73, 0.86, "|#it{#eta}_{ee}| < 0.9")
+        latexRap.DrawLatex(0.73, 0.86, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
 
     canvasFitHist3D.Update()
-    canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D_{config["fit"]["JpsiChannel"]}_fitSave.pdf')
+    canvasFitHist3D.SaveAs(f'{config["output"]["figures"]}/fit_2D_{config["fit"]["JpsiChannel"]}_fitSave.png')
     
     fitResult.Print()
 
@@ -842,18 +846,18 @@ def plot_results(config):
     
     latexRap.DrawLatex(0.18, 0.68, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.63, "#minus 4 < #it{#eta}_{#mu#mu} < #minus 2.5") #titleSuffix
+        latexRap.DrawLatex(0.18, 0.63, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, 0.63, "|#it{#eta}_{ee}| < 0.9")
+        latexRap.DrawLatex(0.18, 0.63, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
 
     canvasOutJpsi.Update()
-    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection.pdf')
+    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection.png')
     
     canvasOutJpsi.SetLogy()
     frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
     frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset_log"])
     canvasOutJpsi.Update()
-    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_logy.pdf')
+    canvasOutJpsi.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_logy.png')
 
     ## plot D0 results
     frameD0 = listOfPrimitivesD0.At(1)
@@ -956,12 +960,12 @@ def plot_results(config):
     
     latexRap.DrawLatex(0.18, 0.68, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.63, "#minus 4 < #it{#eta}_{#mu#mu} < #minus 2.5") #titleSuffix
+        latexRap.DrawLatex(0.18, 0.63, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, 0.63, "|#it{#eta}_{ee}| < 0.9")
+        latexRap.DrawLatex(0.18, 0.63, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
 
     canvasOutD0.Update()
-    canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_d0_projection.pdf')
+    canvasOutD0.SaveAs(f'{config["output"]["figures"]}/fit_{config["fit"]["JpsiChannel"]}_d0_projection.png')
     
     ## plot the 2D results
     hist3D = listOfPrimitives3D.At(0)
@@ -996,12 +1000,12 @@ def plot_results(config):
     latexRap.SetTextSize(0.04)
     latexRap.DrawLatex(0.7, 0.92, "|#it{#eta}_{#piK}| < 0.8")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.7, 0.86, "#minus 4 < #it{#eta}_{#mu#mu} < #minus 2.5") #titleSuffix
+        latexRap.DrawLatex(0.7, 0.86, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.7, 0.86, "|#it{#eta}_{ee}| < 0.9")
+        latexRap.DrawLatex(0.7, 0.86, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
 
     canvasOut3D.Update()
-    canvasOut3D.SaveAs(f'{config["output"]["figures"]}/fit_2d_{config["fit"]["JpsiChannel"]}.pdf')
+    canvasOut3D.SaveAs(f'{config["output"]["figures"]}/fit_2d_{config["fit"]["JpsiChannel"]}.png')
     
     input()
 

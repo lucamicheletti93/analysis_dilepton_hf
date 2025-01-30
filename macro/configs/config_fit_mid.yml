@@ -53,6 +53,9 @@ fit:
   JpsiChannel: "Jpsi2ee"
   add_psi2s: False ## if true, the psi2s is added to the fit
 
+  min_jpsi_rap : -0.9
+  max_jpsi_rap : 0.9
+
   norm_par_sig_name: [nJPsiD0, nPsi2SD0, nBkgJPsi, nBkgPsi2S, nBkgD0, nBkgBkg]
   norm_par_sig_val: [5000, 90, 1000, 100, 2000, 10000]
   norm_par_sig_lw_lim: [50, 10, 10, 10, 20, 100]
