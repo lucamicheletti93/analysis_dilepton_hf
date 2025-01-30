@@ -46,6 +46,9 @@ fit:
   JpsiChannel: "Jpsi2mumu"
   add_psi2s: True ## if true, the psi2s is added to the fit
 
+  min_jpsi_rap : -4
+  max_jpsi_rap : -2.7
+
   norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg, rPsi2sJPsi]
   norm_par_sig_val: [5000, 10000, 2000, 10000, 0.023]
   norm_par_sig_lw_lim: [50, 1000, 20, 100, 0.02]
