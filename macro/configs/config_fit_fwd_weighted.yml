@@ -45,6 +45,19 @@ fit:
 
   min_jpsi_rap : -4
   max_jpsi_rap : -2.7
+
+  min_jpsi_pt : 0
+  max_jpsi_pt : 100
+
+  min_d0_rap : -0.6
+  max_d0_rap : 0.6
+
+  min_d0_pt : 0.5
+  max_d0_pt : 100
+
+  min_dRap : 3
+  max_dRap : 100
+  
   
   norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg, rPsi2sJPsi]
   norm_par_sig_val: [5000, 10000, 2000, 10000, 0.023]
