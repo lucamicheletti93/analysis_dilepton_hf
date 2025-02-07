@@ -151,7 +151,7 @@ def prefit():
     nBkgD0  = ROOT.RooRealVar("nBkgD0", "D0 background", 1e6, 0., 1e10)
     modelD0 = ROOT.RooAddPdf("modelD0", "sigD0 + bkgD0", ROOT.RooArgList(cbPdfD0, chebyPdfD0), ROOT.RooArgList(nSigD0, nBkgD0))
 
-    fitResultD0 = modelD0.fitTo(dataHistD0, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
+    fitResultD0 = modelD0.fitTo(dataHistD0, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1), ROOT.RooFit.Minos(not config['fit']['weighted']), ROOT.RooFit.SumW2Error(config['fit']['weighted']))
 
     mD0frame = mD0.frame(Title=" ")
     dataHistD0.plotOn(mD0frame)
@@ -182,7 +182,7 @@ def prefit():
     nBkgJpsi  = ROOT.RooRealVar("nBkgJpsi", "Jpsi background", 1e6, 0., 1e8)
     modelJpsi = ROOT.RooAddPdf("modelJpsi", "sigJpsi + bkgJpsi", ROOT.RooArgList(cbPdfJpsi, chebyPdfJpsi), ROOT.RooArgList(nSigJpsi, nBkgJpsi))
 
-    fitResultJpsi = modelJpsi.fitTo(dataHistJpsi, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
+    fitResultJpsi = modelJpsi.fitTo(dataHistJpsi, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1), ROOT.RooFit.Minos(not config['fit']['weighted']), ROOT.RooFit.SumW2Error(config['fit']['weighted']))
 
     mJpsiframe = mJpsi.frame(Title=" ")
     dataHistJpsi.plotOn(mJpsiframe)
@@ -383,8 +383,9 @@ def fit(config):
         sampleToFit = sampleToFit.reduce(f"fabs(fDeltaY)>{config['fit']['min_dRap']} && fabs(fDeltaY)<{config['fit']['max_dRap']}")
         
     # Fit
-    fitResult = model.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Minos(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1))
-    
+    fitResult = model.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1), ROOT.RooFit.Minos(not config['fit']['weighted']), ROOT.RooFit.SumW2Error(config['fit']['weighted']))
+
+
     # Create sPlot
     sampleToFit_sPlot = sampleToFit.Clone("sampleToFit_sPlot") # cloning the original dataset
     sData = ROOT.RooStats.SPlot("sData", "An SPlot", sampleToFit_sPlot, model, ROOT.RooArgList(nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg)) # The line creates an SPlot 'sData' and adds columns to 'sampleToFit_sPlot' that represent the weights for various components of the model
@@ -626,7 +627,11 @@ def fit(config):
 
     canvasFitHist3D.Update()
     canvasFitHist3D.SaveAs(f'{output_dir}/fit_2D_{config["fit"]["JpsiChannel"]}_fitSave_{getGlobalLabel(config)}.pdf')
-    
+
+    #print("Number of entries:", sampleToFit.numEntries())
+    #print("Sum of weights:", sampleToFit.sumEntries())
+    #print("Sum of squared weights:", sampleToFit.sumEntries("1", "weight*weight"))
+
     fitResult.Print()
 
     fOut = ROOT.TFile(f'{config["output"]["directory"]}/results_{weighted_label}_{getGlobalLabel(config)}.root', "RECREATE")
