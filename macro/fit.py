@@ -50,7 +50,7 @@ def getLabel(val):
         label +="Neg"
     label += str(int(ROOT.TMath.Abs(val)))
     label += "p"
-    label += str((10*ROOT.TMath.Abs(val))%10)
+    label += str(int((10*ROOT.TMath.Abs(val))%10))
     return label
 
 def getGlobalLabel(config):
@@ -516,20 +516,27 @@ def fit(config):
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.835, "Work in progress")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
-    #latexRap.DrawLatex(0.15, 0.72, "|#it{#eta}_{#piK}| < 0.8")
+    yLatex = 0.72
+    dyLatex = 0.04
+    latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, 0.68, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, 0.68, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, 0.64, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.15, 0.64, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.15, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+        yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, 0.64, f"#Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.15, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            yLatex -= dyLatex
+    if config["fit"]["min_d0_pt"] > 0:
+         latexRap.DrawLatex(0.15, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
 
     weighted_label = "weightedFits" if config['fit']['weighted'] else "unweightedFits"
     output_dir = f'{config["output"]["figures"]}/{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
@@ -556,20 +563,28 @@ def fit(config):
         legend_comp2.Draw()
     latexTitle.DrawLatex(0.15, 0.835, "Work in progress")
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.15, 0.72, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex = 0.72
+    dyLatex = 0.04
+    latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, 0.68, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, 0.68, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+    yLatex -= dyLatex
 
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, 0.64, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.15, 0.64, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.15, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+        yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, 0.64, f"#Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.15, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            yLatex -= dyLatex
+    if config["fit"]["min_d0_pt"] > 0:
+        latexRap.DrawLatex(0.15, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
 
     canvasFitD0.Update()
     canvasFitD0.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_{getGlobalLabel(config)}.pdf')
@@ -611,26 +626,30 @@ def fit(config):
     
     latexTitle.DrawLatex(0.1, 0.94, "Work in progress")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    latexRap.DrawLatex(0.73, 0.92, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex = 0.93
+    dyLatex = 0.04
+    latexRap.DrawLatex(0.73, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.73, 0.88, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.73, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.73, 0.88, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.73, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.73, 0.84, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.73, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.73, 0.84, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.73, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+        yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.73, 0.84, f"#Delta y < {config['fit']['max_dRap']}")
-
+            latexRap.DrawLatex(0.73, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            yLatex -= dyLatex
+    if config["fit"]["min_d0_pt"] > 0:
+        latexRap.DrawLatex(0.73, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
+        
     canvasFitHist3D.Update()
     canvasFitHist3D.SaveAs(f'{output_dir}/fit_2D_{config["fit"]["JpsiChannel"]}_fitSave_{getGlobalLabel(config)}.pdf')
-
-    #print("Number of entries:", sampleToFit.numEntries())
-    #print("Sum of weights:", sampleToFit.sumEntries())
-    #print("Sum of squared weights:", sampleToFit.sumEntries("1", "weight*weight"))
 
     fitResult.Print()
 
@@ -905,20 +924,27 @@ def plot_results(config):
         latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow #mu^{+}#mu^{#minus}")
     else:
         latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow e^{+}e^{#minus}")
-    
-    latexRap.DrawLatex(0.18, 0.68, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex = 0.68
+    dyLatex = 0.05
+    latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.63, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, 0.63, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.18, 0.58, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.18, 0.58, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.18, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+        yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.18, 0.58, f"#Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.18, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            yLatex -= dyLatex
+    if config["fit"]["min_d0_pt"] > 0:
+        latexRap.DrawLatex(0.18, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
 
 
     output_dir = f'{config["output"]["figures"]}_paperStyle/{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
@@ -1031,20 +1057,27 @@ def plot_results(config):
         latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow #mu^{+}#mu^{#minus}")
     else:
         latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow e^{+}e^{#minus}")
-    
-    latexRap.DrawLatex(0.18, 0.68, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex = 0.68
+    dyLatex = 0.05
+    latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, 0.63, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, 0.63, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.18, 0.58, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.18, 0.58, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.18, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+        yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.18, 0.58, f"#Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.18, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            yLatex -= dyLatex
+    if config["fit"]["min_d0_pt"] > 0:
+        latexRap.DrawLatex(0.18, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
 
     canvasOutD0.Update()
     canvasOutD0.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_d0_projection_{getGlobalLabel(config)}.pdf')
@@ -1080,20 +1113,27 @@ def plot_results(config):
         latexDecay.DrawLatex(0.1, 0.78, "J/#psi #rightarrow e^{+}e^{#minus}")
 
     latexRap.SetTextSize(0.04)
-    latexRap.DrawLatex(0.7, 0.93, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex = 0.93
+    dyLatex = 0.05
+    latexRap.DrawLatex(0.7, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.7, 0.87, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.7, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.7, 0.87, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.7, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+    yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.7, 0.81, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.7, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.7, 0.81, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.7, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+        yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.7, 0.81, f"#Delta y < {config['fit']['max_dRap']}")
-
+            latexRap.DrawLatex(0.7, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            yLatex -= dyLatex
+    if config["fit"]["min_d0_pt"] > 0:
+        latexRap.DrawLatex(0.7, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
     canvasOut3D.Update()
     canvasOut3D.SaveAs(f'{output_dir}/fit_2d_{config["fit"]["JpsiChannel"]}_{getGlobalLabel(config)}.pdf')
     
