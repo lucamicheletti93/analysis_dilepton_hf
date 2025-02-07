@@ -112,7 +112,7 @@ plot_results:
     x_title_offset: 1.1
     y_title_offset: 2.1
     x_range: [1.7, 2.05]
-    y_range: [0.1, 150000]
+    y_range: [0.1, 200000]
     y_range_log: [1.1, 1.e+9]
 
 output:
