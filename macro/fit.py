@@ -50,7 +50,7 @@ def getLabel(val):
         label +="Neg"
     label += str(int(ROOT.TMath.Abs(val)))
     label += "p"
-    label += str((10*ROOT.TMath.Abs(val))%10)
+    label += str(int((10*ROOT.TMath.Abs(val))%10))
     return label
 
 def getGlobalLabel(config):

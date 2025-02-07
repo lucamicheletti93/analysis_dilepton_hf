@@ -52,17 +52,17 @@ fit:
   min_d0_rap : -0.6
   max_d0_rap : 0.6
 
-  min_d0_pt : 2.0
+  min_d0_pt : 0.5
   max_d0_pt : 100
 
-  min_dRap : 3
+  min_dRap : 0
   max_dRap : 100
   
   
   norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg, rPsi2sJPsi]
-  norm_par_sig_val: [5000, 10000, 2000, 10000, 0.023]
-  norm_par_sig_lw_lim: [50, 1000, 20, 100, 0.02]
-  norm_par_sig_up_lim: [50000000, 10000000, 20000000, 100000000, 0.03]
+  norm_par_sig_val: [50000, 10000, 2000, 10000, 0.023]
+  norm_par_sig_lw_lim: [5000, 1000, 20, 100, 0.02]
+  norm_par_sig_up_lim: [500000, 10000000, 20000000, 100000000, 0.03]
   norm_par_sig_is_const: [False, False, False, False, True]
 
   cb_par_jpsi_name: [meanJpsi, sigmaJpsi, alphaJpsi, nJpsi]
