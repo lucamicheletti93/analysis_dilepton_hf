@@ -12,6 +12,7 @@ def main():
     parser.add_argument('cfgFileName', metavar='text', default='config.yml', help='config file name')
     parser.add_argument("--do_prefit", help="Do the pre-fit to data", action="store_true")
     parser.add_argument("--do_weightdata", help="Weight unbinned data sample with Axe", action="store_true")
+    parser.add_argument("--do_1Dfit", help="Do the 1D fit to extract parameters", action="store_true")
     parser.add_argument("--do_fit", help="Do the fit to data / toy MC", action="store_true")
     parser.add_argument("--do_upper_limit", help="Do the calculation of the upper limit", action="store_true")
     parser.add_argument("--do_prefilter", help="Apply selections", action="store_true")
@@ -28,6 +29,9 @@ def main():
     if args.do_weightdata:
         weightdata(inputCfg)
 
+    if args.do_1Dfit:
+        fit1D(inputCfg)
+    
     if args.do_fit:
         fit(inputCfg)
 
@@ -222,18 +226,18 @@ def prefit():
     input()
     exit()
 
-def fit(config):
+
+def fit1D(config):
     """
-    function to fit the 2D distribution of D0 - J/psi masses
-    - toy_mc:   True/False (enable the generation of toy MC sample to validate the result)
-    - unbinned: True/False (enable the fit of unbinned datasets)
-    """    
-    
-    # Variables
-    minFitRangeD0 = config["fit"]["min_fit_range_d0"]
-    maxFitRangeD0 = config["fit"]["max_fit_range_d0"]
-    minFitRangeJpsi = config["fit"]["min_fit_range_jpsi"]
-    maxFitRangeJpsi = config["fit"]["max_fit_range_jpsi"]
+    function to fit in 1D the associated  J/psi-D0 masses to extract shape parameters
+    """
+    LoadStyle()
+    ROOT.gStyle.SetPalette(ROOT.kBird)
+
+    latexTitle = ROOT.TLatex()
+    latexTitle.SetTextSize(0.040)
+    latexTitle.SetNDC()
+    latexTitle.SetTextFont(42)
 
     if config["fit"]["JpsiChannel"] == "Jpsi2ee":
         titleSuffix = "e^{+}e^{-}"
@@ -242,6 +246,195 @@ def fit(config):
     else:
         print("Error: JpsiChannel not defined in the configuration file.")
         sys.exit(1)
+
+    # Variables
+    minFitRangeD0 = config["fit"]["min_fit_range_d0"]
+    maxFitRangeD0 = config["fit"]["max_fit_range_d0"]
+    minFitRangeJpsi = config["fit"]["min_fit_range_jpsi"]
+    maxFitRangeJpsi = config["fit"]["max_fit_range_jpsi"]
+        
+    mD0   = ROOT.RooRealVar("fMassDmes", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
+    mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", minFitRangeJpsi, maxFitRangeJpsi)
+    ptD0   = ROOT.RooRealVar("fPtDmes", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100)
+    ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", 0, 100)
+    dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", -5, -1)
+    rapJpsi = ROOT.RooRealVar("fRapJpsi", f"y_{{{titleSuffix}}}", -5, -1)
+    if config["fit"]["weighted"]:
+        weight = ROOT.RooRealVar("weight", "weight", 0, 1e10)
+
+    meanD0  = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_val"][0], config["fit"]["cb_par_d0_lw_lim"][0], config["fit"]["cb_par_d0_up_lim"][0]); meanD0.setConstant(config["fit"]["cb_par_d0_is_const"][0])
+    sigmaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_val"][1], config["fit"]["cb_par_d0_lw_lim"][1], config["fit"]["cb_par_d0_up_lim"][1]); sigmaD0.setConstant(config["fit"]["cb_par_d0_is_const"][1])
+    alphaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_val"][2], config["fit"]["cb_par_d0_lw_lim"][2], config["fit"]["cb_par_d0_up_lim"][1]); alphaD0.setConstant(config["fit"]["cb_par_d0_is_const"][2])
+    nD0     = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_val"][3], config["fit"]["cb_par_d0_lw_lim"][3], config["fit"]["cb_par_d0_up_lim"][2]); nD0.setConstant(config["fit"]["cb_par_d0_is_const"][3])
+    cbPdfD0 = ROOT.RooCBShape("cbPdfD0", "Crystal Ball D0", mD0, meanD0, sigmaD0, alphaD0, nD0)
+
+    chebyParsD0 = [ROOT.RooRealVar(config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_val"][i], config["fit"]["cheby_par_d0_lw_lim"][i], config["fit"]["cheby_par_d0_up_lim"][i]) for i in range(3)]
+    for i in range(0, 3): chebyParsD0[i].setConstant(config["fit"]["cheby_par_d0_is_const"][i])
+    chebyPdfD0  = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg1", mD0, ROOT.RooArgList(*chebyParsD0))
+
+    # reflection
+    fRefl = ROOT.TFile(config["reflections"]["data"], "READ")
+    hRefl = fRefl.Get(config["reflections"]["refl"])
+    hSig = fRefl.Get(config["reflections"]["signal"])
+    bin_min_refl = hRefl.FindBin(config["fit"]["min_fit_range_d0"])
+    bin_max_refl = hRefl.FindBin(config["fit"]["max_fit_range_d0"])
+    bin_min_sig = hSig.FindBin(config["fit"]["min_fit_range_d0"])
+    bin_max_sig = hSig.FindBin(config["fit"]["max_fit_range_d0"])
+
+    integral_hRefl = hRefl.Integral(bin_min_refl, bin_max_refl)
+    integral_hSig = hSig.Integral(bin_min_sig, bin_max_sig)
+
+    if integral_hSig != 0:
+        reflRatio = integral_hRefl / integral_hSig
+    else:
+        print(f"Error: The integral of hSig in the mass range is zero.")
+        sys.exit(1)  # Exit the script with a non-zero status to indicate an error
+
+    reflFracD0 = ROOT.RooRealVar("reflFracD0", "reflFracD0", reflRatio); reflFracD0.setConstant(True)
+    
+    refl_template_D0 = ROOT.RooDataHist("refl_template_D0", "refl_template_D0", ROOT.RooArgList(mD0), hRefl)
+    templatePdfReflD0 = ROOT.RooHistPdf("templatePdfReflD0", "templatePdfReflD0", ROOT.RooArgList(mD0), refl_template_D0)
+    
+    nSigD0  = ROOT.RooRealVar("nSigD0", "D0 signal", 1e6, 1e3, 1e8)
+    nBkgD0  = ROOT.RooRealVar("nBkgD0", "D0 background", 1e5, 1e3, 1e8)
+    nReflD0  = ROOT.RooFormulaVar("nReflJPsi", "reflFracD0 * nSigD0", ROOT.RooArgList(reflFracD0,nSigD0))
+    
+    modelD0 = ROOT.RooAddPdf("modelD0", "sigD0 + bkgD0 + reflD0", ROOT.RooArgList(cbPdfD0, chebyPdfD0, templatePdfReflD0), ROOT.RooArgList(nSigD0, nBkgD0, nReflD0))
+
+    if config["fit"]["unbinned"]:
+        fIn = ROOT.TFile(config["inputs"]["data"], "READ")
+        sample = fIn.Get(config["inputs"]["tree"])
+    else:
+        fIn = ROOT.TFile(config["inputs"]["data"], "READ")
+        sample = fIn.Get(config["inputs"]["hist"])
+    if config["fit"]["unbinned"]:
+        if config["fit"]["weighted"]:
+            #sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi, weight], Import=sample, "", "weight")
+            sampleToFit = ROOT.RooDataSet("dataTree", "dataset with weights", sample, ROOT.RooArgSet(mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi, weight), "", "weight")
+        else:
+            sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi], Import=sample)
+    else:
+        sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [mD0, mJpsi, ptD0, ptJpsi, dRap, rapJpsi], Import=sample)
+
+    if config["fit"]["unbinned"]:
+        ## jpsi rapidity cut
+        sampleToFit = sampleToFit.reduce(f"fRapJpsi>{config['fit']['min_jpsi_rap']} && fRapJpsi<{config['fit']['max_jpsi_rap']}")
+        ## D0 pt cut
+        sampleToFit = sampleToFit.reduce(f"fPtDmes>{config['fit']['min_d0_pt']}")
+        ## dRap cut
+        sampleToFit = sampleToFit.reduce(f"fabs(fDeltaY)>{config['fit']['min_dRap']} && fabs(fDeltaY)<{config['fit']['max_dRap']}")
+
+    
+    fitResultD0 = modelD0.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1), ROOT.RooFit.Minos(not config['fit']['weighted']), ROOT.RooFit.SumW2Error(config['fit']['weighted']))
+    
+
+    mD0frame = mD0.frame(Title=" ")
+    #dataHistD0.plotOn(mD0frame)
+    sampleToFit.plotOn(mD0frame, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
+    modelD0.plotOn(mD0frame)
+    modelD0.plotOn(mD0frame, Name={"Sig"}, Components={cbPdfD0}, LineStyle="--", LineColor=ROOT.kRed+1)
+    modelD0.plotOn(mD0frame, Name={"Bkg"}, Components={chebyPdfD0}, LineStyle="--", LineColor=ROOT.kAzure+1)
+    modelD0.plotOn(mD0frame, Name={"Refl"}, Components={templatePdfReflD0}, LineStyle="--", LineColor=ROOT.kGray+1)
+
+    
+    # fit 1D J/psi
+    # Load data for pre-fit for J/psi - Taken from AnalysisResults
+
+    meanJpsi  = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_val"][0], config["fit"]["cb_par_jpsi_lw_lim"][0], config["fit"]["cb_par_jpsi_up_lim"][0]); meanJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][0])
+    sigmaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_val"][1], config["fit"]["cb_par_jpsi_lw_lim"][1], config["fit"]["cb_par_jpsi_up_lim"][1]); sigmaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][1])
+    alphaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_val"][2], config["fit"]["cb_par_jpsi_lw_lim"][2], config["fit"]["cb_par_jpsi_up_lim"][2]); alphaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][2])
+    nJpsi     = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_val"][3], config["fit"]["cb_par_jpsi_lw_lim"][3], config["fit"]["cb_par_jpsi_up_lim"][3]); nJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][3])
+    cbPdfJpsi = ROOT.RooCBShape("cbPdfJpsi", "Crystal Ball J/psi", mJpsi, meanJpsi, sigmaJpsi, alphaJpsi, nJpsi)
+
+    ## adding the psi2S
+    if config["fit"]["add_psi2s"]:
+        meanPsi2S  = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_val"][0], config["fit"]["cb_par_psi2s_lw_lim"][0], config["fit"]["cb_par_psi2s_up_lim"][0]); meanPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][0])
+        sigmaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_val"][1], config["fit"]["cb_par_psi2s_lw_lim"][1], config["fit"]["cb_par_psi2s_up_lim"][1]); sigmaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][1])
+        alphaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_val"][2], config["fit"]["cb_par_psi2s_lw_lim"][2], config["fit"]["cb_par_psi2s_up_lim"][2]); alphaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][2])
+        nPsi2S     = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_val"][3], config["fit"]["cb_par_psi2s_lw_lim"][3], config["fit"]["cb_par_psi2s_up_lim"][3]); nPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][3])
+        cbPdfPsi2S = ROOT.RooCBShape("cbPdfPsi2S", "Crystal Ball J/psi", mJpsi, meanPsi2S, sigmaJpsi, alphaPsi2S, nPsi2S)
+
+    ##same bkg for both
+    chebyParsJpsi = [ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_val"][i], config["fit"]["cheby_par_jpsi_lw_lim"][i], config["fit"]["cheby_par_jpsi_up_lim"][i]) for i in range(3)]
+    for i in range(0, 3): chebyParsJpsi[i].setConstant(config["fit"]["cheby_par_jpsi_is_const"][i])
+    chebyPdfJpsi  = ROOT.RooChebychev("chebyPdfJpsi", "Cheby for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
+
+    nSigJpsi  = ROOT.RooRealVar("nSigJpsi", "Jpsi signal", 1e6, 1e4, 1e8)
+    nSigPsi2S  = ROOT.RooRealVar("nSigPsi2S", "psi(2S) signal", 1e3, 1e1, 1e4)
+    nBkgJpsi  = ROOT.RooRealVar("nBkgJpsi", "Jpsi background", 1e6, 1e4, 1e8)
+    modelJpsi = ROOT.RooAddPdf("modelJpsi", "sigJpsi + nSigPsi2S + bkgJpsi", ROOT.RooArgList(cbPdfJpsi, cbPdfPsi2S, chebyPdfJpsi), ROOT.RooArgList(nSigJpsi, nSigPsi2S, nBkgJpsi))
+
+    fitResultJpsi = modelJpsi.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1), ROOT.RooFit.Minos(not config['fit']['weighted']), ROOT.RooFit.SumW2Error(config['fit']['weighted']))
+
+    mJpsiframe = mJpsi.frame(Title=" ")
+    sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
+    modelJpsi.plotOn(mJpsiframe)
+    modelJpsi.plotOn(mJpsiframe, Name={"Sig"}, Components={cbPdfJpsi}, LineStyle="--", LineColor=ROOT.kRed+1)
+    modelJpsi.plotOn(mJpsiframe, Name={"SigPsi2s"}, Components={cbPdfPsi2S}, LineStyle="--", LineColor=ROOT.kGreen+1)
+    modelJpsi.plotOn(mJpsiframe, Name={"Bkg"}, Components={chebyPdfJpsi}, LineStyle="--", LineColor=ROOT.kAzure+1)
+
+    
+    canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 600)
+    canvasFitD0.SetTickx(1)
+    canvasFitD0.SetTicky(1)
+    mD0frame.GetYaxis().SetTitleOffset(1.4)
+    mD0frame.Draw()
+
+    latexTitle.DrawLatex(0.65, 0.74, "#it{N}_{D0} = %1.0f #pm %1.0f" % (nSigD0.getVal(), nSigD0.getError()))
+    latexTitle.DrawLatex(0.65, 0.68, "#it{#mu}_{D0} = %4.3f #pm %4.3f" % (meanD0.getVal(), meanD0.getError()))
+    latexTitle.DrawLatex(0.65, 0.62, "#it{#sigma}_{D0} = %4.3f #pm %4.3f" % (sigmaD0.getVal(), sigmaD0.getError()))
+    
+    canvasFitD0.Update()
+    
+    canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 600)
+    canvasFitJpsi.SetTickx(1)
+    canvasFitJpsi.SetTicky(1)
+    mJpsiframe.GetYaxis().SetTitleOffset(1.4)
+    mJpsiframe.Draw()
+
+    latexTitle.DrawLatex(0.65, 0.74, "#it{N}_{J/#psi} = %1.0f #pm %1.0f" % (nSigJpsi.getVal(), nSigJpsi.getError()))
+    latexTitle.DrawLatex(0.65, 0.68, "#it{#mu}_{J/#psi} = %4.3f #pm %4.3f" % (meanJpsi.getVal(), meanJpsi.getError()))
+    latexTitle.DrawLatex(0.65, 0.62, "#it{#sigma}_{J/#psi} = %4.3f #pm %4.3f" % (sigmaJpsi.getVal(), sigmaJpsi.getError()))
+    
+    canvasFitJpsi.Update()
+
+    weighted_label = "weightedFits" if config['fit']['weighted'] else "unweightedFits"
+    output_dir = f'{config["output"]["figures"]}/{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
+    os.makedirs(output_dir, exist_ok=True)
+
+    canvasFitJpsi.Update()
+    canvasFitD0.SaveAs(f'{output_dir}/fit1D_{config["fit"]["JpsiChannel"]}_d0_fit_{getGlobalLabel(config)}.pdf')
+    canvasFitJpsi.SaveAs(f'{output_dir}/fit1D_{config["fit"]["JpsiChannel"]}_jpsi_fit_{getGlobalLabel(config)}.pdf')
+    
+
+    
+    fitResultD0.Print()
+    fitResultJpsi.Print()
+    
+    input()
+    exit()
+
+    
+def fit(config):
+    """
+    function to fit the 2D distribution of D0 - J/psi masses
+    - toy_mc:   True/False (enable the generation of toy MC sample to validate the result)
+    - unbinned: True/False (enable the fit of unbinned datasets)
+    """    
+    if config["fit"]["JpsiChannel"] == "Jpsi2ee":
+        titleSuffix = "e^{+}e^{-}"
+    elif config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        titleSuffix = "#mu^{+}#mu^{-}"
+    else:
+        print("Error: JpsiChannel not defined in the configuration file.")
+        sys.exit(1)
+    
+    # Variables
+    minFitRangeD0 = config["fit"]["min_fit_range_d0"]
+    maxFitRangeD0 = config["fit"]["max_fit_range_d0"]
+    minFitRangeJpsi = config["fit"]["min_fit_range_jpsi"]
+    maxFitRangeJpsi = config["fit"]["max_fit_range_jpsi"]
+
         
     mD0   = ROOT.RooRealVar("fMassDmes", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0)
     mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", minFitRangeJpsi, maxFitRangeJpsi)
