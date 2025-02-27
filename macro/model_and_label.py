@@ -21,7 +21,7 @@ def getLabel(val):
     return label
 
 def getGlobalLabel(config):
-    return ("weightedFit" if config['fit']['weighted'] else "")+"_dRap_min"+getLabel(config['fit']['min_dRap'])+"_max"+getLabel(config['fit']['max_dRap'])+"rapJpsi_min"+getLabel(config['fit']['min_jpsi_rap'])+"_max"+getLabel(config['fit']['max_jpsi_rap'])+"_ptJpsi_min"+getLabel(config['fit']['min_jpsi_pt'])+"_max"+getLabel(config['fit']['max_jpsi_pt'])+"_rapD0_min"+getLabel(config['fit']['min_d0_rap'])+"_max"+getLabel(config['fit']['max_d0_rap'])+"_ptD0_min"+getLabel(config['fit']['min_d0_pt'])+"_max"+getLabel(config['fit']['max_d0_pt'])
+    return config["inputs"]["inputLabel"]+("_weightedFit" if config['fit']['weighted'] else "")+"_dRap_min"+getLabel(config['fit']['min_dRap'])+"_max"+getLabel(config['fit']['max_dRap'])+"rapJpsi_min"+getLabel(config['fit']['min_jpsi_rap'])+"_max"+getLabel(config['fit']['max_jpsi_rap'])+"_ptJpsi_min"+getLabel(config['fit']['min_jpsi_pt'])+"_max"+getLabel(config['fit']['max_jpsi_pt'])+"_rapD0_min"+getLabel(config['fit']['min_d0_rap'])+"_max"+getLabel(config['fit']['max_d0_rap'])+"_ptD0_min"+getLabel(config['fit']['min_d0_pt'])+"_max"+getLabel(config['fit']['max_d0_pt'])
 
 
 def constructWorkspace(config, includeJpsi, includeD0):
@@ -107,16 +107,16 @@ def constructWorkspace(config, includeJpsi, includeD0):
 
 #### now make the products of the pdfs depending on the case
     if (includeJpsi and not includeD0):
-        nSigJpsi  = ROOT.RooRealVar("nSigJpsi", "Jpsi signal", 1e6, 1e4, 1e8) ## to be changed to not be hardcoded
-        nSigPsi2S  = ROOT.RooRealVar("nSigPsi2S", "psi(2S) signal", 1e3, 1e1, 1e4) ## to be changed to not be hardcoded
-        nBkgJpsi  = ROOT.RooRealVar("nBkgJpsi", "Jpsi background", 1e6, 1e4, 1e8) ## to be changed to not be hardcoded
+        nSigJpsi  = ROOT.RooRealVar("nSigJpsi", "Jpsi signal", 1e4, 1e2, 1e8) ## to be changed to not be hardcoded
+        nSigPsi2S  = ROOT.RooRealVar("nSigPsi2S", "psi(2S) signal", 1e4, 9e3, 3e4) ## to be changed to not be hardcoded
+        nBkgJpsi  = ROOT.RooRealVar("nBkgJpsi", "Jpsi background", 1e6, 1e2, 1e8) ## to be changed to not be hardcoded
         if config["fit"]["add_psi2s"]:
             model = ROOT.RooAddPdf("model", "sigJpsi + nSigPsi2S + bkgJpsi", ROOT.RooArgList(cbPdfJpsi, cbPdfPsi2S, chebyPdfJpsi), ROOT.RooArgList(nSigJpsi, nSigPsi2S, nBkgJpsi))
         else:
             model = ROOT.RooAddPdf("model", "sigJpsi + bkgJpsi", ROOT.RooArgList(cbPdfJpsi, chebyPdfJpsi), ROOT.RooArgList(nSigJpsi, nBkgJpsi))
     elif (includeD0 and not includeJpsi):
-        nSigD0  = ROOT.RooRealVar("nSigD0", "D0 signal", 1e6, 1e3, 1e8) ## to be changed to not be hardcoded
-        nBkgD0  = ROOT.RooRealVar("nBkgD0", "D0 background", 1e5, 1e3, 1e8) ## to be changed to not be hardcoded
+        nSigD0  = ROOT.RooRealVar("nSigD0", "D0 signal", 1e4, 1e1, 1e8) ## to be changed to not be hardcoded
+        nBkgD0  = ROOT.RooRealVar("nBkgD0", "D0 background", 1e5, 1e1, 1e8) ## to be changed to not be hardcoded
         nReflD0  = ROOT.RooFormulaVar("nReflD0", "reflFracD0 * nSigD0", ROOT.RooArgList(reflFracD0,nSigD0))
         model = ROOT.RooAddPdf("model", "sigD0 + bkgD0 + reflD0", ROOT.RooArgList(cbPdfD0, chebyPdfD0, templatePdfReflD0), ROOT.RooArgList(nSigD0, nBkgD0, nReflD0))
     elif(includeD0 and includeJpsi):

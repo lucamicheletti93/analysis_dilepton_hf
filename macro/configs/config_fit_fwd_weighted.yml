@@ -1,13 +1,17 @@
 ---
 inputs:
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut_weighted.root
-  data: /Users/bat/alice/jpsiHF/mergedOutput_BDT_modular_cut_weighted.root
-  
-  hist: hSparseJPsiDmeson_proj_3_2
+  #data: ../data_shared/2022_pass7_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC22Pass7_BDT_modular_cut_weighted.root
+  #tree: "DF_2249150152204455/O2rtdilptdmesall"
+  #inputLabel: "LHC22Pass7"
+  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC23Pass4_BDT_modular_cut_weighted.root
+  #tree: "DF_2298103923608640/O2rtdilptdmesall"
+  #inputLabel: "LHC23Pass4"
+  data: ../data_shared/2024_pass1_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC24Pass1_BDT_modular_cut_weighted.root
   #tree: "DF_2365874330435264/O2rtdilptdmesall"
+  inputLabel: "LHC24Pass1"
+
   tree: "O2rtdilptdmesall"
+  hist: hSparseJPsiDmeson_proj_3_2
   axeJpsi: ../data_shared/axeJpsiToMuMu.root
   axeD0: ../data_shared/axeD0.root
   
@@ -61,7 +65,7 @@ fit:
   
   norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg, rPsi2sJPsi]
   norm_par_sig_val: [50000, 10000, 2000, 10000, 0.023]
-  norm_par_sig_lw_lim: [5000, 1000, 20, 100, 0.02]
+  norm_par_sig_lw_lim: [10, 100, 20, 100, 0.02]
   norm_par_sig_up_lim: [500000, 10000000, 20000000, 100000000, 0.03]
   norm_par_sig_is_const: [False, False, False, False, True]
 
@@ -103,7 +107,7 @@ plot_results:
     x_title_offset: 1.1
     y_title_offset: 2.1
     x_range: [2.51, 4.0]
-    y_range: [0.1, 300000]
+    y_range: [0.1, 3000]
     y_range_log: [1.1, 1.e+9]
     y_title_offset_log: 1.5
   d0Frame:
@@ -112,7 +116,7 @@ plot_results:
     x_title_offset: 1.1
     y_title_offset: 2.1
     x_range: [1.7, 2.05]
-    y_range: [0.1, 200000]
+    y_range: [0.1, 2000]
     y_range_log: [1.1, 1.e+9]
 
 output:

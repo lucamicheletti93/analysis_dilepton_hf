@@ -318,12 +318,13 @@ def fit1D(config):
     canvasFitJpsi.Update()
 
     weighted_label = "weightedFits" if config['fit']['weighted'] else "unweightedFits"
-    output_dir = f'{config["output"]["figures"]}/{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
+    output_dir = f'{config["output"]["figures"]}/{config["inputs"]["inputLabel"]}_{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
+    #output_dir = f'{config["output"]["figures"]}/{weighted
     os.makedirs(output_dir, exist_ok=True)
 
     canvasFitJpsi.Update()
-    canvasFitD0.SaveAs(f'{output_dir}/fit1DTest_{config["fit"]["JpsiChannel"]}_d0_fit_{getGlobalLabel(config)}.pdf')
-    canvasFitJpsi.SaveAs(f'{output_dir}/fit1DTest_{config["fit"]["JpsiChannel"]}_jpsi_fit_{getGlobalLabel(config)}.pdf')    
+    canvasFitD0.SaveAs(f'{output_dir}/fit1D_{config["fit"]["JpsiChannel"]}_d0_fit_{getGlobalLabel(config)}.pdf')
+    canvasFitJpsi.SaveAs(f'{output_dir}/fit1D_{config["fit"]["JpsiChannel"]}_jpsi_fit_{getGlobalLabel(config)}.pdf')    
 
     
     fitResultD0.Print()
@@ -524,7 +525,8 @@ def fit(config):
     canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 800)
     canvasFitJpsi.SetTickx(1)
     canvasFitJpsi.SetTicky(1)
-    mJpsiframe.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    #mJpsiframe.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    mJpsiframe.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries() )
     mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mJpsiframe.Draw()
@@ -556,23 +558,23 @@ def fit(config):
          latexRap.DrawLatex(0.15, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
 
     weighted_label = "weightedFits" if config['fit']['weighted'] else "unweightedFits"
-    output_dir = f'{config["output"]["figures"]}/{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
+    output_dir = f'{config["output"]["figures"]}/{config["inputs"]["inputLabel"]}_{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
     os.makedirs(output_dir, exist_ok=True)
 
     canvasFitJpsi.Update()
-    canvasFitJpsi.SaveAs(f'{output_dir}/projectedTest_{config["fit"]["JpsiChannel"]}_jpsi_fit_{getGlobalLabel(config)}.pdf')
+    canvasFitJpsi.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_{getGlobalLabel(config)}.pdf')
     
     canvasFitJpsi.SetLogy()
-    mJpsiframe.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
+    mJpsiframe.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
     canvasFitJpsi.Update()
-    canvasFitJpsi.SaveAs(f'{output_dir}/projectedTest_{config["fit"]["JpsiChannel"]}_jpsi_fit_logy_{getGlobalLabel(config)}.pdf')
+    canvasFitJpsi.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_logy_{getGlobalLabel(config)}.pdf')
 
     canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 800)
     canvasFitD0.SetTickx(1)
     canvasFitD0.SetTicky(1)
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.GetYaxis().SetLabelSize(0.03)
-    mD0frame.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
+    mD0frame.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
     mD0frame.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mD0frame.Draw()
     legend_comp.Draw()
@@ -604,12 +606,13 @@ def fit(config):
         latexRap.DrawLatex(0.15, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
 
     canvasFitD0.Update()
-    canvasFitD0.SaveAs(f'{output_dir}/projectedTest_{config["fit"]["JpsiChannel"]}_d0_fit_{getGlobalLabel(config)}.pdf')
+    canvasFitD0.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_{getGlobalLabel(config)}.pdf')
 
     canvasFitD0.SetLogy()
-    mD0frame.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range_log"][0], config["plot_results"]["d0Frame"]["y_range_log"][1])
+    mD0frame.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
+
     canvasFitD0.Update()
-    canvasFitD0.SaveAs(f'{output_dir}/projectedTest_{config["fit"]["JpsiChannel"]}_d0_fit_logy_{getGlobalLabel(config)}.pdf')
+    canvasFitD0.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_logy_{getGlobalLabel(config)}.pdf')
 
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
@@ -804,7 +807,7 @@ def upper_limit(config):
         dataCanvas.Update()
 
     weighted_label = "weightedFits" if config['fit']['weighted'] else "unweightedFits"
-    output_dir = f'{config["output"]["figures"]}_upper_limit/{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
+    output_dir = f'{config["output"]["figures"]}_upper_limit/{config["inputs"]["inputLabel"]}_{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
     os.makedirs(output_dir, exist_ok=True)
     dataCanvas.SaveAs(f'{output_dir}/upper_limit_{getGlobalLabel(config)}.pdf')
     input()
@@ -850,7 +853,7 @@ def plot_results(config):
     frameJpsi.GetXaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["x_title_offset"])
     # frameJpsi.GetXaxis().SetTitleSize(0.05)
     # frameJpsi.GetXaxis().SetLabelSize(0.045)
-    frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    frameJpsi.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
     frameJpsi.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     
     if config["plot_results"]["jpsiFrame"]["y_title"]:
@@ -964,14 +967,14 @@ def plot_results(config):
         latexRap.DrawLatex(0.18, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
 
 
-    output_dir = f'{config["output"]["figures"]}_paperStyle/{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
+    output_dir = f'{config["output"]["figures"]}_paperStyle/{config["inputs"]["inputLabel"]}_{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
     os.makedirs(output_dir, exist_ok=True)
 
     canvasOutJpsi.Update()
     canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_{getGlobalLabel(config)}.pdf')
     
     canvasOutJpsi.SetLogy()
-    frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
+    frameJpsi.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
     frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset_log"])
     canvasOutJpsi.Update()
     canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_logy_{getGlobalLabel(config)}.pdf')
@@ -984,7 +987,7 @@ def plot_results(config):
     frameD0.GetXaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["x_title_offset"])
     # frameD0.GetXaxis().SetTitleSize(0.05)
     # frameD0.GetXaxis().SetLabelSize(0.045)
-    frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
+    frameD0.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
     frameD0.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     if config["plot_results"]["d0Frame"]["y_title"]:
         frameD0.GetYaxis().SetTitle(config["plot_results"]["d0Frame"]["y_title"])
