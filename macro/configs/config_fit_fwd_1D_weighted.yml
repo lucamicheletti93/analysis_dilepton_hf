@@ -1,13 +1,17 @@
 ---
 inputs:
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut.root
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_BDT_modular_cut_weighted.root
-  data: /Users/bat/alice/jpsiHF/mergedOutput_BDT_modular_cut_weighted.root
-  
-  hist: hSparseJPsiDmeson_proj_3_2
+  #data: ../data_shared/2022_pass7_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC22Pass7_BDT_modular_cut_weighted.root
+  #tree: "DF_2249150152204455/O2rtdilptdmesall"
+  #inputLabel: "LHC22Pass7"
+  data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC23Pass4_BDT_modular_cut_weighted.root
+  #tree: "DF_2298103923608640/O2rtdilptdmesall"
+  inputLabel: "LHC23Pass4"
+  #data: ../data_shared/2024_pass1_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC24Pass1_BDT_modular_cut_weighted.root
   #tree: "DF_2365874330435264/O2rtdilptdmesall"
+  #inputLabel: "LHC24Pass1"
+
   tree: "O2rtdilptdmesall"
+  hist: hSparseJPsiDmeson_proj_3_2
   axeJpsi: ../data_shared/axeJpsiToMuMu.root
   axeD0: ../data_shared/axeD0.root
   
@@ -17,9 +21,12 @@ reflections:
   signal: hist_signal
 
 prefilter:  
-  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged.root
-  data: /Users/bat/alice/jpsiHF/mergedOutput.root
-  tree: "DF_2365874330435264/O2rtdilptdmesall"
+  data: ../data_shared/2022_pass7_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC22Pass7.root
+  tree: "DF_2249150152204455/O2rtdilptdmesall"
+  #data: ../data_shared/2023_pass4_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC23Pass4.root
+  #tree: "DF_2298103923608640/O2rtdilptdmesall"
+  #data: ../data_shared/2024_pass1_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_LHC24Pass1.root
+  #tree: "DF_2365874330435264/O2rtdilptdmesall"
   cuts: "(fPtDmes >= 0.  && fPtDmes < 1.  && fBdtBkg < 0.050) ||
          (fPtDmes >= 1.  && fPtDmes < 2.  && fBdtBkg < 0.050) ||
          (fPtDmes >= 2.  && fPtDmes < 3.  && fBdtBkg < 0.100) ||
@@ -61,7 +68,7 @@ fit:
   
   norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg, rPsi2sJPsi]
   norm_par_sig_val: [50000, 10000, 2000, 10000, 0.023]
-  norm_par_sig_lw_lim: [5000, 1000, 20, 100, 0.02]
+  norm_par_sig_lw_lim: [500, 100, 20, 100, 0.02]
   norm_par_sig_up_lim: [500000, 10000000, 20000000, 100000000, 0.03]
   norm_par_sig_is_const: [False, False, False, False, True]
 
@@ -90,7 +97,7 @@ fit:
   cb_par_d0_is_const: [False, False, True, True]
 
   cheby_par_d0_name: [cheb_coeff_d0_0, cheb_coeff_d0_1, cheb_coeff_d0_2]
-  cheby_par_d0_val: [-5.e-01, 8.1e-02, 1.230e-08]
+  cheby_par_d0_val: [-5.e-01, 8.1e-02, 1.230e-02]
   cheby_par_d0_lw_lim: [-1, -1, -1]
   cheby_par_d0_up_lim: [1, 1, 1]
   cheby_par_d0_is_const: [False, False, False]
