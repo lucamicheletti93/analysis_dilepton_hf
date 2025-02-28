@@ -240,9 +240,6 @@ def fit1D(config):
         print("Error: JpsiChannel not defined in the configuration file.")
         sys.exit(1)
 
-    workSpaceD0 = constructWorkspace(config, includeJpsi=False, includeD0=True)
-    modelD0 = workSpaceD0.pdf("model")
-
     # Load data
 
     if config["fit"]["unbinned"]:
@@ -251,6 +248,15 @@ def fit1D(config):
     else:
         fIn = ROOT.TFile(config["inputs"]["data"], "READ")
         sample = fIn.Get(config["inputs"]["hist"])
+
+    nEvent = sample.GetEntries()
+    if config['fit']['weighted'] and config["fit"]["unbinned"]:
+        h = ROOT.TH1F("h", "", 1, 0, 1e5)
+        sample.Draw("1>>h", "weight")
+        nEvent = h.Integral()
+    
+    workSpaceD0 = constructWorkspace(config, includeJpsi=False, includeD0=True, nEvent=nEvent)
+    
     if config["fit"]["unbinned"]:
         if config["fit"]["weighted"]:
             sampleToFit = ROOT.RooDataSet("dataTree", "dataset with weights", sample, ROOT.RooArgSet(workSpaceD0.var("fMassDmes"), workSpaceD0.var("fMass"), workSpaceD0.var("fPtDmes"),  workSpaceD0.var("fPtJpsi"), workSpaceD0.var("fDeltaY"), workSpaceD0.var("fRapJpsi"), workSpaceD0.var("weight")), "", "weight")
@@ -267,7 +273,7 @@ def fit1D(config):
         ## dRap cut
         sampleToFit = sampleToFit.reduce(f"fabs(fDeltaY)>{config['fit']['min_dRap']} && fabs(fDeltaY)<{config['fit']['max_dRap']}")
 
-    
+    modelD0 = workSpaceD0.pdf("model")
     fitResultD0 = modelD0.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1), ROOT.RooFit.Minos(not config['fit']['weighted']), ROOT.RooFit.SumW2Error(config['fit']['weighted']))
     
 
@@ -281,9 +287,9 @@ def fit1D(config):
     
     # fit 1D J/psi
 
-    workSpaceJpsi = constructWorkspace(config, includeJpsi=True, includeD0=False)
+    workSpaceJpsi = constructWorkspace(config, includeJpsi=True, includeD0=False, nEvent=nEvent)
+    
     modelJpsi = workSpaceJpsi.pdf("model")
-
     fitResultJpsi = modelJpsi.fitTo(sampleToFit, ROOT.RooFit.PrintLevel(3), ROOT.RooFit.Optimize(1), ROOT.RooFit.Hesse(1), ROOT.RooFit.Strategy(2), ROOT.RooFit.Save(1), ROOT.RooFit.Minos(not config['fit']['weighted']), ROOT.RooFit.SumW2Error(config['fit']['weighted']))
 
     mJpsiframe = workSpaceJpsi.var("fMass").frame(Title=" ")
@@ -359,11 +365,7 @@ def fit(config):
     genBkgJpsi = config["fit"]["norm_par_sig_val"][1]
     genBkgD0   = config["fit"]["norm_par_sig_val"][2]
     genBkgBkg  = config["fit"]["norm_par_sig_val"][3]
-    
-    workSpace = constructWorkspace(config, includeJpsi=True, includeD0=True)
-    
-    model =  workSpace.pdf("model")
-    
+        
     if config["fit"]["toy_mc"]:
         # Generate toy sample
         data  = sigD0_sigJpsiPdf.generate(ROOT.RooArgSet(workSpace.var("fMassDmes"), workSpace.var("fMass")), genJpsiD0)
@@ -384,6 +386,17 @@ def fit(config):
         else:
             fIn = ROOT.TFile(config["inputs"]["data"], "READ")
             sample = fIn.Get(config["inputs"]["hist"])
+
+
+    nEvent = sample.GetEntries()
+    if config['fit']['weighted'] and config["fit"]["unbinned"]:
+        h = ROOT.TH1F("h", "", 1, 0, 1e5)
+        sample.Draw("1>>h", "weight")
+        nEvent = h.Integral()
+
+    workSpace = constructWorkspace(config, includeJpsi=True, includeD0=True, nEvent=nEvent)
+    model =  workSpace.pdf("model")
+
     if config["fit"]["unbinned"]:
         if config["fit"]["weighted"]:
             sampleToFit = ROOT.RooDataSet("dataTree", "dataset with weights", sample, ROOT.RooArgSet(workSpace.var("fMassDmes"), workSpace.var("fMass"), workSpace.var("fPtDmes"),  workSpace.var("fPtJpsi"), workSpace.var("fDeltaY"), workSpace.var("fRapJpsi"), workSpace.var("weight")), "", "weight")
