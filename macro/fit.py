@@ -444,6 +444,10 @@ def fit(config):
     modelHist = model.createHistogram("model m_{D0}, m_{J/#psi}", workSpace.var("fMassDmes"), Binning=config["plot_results"]["dataBins"], YVar=dict(var=workSpace.var("fMass"), Binning=config["plot_results"]["dataBins"]))
     modelHist.SetLineColor(ROOT.kRed)
     modelHist.SetLineWidth(1)
+    if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
+        modelHist.SetTitle(f';#it{{m}}_{{#piK}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{#mu#mu}} (GeV/#it{{c}}^{{2}})')
+    else:
+        modelHist.SetTitle(f';#it{{m}}_{{#piK}} (GeV/#it{{c}}^{{2}});#it{{m}}_{{ee}} (GeV/#it{{c}}^{{2}})')
 
     mJpsiframe = workSpace.var("fMass").frame(Title=" ")
     sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
@@ -550,12 +554,12 @@ def fit(config):
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
     yLatex = 0.72
     dyLatex = 0.04
-    latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
@@ -597,12 +601,12 @@ def fit(config):
     latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
     yLatex = 0.72
     dyLatex = 0.04
-    latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
 
     if config["fit"]["min_dRap"] > 0:
@@ -661,12 +665,12 @@ def fit(config):
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
     yLatex = 0.93
     dyLatex = 0.04
-    latexRap.DrawLatex(0.73, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexRap.DrawLatex(0.73, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.73, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.73, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.73, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.73, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
@@ -866,7 +870,8 @@ def plot_results(config):
     frameJpsi.GetXaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["x_title_offset"])
     # frameJpsi.GetXaxis().SetTitleSize(0.05)
     # frameJpsi.GetXaxis().SetLabelSize(0.045)
-    frameJpsi.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
+    frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    # frameJpsi.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
     frameJpsi.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     
     if config["plot_results"]["jpsiFrame"]["y_title"]:
@@ -959,12 +964,12 @@ def plot_results(config):
         latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow e^{+}e^{#minus}")
     yLatex = 0.68
     dyLatex = 0.05
-    latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexRap.DrawLatex(0.18, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.18, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
@@ -987,7 +992,8 @@ def plot_results(config):
     canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_{getGlobalLabel(config)}.pdf')
     
     canvasOutJpsi.SetLogy()
-    frameJpsi.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
+    frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
+    # frameJpsi.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
     frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset_log"])
     canvasOutJpsi.Update()
     canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_logy_{getGlobalLabel(config)}.pdf')
@@ -1000,7 +1006,8 @@ def plot_results(config):
     frameD0.GetXaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["x_title_offset"])
     # frameD0.GetXaxis().SetTitleSize(0.05)
     # frameD0.GetXaxis().SetLabelSize(0.045)
-    frameD0.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
+    frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
+    # frameD0.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
     frameD0.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     if config["plot_results"]["d0Frame"]["y_title"]:
         frameD0.GetYaxis().SetTitle(config["plot_results"]["d0Frame"]["y_title"])
@@ -1092,12 +1099,12 @@ def plot_results(config):
         latexDecay.DrawLatex(0.18, 0.73, "J/#psi #rightarrow e^{+}e^{#minus}")
     yLatex = 0.68
     dyLatex = 0.05
-    latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexRap.DrawLatex(0.18, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.18, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.18, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.18, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
@@ -1114,6 +1121,13 @@ def plot_results(config):
 
     canvasOutD0.Update()
     canvasOutD0.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_d0_projection_{getGlobalLabel(config)}.pdf')
+    
+    canvasOutD0.SetLogy()
+    frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range_log"][0], config["plot_results"]["d0Frame"]["y_range_log"][1])
+    # frameJpsi.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
+    frameD0.GetYaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["y_title_offset_log"])
+    canvasOutD0.Update()
+    canvasOutD0.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_d0_projection_logy_{getGlobalLabel(config)}.pdf')
     
     ## plot the 2D results
     hist3D = listOfPrimitives3D.At(0)
@@ -1148,12 +1162,12 @@ def plot_results(config):
     latexRap.SetTextSize(0.04)
     yLatex = 0.93
     dyLatex = 0.05
-    latexRap.DrawLatex(0.7, yLatex, f"|#it{{#eta}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexRap.DrawLatex(0.7, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.7, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{#eta}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.7, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
     else:
-        latexRap.DrawLatex(0.7, yLatex, f"|#it{{#eta}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.7, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
