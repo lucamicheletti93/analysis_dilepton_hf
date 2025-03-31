@@ -45,12 +45,12 @@ def constructWorkspace(config, includeJpsi, includeD0, nEvent):
 
     mD0   = ROOT.RooRealVar("fMassDmes", "#it{m}_{#piK} (GeV/#it{c}^{2})", config["fit"]["min_fit_range_d0"], config["fit"]["max_fit_range_d0"]); getattr(ws, "import")(mD0)
     mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", config["fit"]["min_fit_range_jpsi"], config["fit"]["max_fit_range_jpsi"]); getattr(ws, "import")(mJpsi)
-    ptD0   = ROOT.RooRealVar("fPtDmes", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", 0, 100); getattr(ws, "import")(ptD0)
-    ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", 0, 100); getattr(ws, "import")(ptJpsi)
-    dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", -10, 10); getattr(ws, "import")(dRap)
-    rapJpsi = ROOT.RooRealVar("fRapJpsi", f"y_{{{titleSuffix}}}", -5, -1); getattr(ws, "import")(rapJpsi)
-    #if config["fit"]["weighted"]:
-    weight = ROOT.RooRealVar("weight", "weight", 0, 1e10); getattr(ws, "import")(weight)
+    ptD0   = ROOT.RooRealVar("fPtDmes", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", config["fit"]["min_d0_pt"], config["fit"]["max_d0_pt"]); getattr(ws, "import")(ptD0)
+    ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", config["fit"]["min_jpsi_pt"], config["fit"]["max_jpsi_pt"]); getattr(ws, "import")(ptJpsi)
+    dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", config["fit"]["min_dRap"], config["fit"]["max_dRap"]); getattr(ws, "import")(dRap)
+    rapJpsi = ROOT.RooRealVar("fRapJpsi", f"y_{{{titleSuffix}}}", config["fit"]["min_jpsi_rap"], config["fit"]["max_jpsi_rap"]); getattr(ws, "import")(rapJpsi)
+    if config["fit"]["weighted"]:
+        weight = ROOT.RooRealVar("weight", "weight", 0, 1e10); getattr(ws, "import")(weight)
             
     # Pdfs
     meanJpsi  = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_val"][0], config["fit"]["cb_par_jpsi_lw_lim"][0], config["fit"]["cb_par_jpsi_up_lim"][0]); meanJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][0])
