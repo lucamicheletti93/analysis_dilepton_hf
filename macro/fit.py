@@ -582,6 +582,7 @@ def fit(config):
     canvasFitJpsi.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_{getGlobalLabel(config)}.pdf')
     
     canvasFitJpsi.SetLogy()
+
     mJpsiframe.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
     canvasFitJpsi.Update()
     canvasFitJpsi.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_jpsi_fit_logy_{getGlobalLabel(config)}.pdf')
@@ -592,6 +593,7 @@ def fit(config):
     mD0frame.GetYaxis().SetTitleOffset(1.4)
     mD0frame.GetYaxis().SetLabelSize(0.03)
     mD0frame.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
+
     mD0frame.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mD0frame.Draw()
     legend_comp.Draw()
@@ -870,8 +872,9 @@ def plot_results(config):
     frameJpsi.GetXaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["x_title_offset"])
     # frameJpsi.GetXaxis().SetTitleSize(0.05)
     # frameJpsi.GetXaxis().SetLabelSize(0.045)
+
     frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
-    # frameJpsi.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
+
     frameJpsi.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     
     if config["plot_results"]["jpsiFrame"]["y_title"]:
@@ -955,7 +958,8 @@ def plot_results(config):
         
     legend1.Draw()
 
-    latexTitle.DrawLatex(0.18, 0.89, "Work in progress")
+    #latexTitle.DrawLatex(0.18, 0.89, "Work in progress")
+    latexTitle.DrawLatex(0.18, 0.89, "ALICE Performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexDecay.DrawLatex(0.18, 0.77, "D^{0} #rightarrow #pi^{+}K^{#minus}")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
@@ -982,21 +986,22 @@ def plot_results(config):
             latexRap.DrawLatex(0.18, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
             yLatex -= dyLatex
     if config["fit"]["min_d0_pt"] > 0:
-        latexRap.DrawLatex(0.18, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
+        latexRap.DrawLatex(0.18, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
 
 
     output_dir = f'{config["output"]["figures"]}_paperStyle/{config["inputs"]["inputLabel"]}_{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
     os.makedirs(output_dir, exist_ok=True)
 
     canvasOutJpsi.Update()
-    canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_{getGlobalLabel(config)}.pdf')
+    canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_{getGlobalLabel(config)}.eps')
     
     canvasOutJpsi.SetLogy()
+
     frameJpsi.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range_log"][0], config["plot_results"]["jpsiFrame"]["y_range_log"][1])
-    # frameJpsi.GetYaxis().SetRangeUser(2, 100*sampleToFit.sumEntries() if config['fit']['weighted'] else 100*sampleToFit.numEntries())
+
     frameJpsi.GetYaxis().SetTitleOffset(config["plot_results"]["jpsiFrame"]["y_title_offset_log"])
     canvasOutJpsi.Update()
-    canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_logy_{getGlobalLabel(config)}.pdf')
+    canvasOutJpsi.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_jpsi_projection_logy_{getGlobalLabel(config)}.eps')
 
     ## plot D0 results
     frameD0 = listOfPrimitivesD0.At(1)
@@ -1006,8 +1011,9 @@ def plot_results(config):
     frameD0.GetXaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["x_title_offset"])
     # frameD0.GetXaxis().SetTitleSize(0.05)
     # frameD0.GetXaxis().SetLabelSize(0.045)
+
     frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range"][0], config["plot_results"]["d0Frame"]["y_range"][1])
-    # frameD0.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
+
     frameD0.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     if config["plot_results"]["d0Frame"]["y_title"]:
         frameD0.GetYaxis().SetTitle(config["plot_results"]["d0Frame"]["y_title"])
@@ -1090,7 +1096,8 @@ def plot_results(config):
 
     legend1.Draw()
     
-    latexTitle.DrawLatex(0.18, 0.89, "Work in progress")
+    #latexTitle.DrawLatex(0.18, 0.89, "Work in progress")
+    latexTitle.DrawLatex(0.18, 0.89, "ALICE Performance")
     latexTitle.DrawLatex(0.18, 0.83, "pp, #sqrt{#it{s}} = 13.6 TeV")
     latexDecay.DrawLatex(0.18, 0.77, "D^{0} #rightarrow #pi^{+}K^{#minus}")
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
@@ -1117,10 +1124,10 @@ def plot_results(config):
             latexRap.DrawLatex(0.18, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
             yLatex -= dyLatex
     if config["fit"]["min_d0_pt"] > 0:
-        latexRap.DrawLatex(0.18, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
+        latexRap.DrawLatex(0.18, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
 
     canvasOutD0.Update()
-    canvasOutD0.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_d0_projection_{getGlobalLabel(config)}.pdf')
+    canvasOutD0.SaveAs(f'{output_dir}/fit_{config["fit"]["JpsiChannel"]}_d0_projection_{getGlobalLabel(config)}.eps')
     
     canvasOutD0.SetLogy()
     frameD0.GetYaxis().SetRangeUser(config["plot_results"]["d0Frame"]["y_range_log"][0], config["plot_results"]["d0Frame"]["y_range_log"][1])
@@ -1150,7 +1157,8 @@ def plot_results(config):
     canvasOut3D.SetPhi(230)
     canvasOut3D.SetTheta(20)
     
-    latexTitle.DrawLatex(0.1, 0.94, "Work in progress")
+    #latexTitle.DrawLatex(0.1, 0.94, "Work in progress")
+    latexTitle.DrawLatex(0.1, 0.94, "ALICE Performance")
     latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
 
     latexDecay.DrawLatex(0.1, 0.82, "D^{0} #rightarrow #pi^{+}K^{#minus}")
@@ -1180,9 +1188,9 @@ def plot_results(config):
             latexRap.DrawLatex(0.7, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
             yLatex -= dyLatex
     if config["fit"]["min_d0_pt"] > 0:
-        latexRap.DrawLatex(0.7, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
+        latexRap.DrawLatex(0.7, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
     canvasOut3D.Update()
-    canvasOut3D.SaveAs(f'{output_dir}/fit_2d_{config["fit"]["JpsiChannel"]}_{getGlobalLabel(config)}.pdf')
+    canvasOut3D.SaveAs(f'{output_dir}/fit_2d_{config["fit"]["JpsiChannel"]}_{getGlobalLabel(config)}.eps')
     
     input()
 
