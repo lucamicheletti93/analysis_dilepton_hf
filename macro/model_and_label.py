@@ -22,8 +22,8 @@ def getLabel(val):
 
 def getGlobalLabel(config):
     return config["inputs"]["inputLabel"]+("_weightedFit" if config['fit']['weighted'] else "")+"_dRap_min"+getLabel(config['fit']['min_dRap'])+"_max"+getLabel(config['fit']['max_dRap'])+"rapJpsi_min"+getLabel(config['fit']['min_jpsi_rap'])+"_max"+getLabel(config['fit']['max_jpsi_rap'])+"_ptJpsi_min"+getLabel(config['fit']['min_jpsi_pt'])+"_max"+getLabel(config['fit']['max_jpsi_pt'])+"_rapD0_min"+getLabel(config['fit']['min_d0_rap'])+"_max"+getLabel(config['fit']['max_d0_rap'])+"_ptD0_min"+getLabel(config['fit']['min_d0_pt'])+"_max"+getLabel(config['fit']['max_d0_pt'])
-
-
+    
+    
 def constructWorkspace(config, includeJpsi, includeD0, nEvent):
     '''
     This function reconstructs the model for all fits to avoid many copy-pastes in different functions
@@ -148,7 +148,7 @@ def constructWorkspace(config, includeJpsi, includeD0, nEvent):
         bkgJpsi_sigD0Pdf = ROOT.RooProdPdf("bkgJpsi_sigD0Pdf", "D0 Pdf * Bkg1 Pdf", ROOT.RooArgList(chebyPdfJpsi, cbPdfD0))
         bkgD0_bkgJpsiPdf = ROOT.RooProdPdf("bkgD0_bkgJpsiPdf", "Bkg1 Pdf * Bkg2 Pdf", ROOT.RooArgList(chebyPdfD0, chebyPdfJpsi))
         reflD0_bkgJpsiPdf = ROOT.RooProdPdf("reflD0_bkgJpsiPdf", "Bkg1 Pdf * refl Pdf", ROOT.RooArgList(templatePdfReflD0, chebyPdfJpsi))
-
+        
         # Sum all Pdfs
         if config["fit"]["add_psi2s"]:
             model = ROOT.RooAddPdf("model", "sigD0_sigJpsiPdf + bkgD0_sigJpsiPdf + reflD0_sigJpsiPdf + sigD0_sigPsi2SPdf + bkgD0_sigPsi2SPdf + reflD0_sigPsi2SPdf + bkgJpsi_sigD0Pdf + bkgD0_bkgJpsiPdf + reflD0_bkgJpsiPdf", ROOT.RooArgList(sigD0_sigJpsiPdf, bkgD0_sigJpsiPdf, reflD0_sigJpsiPdf, sigD0_sigPsi2SPdf, bkgD0_sigPsi2SPdf, reflD0_sigPsi2SPdf,bkgJpsi_sigD0Pdf, bkgD0_bkgJpsiPdf, reflD0_bkgJpsiPdf), ROOT.RooArgList(nJPsiD0, nBkgJPsi, nReflJPsi, nPsi2SD0, nBkgPsi2S, nReflPsi2S,nBkgD0, nBkgBkg, nReflBkg))
