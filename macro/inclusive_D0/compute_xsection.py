@@ -87,24 +87,43 @@ def compute_xsec(input_rawy, input_eff, input_cutvar, input_norm, had, suffix):
         "hist_xsec_ptint_p", ";#it{p}_{T} (GeV/#it{c}); #sigma (#mub)", 1, pt_min, pt_max)
     hist_xsec_ptint_np = ROOT.TH1D(
         "hist_xsec_ptint_np", ";#it{p}_{T} (GeV/#it{c}); #sigma (#mub)", 1, pt_min, pt_max)
+    hist_xsec_ptgrt1_p = ROOT.TH1D(
+        "hist_xsec_ptgrt1_p", ";#it{p}_{T} (GeV/#it{c}); #sigma (#mub)", 1, 1., pt_max)
+    hist_xsec_ptgrt1_np = ROOT.TH1D(
+        "hist_xsec_ptgrt1_np", ";#it{p}_{T} (GeV/#it{c}); #sigma (#mub)", 1, 1., pt_max)
     xsec_ptint_p, xsec_ptint_np, unc_xsec_ptint_p, unc_xsec_ptint_np = 0, 0, 0, 0
+    xsec_ptgrt1_p, xsec_ptgrt1_np, unc_xsec_ptgrt1_p, unc_xsec_ptgrt1_np = 0, 0, 0, 0
     for ipt in range(nptbins):
-        xsec_ptint_p += hist_xsec_p.GetBinContent(ipt+1)
-        xsec_ptint_np += hist_xsec_np.GetBinContent(ipt+1)
-        unc_xsec_ptint_p += hist_xsec_p.GetBinError(ipt+1)**2
-        unc_xsec_ptint_np += hist_xsec_np.GetBinError(ipt+1)**2
+        xsec_ptint_p += hist_xsec_p.GetBinContent(ipt+1) * hist_xsec_p.GetBinWidth(ipt+1)
+        xsec_ptint_np += hist_xsec_np.GetBinContent(ipt+1) * hist_xsec_p.GetBinWidth(ipt+1)
+        unc_xsec_ptint_p += hist_xsec_p.GetBinError(ipt+1)**2 * hist_xsec_p.GetBinWidth(ipt+1)**2
+        unc_xsec_ptint_np += hist_xsec_np.GetBinError(ipt+1)**2 * hist_xsec_p.GetBinWidth(ipt+1)**2
+        if hist_xsec_p.GetBinLowEdge(ipt+1) > 0.99:
+            xsec_ptgrt1_p += hist_xsec_p.GetBinContent(ipt+1) * hist_xsec_p.GetBinWidth(ipt+1)
+            xsec_ptgrt1_np += hist_xsec_np.GetBinContent(ipt+1) * hist_xsec_p.GetBinWidth(ipt+1)
+            unc_xsec_ptgrt1_p += hist_xsec_p.GetBinError(ipt+1)**2 * hist_xsec_p.GetBinWidth(ipt+1)**2
+            unc_xsec_ptgrt1_np += hist_xsec_np.GetBinError(ipt+1)**2 * hist_xsec_p.GetBinWidth(ipt+1)**2
+            
     unc_xsec_ptint_p = np.sqrt(unc_xsec_ptint_p)
     unc_xsec_ptint_np = np.sqrt(unc_xsec_ptint_np)
     hist_xsec_ptint_p.SetBinContent(1, xsec_ptint_p)
     hist_xsec_ptint_p.SetBinError(1, unc_xsec_ptint_p)
     hist_xsec_ptint_np.SetBinContent(1, xsec_ptint_np)
     hist_xsec_ptint_np.SetBinError(1, unc_xsec_ptint_np)
+    unc_xsec_ptgrt1_p = np.sqrt(unc_xsec_ptgrt1_p)
+    unc_xsec_ptgrt1_np = np.sqrt(unc_xsec_ptgrt1_np)
+    hist_xsec_ptgrt1_p.SetBinContent(1, xsec_ptgrt1_p)
+    hist_xsec_ptgrt1_p.SetBinError(1, unc_xsec_ptgrt1_p)
+    hist_xsec_ptgrt1_np.SetBinContent(1, xsec_ptgrt1_np)
+    hist_xsec_ptgrt1_np.SetBinError(1, unc_xsec_ptgrt1_np)
 
     outfile = ROOT.TFile(f"../../data_shared/{had}_xsec_pp13dot6TeV{suffix}.root", "recreate")
     hist_xsec_p.Write()
     hist_xsec_np.Write()
     hist_xsec_ptint_p.Write()
     hist_xsec_ptint_np.Write()
+    hist_xsec_ptgrt1_p.Write()
+    hist_xsec_ptgrt1_np.Write()
     hist_norm.Write()
     outfile.Close()
 
@@ -115,10 +134,10 @@ if __name__ == "__main__":
                         default="rawyields/rawyields_nocut_dzero_LHC24_JPsiD.root",
                         help="input file with raw yields")
     parser.add_argument("--input_efficiency", "-ie", metavar="text",
-                        default="efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+                        default="efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD.root",
                         help="input file with efficiencies")
     parser.add_argument("--input_cutvar", "-ic", metavar="text",
-                        default="cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD_y06.root",
+                        default="cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD.root",
                         help="input file with cut-variation output")
     parser.add_argument("--input_normalisation", "-in", metavar="text",
                         default="../../data_shared/luminosity_dzero_LHC24_minBias_sampled.root",
@@ -127,7 +146,7 @@ if __name__ == "__main__":
                         default="dzero",
                         help="Particle species, options [dplus, dstar, dzero]")
     parser.add_argument("--suffix", "-s", metavar="text",
-                        default="_y06", help="suffix for output file")
+                        default="", help="suffix for output file")
     args = parser.parse_args()
 
     compute_xsec(args.input_rawyield, args.input_efficiency, args.input_cutvar,
