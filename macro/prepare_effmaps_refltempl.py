@@ -15,6 +15,9 @@ def get_reflections(config): #pylint:disable=too-many-locals,too-many-statements
 
     ROOT.gStyle.SetPalette(ROOT.kRainBow)
     ROOT.gStyle.SetOptStat(0)
+    ROOT.gStyle.SetPadLeftMargin(0.18)
+    ROOT.gStyle.SetPadRightMargin(0.16)
+    ROOT.gStyle.SetTitleOffset(1.4, "z")
 
     with open(config, 'r') as yml:
         cfg = yaml.load(yml, yaml.FullLoader)

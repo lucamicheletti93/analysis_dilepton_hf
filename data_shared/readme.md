@@ -1,12 +1,20 @@
 ### Links to the shared cernbox directories
-- LHC22 pass7 skimmed: https://cernbox.cern.ch/s/nJ8YNoR77FIDwvJ
+- LHC22 pass7 skimmed: https://cernbox.cern.ch/s/nJ8YNoR77FIDwvJ (not to be used)
 - LHC23 pass4 skimmed: https://cernbox.cern.ch/s/DYW65twa2sWH8qz
 - LHC24 pass1 skimmed: https://cernbox.cern.ch/s/gdXXO4gc1YBKlNX
+- LHC24 pass1 minimum bias (D<sup>0</sup> only): https://cernbox.cern.ch/s/f6lhMNhEjv7zNWR
 
 ## MC outputs for D<sup>0</sup>
-- LHC24g5 (anchored to LHC22 pass7): https://cernbox.cern.ch/s/n6fglJh0XOpbWni
-- LHC24h1 (anchored to LHC23 pass4): https://cernbox.cern.ch/s/HbZVGqFlnbHrQTU
-- LHC24k3 (anchored to LHC24 pass1): https://cernbox.cern.ch/s/NgrDNCw0xABYaof
+- LHC24g5 (anchored to LHC22 pass7): not to be used
+- LHC24h1 (anchored to LHC23 pass4): to be updated (train running)
+- LHC24k3 (anchored to LHC24 pass1): https://cernbox.cern.ch/s/crhwnFFlZAv6Ze7
+
+## D0 quantities
+- efficiency map: https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/axeD0.root
+- reflection template: https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/reflections_d0.root
+- prompt fraction: https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/macro/inclusive_D0/cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD_y06.root
+- D<sup>0</sup> cross section for p<sub>T</sub> > 0.5 GeV/c and |y|<0.5: https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/dzero_xsec_pp13dot6TeV.root
+- D<sup>0</sup> cross section for p<sub>T</sub> > 0.5 GeV/c and |y|<0.6 : https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/dzero_xsec_pp13dot6TeV_y06.root
 
 ### Useful commands
 
