@@ -134,10 +134,10 @@ if __name__ == "__main__":
                         default="rawyields/rawyields_nocut_dzero_LHC24_JPsiD.root",
                         help="input file with raw yields")
     parser.add_argument("--input_efficiency", "-ie", metavar="text",
-                        default="efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD.root",
+                        default="efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
                         help="input file with efficiencies")
     parser.add_argument("--input_cutvar", "-ic", metavar="text",
-                        default="cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD.root",
+                        default="cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD_y06.root",
                         help="input file with cut-variation output")
     parser.add_argument("--input_normalisation", "-in", metavar="text",
                         default="../../data_shared/luminosity_dzero_LHC24_minBias_sampled.root",
@@ -146,7 +146,7 @@ if __name__ == "__main__":
                         default="dzero",
                         help="Particle species, options [dplus, dstar, dzero]")
     parser.add_argument("--suffix", "-s", metavar="text",
-                        default="", help="suffix for output file")
+                        default="_y06", help="suffix for output file")
     args = parser.parse_args()
 
     compute_xsec(args.input_rawyield, args.input_efficiency, args.input_cutvar,
