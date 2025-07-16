@@ -46,7 +46,7 @@ def produce_predictions(infile_name, outfile_name):
     df = uproot.open(infile_name)["tuplePairs"].arrays(library="pd")
 
     outfile = ROOT.TFile(outfile_name, "recreate")
-    canv = {}
+    canv, leg = {}, {}
     hist_ratio_tot_jpsiincl_dmesincl = ROOT.TH1D("hist_ratio_tot_jpsiincl_dmesincl", ";;#it{R}_{DJ/#Psi} (#mub)", 3, -0.5, 2.5)
     hist_ratio_sps_jpsiincl_dmesincl = ROOT.TH1D("hist_ratio_sps_jpsiincl_dmesincl", ";;#it{R}_{DJ/#Psi} (#mub)", 3, -0.5, 2.5)
     hist_ratio_dps_jpsiincl_dmesincl = ROOT.TH1D("hist_ratio_dps_jpsiincl_dmesincl", ";;#it{R}_{DJ/#Psi} (#mub)", 3, -0.5, 2.5)
@@ -73,6 +73,20 @@ def produce_predictions(infile_name, outfile_name):
 
         canv[variant] = ROOT.TCanvas(f"canv_{variant}", "", 1000, 500)
         canv[variant].Divide(2, 1)
+
+        header = "D^{0}#minusJ/#Psi (no kine cuts)"
+        if variant == "fwd_cuts":
+            header = "D^{0}(mid)-J/#Psi(fwd)"
+        elif variant == "mid_cuts":
+            header = "D^{0}(mid)-J/#Psi(mid)"
+        leg[variant] = ROOT.TLegend(0.2, 0.7, 0.5, 0.9)
+        leg[variant].SetFillStyle(0)
+        leg[variant].SetBorderSize(0)
+        leg[variant].SetTextSize(0.045)
+        leg[variant].SetHeader(header)
+        leg[variant].AddEntry(hist_ratio_tot_jpsiincl_dmesincl, "Total", "lp")
+        leg[variant].AddEntry(hist_ratio_sps_jpsiincl_dmesincl, "SPS", "lp")
+        leg[variant].AddEntry(hist_ratio_dps_jpsiincl_dmesincl, "DPS", "lp")
 
         kine_cuts = ""
         if variant == "no_kine_cuts":
@@ -118,10 +132,10 @@ def produce_predictions(infile_name, outfile_name):
                                                         100, -10., 10.)
         hist_deltaphi_sps_jpsiincl_dmesincl = ROOT.TH1D("hist_deltaphi_sps_jpsiincl_dmesincl",
                                                         ";|#Delta#varphi|; d#sigma/d|#Delta#varphi| (#mub)",
-                                                        90, 0., np.pi)
+                                                        45, 0., np.pi)
         hist_deltaphi_sps_jpsiincl_dmesprompt = ROOT.TH1D("hist_deltaphi_sps_jpsiincl_dmesprompt",
                                                           ";|#Delta#varphi|; d#sigma/|d#Delta#varphi| (#mub)",
-                                                          90, 0., np.pi)
+                                                          45, 0., np.pi)
 
         for deltay, deltaphi, dfromb in zip(df_sps["deltaY"].to_numpy(),
                                             df_sps["deltaPhi"].to_numpy(),
@@ -164,10 +178,10 @@ def produce_predictions(infile_name, outfile_name):
                                                         100, -10., 10.)
         hist_deltaphi_dps_jpsiincl_dmesincl = ROOT.TH1D("hist_deltaphi_dps_jpsiincl_dmesincl",
                                                         ";|#Delta#varphi|; d#sigma/d|#Delta#varphi| (#mub)",
-                                                        90, 0., np.pi)
+                                                        45, 0., np.pi)
         hist_deltaphi_dps_jpsiincl_dmesprompt = ROOT.TH1D("hist_deltaphi_dps_jpsiincl_dmesprompt",
                                                           ";|#Delta#varphi|; d#sigma/d|#Delta#varphi| (#mub)",
-                                                          90, 0., np.pi)
+                                                          45, 0., np.pi)
         for deltay, deltaphi, dfromb in zip(df_dps["deltaY"].to_numpy(),
                                             df_dps["deltaPhi"].to_numpy(),
                                             df_dps["DfromB"].to_numpy()):
@@ -200,8 +214,6 @@ def produce_predictions(infile_name, outfile_name):
         hist_ratio_tot_jpsiincl_dmesincl.SetBinError(ivar+1, ratiounc_tot_incl)
         hist_ratio_tot_jpsiincl_dmesprompt.SetBinError(ivar+1, ratiounc_tot_prompt)
 
-        print(xsec_jpsi, xsec_dmes_prompt, xsec_dps_jpsidmesprompt)
-
         hist_deltay_dps_jpsiincl_dmesincl.Scale(xsec/nevents, "width")
         hist_deltay_dps_jpsiincl_dmesprompt.Scale(xsec/nevents, "width")
         hist_deltaphi_dps_jpsiincl_dmesincl.Scale(xsec/nevents, "width")
@@ -232,9 +244,12 @@ def produce_predictions(infile_name, outfile_name):
 
         canv[variant].cd(1)
         hist_deltay_tot_jpsiincl_dmesprompt.GetYaxis().SetDecimals()
+        hist_deltay_tot_jpsiincl_dmesprompt.GetYaxis().SetRangeUser(
+            0., hist_deltay_tot_jpsiincl_dmesprompt.GetMaximum()*1.5)
         hist_deltay_tot_jpsiincl_dmesprompt.DrawCopy()
         hist_deltay_sps_jpsiincl_dmesprompt.DrawCopy("same")
         hist_deltay_dps_jpsiincl_dmesprompt.DrawCopy("same")
+        leg[variant].Draw()
         canv[variant].cd(2)
         hist_deltaphi_tot_jpsiincl_dmesprompt.GetYaxis().SetDecimals()
         hist_deltaphi_tot_jpsiincl_dmesprompt.GetYaxis().SetRangeUser(
