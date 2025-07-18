@@ -12,6 +12,11 @@
 - D<sup>0</sup> cross section for p<sub>T</sub> > 0.5 GeV/c and |y|<0.5: https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/dzero_xsec_pp13dot6TeV.root
 - D<sup>0</sup> cross section for p<sub>T</sub> > 0.5 GeV/c and |y|<0.6 : https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/dzero_xsec_pp13dot6TeV_y06.root
 
+## J/psi quantities
+- efficiency map [MC anchored to pp 2023, LHC25c1]: https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/axeJpsiToMuMu.root
+- efficiency map [MC anchored to pp 2024, LHC25c3]: https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/axeJpsiToMuMu_LHC25c3.root
+- J/psi cross section for p<sub>T</sub> > 0 and 2.5 < y < 4.0 : https://github.com/lucamicheletti93/analysis_dilepton_hf/blob/main/data_shared/jpsi_xsec_pp13dot6TeV.root
+
 ### Useful commands
 
 Inside `fDiMuon` / `fDiElectron` repository run the command:
