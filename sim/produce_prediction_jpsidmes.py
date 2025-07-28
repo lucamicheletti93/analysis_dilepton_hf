@@ -199,12 +199,12 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
                     hist_deltay_sps_jpsiprompt_dmesprompt.Fill(deltay)
                     hist_deltaphi_sps_jpsiprompt_dmesprompt.Fill(deltaphi)
         
-        xsec_sps_jpsidmesincl = hist_deltay_sps_jpsiincl_dmesincl.Integral() * xsec / nevents
-        unc_sps_incl = np.sqrt(hist_deltay_sps_jpsiincl_dmesincl.Integral()) * xsec / nevents
-        xsec_sps_jpsiincl_dmesprompt = hist_deltay_sps_jpsiincl_dmesprompt.Integral() * xsec / nevents
-        unc_sps_dprompt = np.sqrt(hist_deltay_sps_jpsiincl_dmesprompt.Integral()) * xsec / nevents
-        xsec_sps_jpsidmesprompt = hist_deltay_sps_jpsiprompt_dmesprompt.Integral() * xsec / nevents
-        unc_sps_prompt = np.sqrt(hist_deltay_sps_jpsiprompt_dmesprompt.Integral()) * xsec / nevents
+        xsec_sps_jpsidmesincl = hist_deltay_sps_jpsiincl_dmesincl.Integral() * xsec / nevents / 2 # / 2 is for charge average
+        unc_sps_incl = np.sqrt(hist_deltay_sps_jpsiincl_dmesincl.Integral()) * xsec / nevents / 2
+        xsec_sps_jpsiincl_dmesprompt = hist_deltay_sps_jpsiincl_dmesprompt.Integral() * xsec / nevents / 2
+        unc_sps_dprompt = np.sqrt(hist_deltay_sps_jpsiincl_dmesprompt.Integral()) * xsec / nevents / 2
+        xsec_sps_jpsidmesprompt = hist_deltay_sps_jpsiprompt_dmesprompt.Integral() * xsec / nevents / 2
+        unc_sps_prompt = np.sqrt(hist_deltay_sps_jpsiprompt_dmesprompt.Integral()) * xsec / nevents / 2
         ratio_sps_incl = xsec_jpsi * xsec_dmes / xsec_sps_jpsidmesincl
         ratiounc_sps_incl = unc_sps_incl / xsec_sps_jpsidmesincl * ratio_sps_incl
         hist_ratio_sps_jpsiincl_dmesincl.SetBinContent(ivar+1, ratio_sps_incl)
@@ -264,12 +264,12 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
                     hist_deltay_dps_jpsiprompt_dmesprompt.Fill(deltay)
                     hist_deltaphi_dps_jpsiprompt_dmesprompt.Fill(deltaphi)
 
-        xsec_dps_jpsidmesincl = hist_deltay_dps_jpsiincl_dmesincl.Integral() * xsec / nevents
-        unc_dps_incl = np.sqrt(hist_deltay_dps_jpsiincl_dmesincl.Integral()) * xsec / nevents
-        xsec_dps_jpsiincl_dmesprompt = hist_deltay_dps_jpsiincl_dmesprompt.Integral() * xsec / nevents
-        unc_dps_dprompt = np.sqrt(hist_deltay_dps_jpsiincl_dmesprompt.Integral()) * xsec / nevents
-        xsec_dps_jpsidmesprompt = hist_deltay_dps_jpsiprompt_dmesprompt.Integral() * xsec / nevents
-        unc_dps_prompt = np.sqrt(hist_deltay_dps_jpsiprompt_dmesprompt.Integral()) * xsec / nevents
+        xsec_dps_jpsidmesincl = hist_deltay_dps_jpsiincl_dmesincl.Integral() * xsec / nevents / 2
+        unc_dps_incl = np.sqrt(hist_deltay_dps_jpsiincl_dmesincl.Integral()) * xsec / nevents / 2
+        xsec_dps_jpsiincl_dmesprompt = hist_deltay_dps_jpsiincl_dmesprompt.Integral() * xsec / nevents / 2
+        unc_dps_dprompt = np.sqrt(hist_deltay_dps_jpsiincl_dmesprompt.Integral()) * xsec / nevents / 2
+        xsec_dps_jpsidmesprompt = hist_deltay_dps_jpsiprompt_dmesprompt.Integral() * xsec / nevents / 2
+        unc_dps_prompt = np.sqrt(hist_deltay_dps_jpsiprompt_dmesprompt.Integral()) * xsec / nevents / 2
         ratio_dps_incl = xsec_jpsi * xsec_dmes / xsec_dps_jpsidmesincl
         ratio_dps_dprompt = xsec_jpsi * xsec_dmes_prompt / xsec_dps_jpsiincl_dmesprompt
         ratio_dps_prompt = xsec_jpsi_prompt * xsec_dmes_prompt / xsec_dps_jpsidmesprompt
@@ -362,21 +362,21 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
             graph_deltaphi_lhcb = lhcb_data.Get("Table 21/Graph1D_y1")
             graph_deltay_lhcb = lhcb_data.Get("Table 24/Graph1D_y1")
             graph_deltaphi_lhcb.SetNameTitle("graph_deltaphi_lhcb",
-                                             ";|#Delta#varphi|/#pi;d#sigma/(d|#Delta#varphi|/#pi)) (a.u.)")
+                                             ";|#Delta#varphi|/#pi;d#sigma/(d|#Delta#varphi|/#pi) (a.u.)")
             graph_deltay_lhcb.SetNameTitle("graph_deltay_lhcb", ";#Delta#it{y};d#sigma/(d#Delta#it{y}) (a.u.)")
-            ratio_lhcb = 14.9e-3
+            ratio_lhcb = 14.9e3
             unc_tot_low_ratio_lhcb = np.sqrt(0.4**2 + 1.1**2 + 3.1**2)*1.e3
             unc_tot_high_ratio_lhcb = np.sqrt(0.4**2 + 1.1**2 + 2.3**2)*1.e3
             graph_ratio_lhcb = ROOT.TGraphAsymmErrors(1)
             graph_ratio_lhcb.SetNameTitle("graph_ratio_lhcb", ";;#it{R}_{DJ/#Psi}")
-            graph_ratio_lhcb.SetPoint(0, 1.5, ratio_lhcb)
+            graph_ratio_lhcb.SetPoint(0, 1., ratio_lhcb)
             graph_ratio_lhcb.SetPointError(0, 0., 0., unc_tot_low_ratio_lhcb, unc_tot_high_ratio_lhcb)
             set_style(graph_deltaphi_lhcb, ROOT.kBlack, ROOT.kOpenSquare, 1.5)
             set_style(graph_deltay_lhcb, ROOT.kBlack, ROOT.kOpenSquare, 1.5)
             set_style(graph_ratio_lhcb, ROOT.kBlack, ROOT.kOpenSquare, 1.5)
             canv_lhcb = ROOT.TCanvas("canv_lhcb", "", 1500, 500)
             canv_lhcb.Divide(3, 1)
-            frame = canv_lhcb.cd(1).DrawFrame(0., 0., 1., 0.25, ";|#Delta#varphi|/#pi;d#sigma/(d|#Delta#varphi|/#pi)) (a.u.)")
+            frame = canv_lhcb.cd(1).DrawFrame(0., 0., 1., 0.25, ";|#Delta#varphi|/#pi;d#sigma/(d|#Delta#varphi|/#pi) (a.u.)")
             frame.GetYaxis().SetDecimals()
             hist_deltaphi_tot_pythia4lhcb = hist_deltaphi_tot_jpsiincl_dmesprompt.Clone("hist_deltaphi_tot_pythia4lhcb")
             hist_deltaphi_sps_pythia4lhcb = hist_deltaphi_sps_jpsiincl_dmesprompt.Clone("hist_deltaphi_sps_pythia4lhcb")
@@ -419,7 +419,7 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
             leg_lhcb_data.AddEntry("", "LHCb JHEP 06 (2012) 141", "")
             leg_lhcb_data.Draw()
             canv_lhcb.cd(3).SetLogy()
-            hist_ratio_dps_jpsiprompt_dmesprompt.GetYaxis().SetRangeUser(1.e2, 1.e5)
+            hist_ratio_dps_jpsiprompt_dmesprompt.GetYaxis().SetRangeUser(1.e3, 4.e5)
             hist_ratio_dps_jpsiprompt_dmesprompt.DrawCopy()
             hist_ratio_sps_jpsiprompt_dmesprompt.DrawCopy("same")
             hist_ratio_tot_jpsiprompt_dmesprompt.DrawCopy("same")
@@ -466,7 +466,7 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
 
     canv_ratio = ROOT.TCanvas("canv_ratio", "", 1000, 500)
     canv_ratio.SetLogy()
-    hist_ratio_dps_jpsiincl_dmesprompt.GetYaxis().SetRangeUser(1.e2, 1.e5)
+    hist_ratio_dps_jpsiincl_dmesprompt.GetYaxis().SetRangeUser(1.e2, 1.e6)
     hist_ratio_dps_jpsiincl_dmesprompt.DrawCopy()
     hist_ratio_sps_jpsiincl_dmesprompt.DrawCopy("same")
     hist_ratio_tot_jpsiincl_dmesprompt.DrawCopy("same")
