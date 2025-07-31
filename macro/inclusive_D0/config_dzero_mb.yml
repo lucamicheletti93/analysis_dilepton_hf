@@ -19,6 +19,10 @@ bdt_cuts:
               0.70, 0.72, 0.74, 0.76, 0.78,
               0.80, 0.82, 0.84, 0.86, 0.88,
               0.90, 0.92, 0.94, 0.96, 0.98] # values for cut-variation method (pT differential?)
+trk_cuts:
+  apply: false
+  ncls_its: 4
+  ncls_tpc: 70
 
 fit:
   mass_mins: [1.72, 1.72, 1.72, 1.72, 1.72, 1.72, 1.72, 1.72, 1.72, 1.72, 1.72, 1.72, 1.72] 

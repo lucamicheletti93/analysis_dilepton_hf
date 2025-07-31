@@ -413,6 +413,8 @@ def project(input_config):
     pt_axis = 1
     bdtbkg_axis = 2
     bdtnp_axis = 3
+    ncls_its_axis = None
+    ncls_tpc_axis = None
     infile = ROOT.TFile.Open(infile_name)
     if cfg["hadron"] != "dzero":
         sparse = infile.Get("hData")
@@ -423,6 +425,8 @@ def project(input_config):
         bdtbkg_axis = 0
         bdtnp_axis = 2
         refl_axis = 6
+        ncls_its_axis = 7
+        ncls_tpc_axis = 8
     infile.Close()
 
     pt_mins = cfg["pt_mins"]
@@ -433,6 +437,15 @@ def project(input_config):
         bdt_bkg_cuts = [bdt_bkg_cuts]*len(pt_mins)
 
     outfile = ROOT.TFile(os.path.join(outputdir, f"hist_mass{suffix}.root"), "recreate")
+
+    if cfg["trk_cuts"]["apply"]:
+        if cfg["hadron"] != "dzero":
+            print("ERROR: Track cuts not implemented! Exit")
+            sys.exit()
+        ncls_its_bin_min = sparse.GetAxis(ncls_its_axis).FindBin(cfg["trk_cuts"]["ncls_its"]*1.001)
+        ncls_tpc_bin_min = sparse.GetAxis(ncls_tpc_axis).FindBin(cfg["trk_cuts"]["ncls_tpc"]*1.001)
+        sparse.GetAxis(ncls_its_axis).SetRange(ncls_its_bin_min, 100000)
+        sparse.GetAxis(ncls_tpc_axis).SetRange(ncls_tpc_bin_min, 100000)
 
     histos_pt, histos_pt_cutvar = [], []
     for ipt, (pt_min, pt_max) in enumerate(zip(pt_mins, pt_maxs)):
@@ -484,6 +497,11 @@ def get_templates(input_config):
         return
 
     if cfg["hadron"] == "dplus":
+
+        if cfg["trk_cuts"]["apply"]:
+            print("ERROR: Track cuts not implemented! Exit")
+            sys.exit()
+
         df = pd.DataFrame()
         for infile_name in infile_names:
             infile = ROOT.TFile.Open(infile_name)
@@ -558,6 +576,15 @@ def get_templates(input_config):
             infile = ROOT.TFile.Open(infile_name)
             sparse_recoall = infile.Get("hf-task-d0/hBdtScoreVsMassVsPtVsPtBVsYVsOriginVsD0Type")
             sparse_recoall.GetAxis(6).SetRange(3, 4) # only reflected signal
+            if cfg["trk_cuts"]["apply"]:
+                if cfg["hadron"] != "dzero":
+                    print("ERROR: Track cuts not implemented! Exit")
+                    sys.exit()
+                ncls_its_bin_min = sparse_recoall.GetAxis(10).FindBin(cfg["trk_cuts"]["ncls_its"]*1.001)
+                ncls_tpc_bin_min = sparse_recoall.GetAxis(11).FindBin(cfg["trk_cuts"]["ncls_tpc"]*1.001)
+                sparse_recoall.GetAxis(10).SetRange(ncls_its_bin_min, 100000)
+                sparse_recoall.GetAxis(11).SetRange(ncls_tpc_bin_min, 100000)
+
             if ifile == 0:
                 sparse_refl = sparse_recoall.Projection(5, np.array([0, 1, 2, 3, 4], dtype=np.int32))
             else:

@@ -22,10 +22,20 @@ def get_lumi(infile_names, suffix):
             hist_collisions = infile.Get("hf-candidate-creator-2prong/hCollisions")
         ibin_zvtx = hist_collisions.GetXaxis().FindBin("PV #it{z}")
         zvtx_eff = hist_collisions.GetBinContent(ibin_zvtx) / hist_collisions.GetBinContent(ibin_zvtx-1)
-        hist_lumi_per_run.append(infile.Get("bc-selection-task/hLumiTVXafterBCcuts"))
-        print(hist_lumi_per_run[-1].GetNbinsX())
-        for ibin in range(1, hist_lumi_per_run[-1].GetNbinsX()+1):
-            lumi += hist_lumi_per_run[-1].GetBinContent(ibin) * zvtx_eff # mub-1
+        has_lumi_task = False
+        for key in infile.GetListOfKeys():
+            if "eventselection-run3" in key.GetName():
+                has_lumi_task = True
+                break
+        if not has_lumi_task:
+            hist_lumi_per_run.append(infile.Get("bc-selection-task/hLumiTVXafterBCcuts"))
+            for ibin in range(1, hist_lumi_per_run[-1].GetNbinsX()+1):
+                lumi += hist_lumi_per_run[-1].GetBinContent(ibin) * zvtx_eff # mub-1
+        else:
+            hist_lumi_per_run.append(infile.Get("eventselection-run3/luminosity/hLumiTVXafterBCcutsRCT"))
+            ibin_rct = hist_lumi_per_run[-1].GetYaxis().FindBin("CBT_hadronPID")
+            for ibin in range(1, hist_lumi_per_run[-1].GetXaxis().GetNbins()+1):
+                lumi += hist_lumi_per_run[-1].GetBinContent(ibin, ibin_rct) * zvtx_eff # mub-1
 
     hist_lumi = ROOT.TH1F("hist_lumi", ";;luminosity (pb^{#minus1})", 1, 0., 1.)
     hist_lumi.SetBinContent(1, lumi)

@@ -1,0 +1,15 @@
+input:
+  central:
+    rawyield: rawyields/rawyields_nocut_dzero_LHC24_JPsiD_y06.root
+    efficiency: efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root
+    fraction: cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD_y06.root
+    xsection: ../../data_shared/dzero_xsec_pp13dot6TeV_y06.root
+  variations:
+    directory: systematics
+    suffixes: ["_loose0", "_loose1", "_loose2", "_loose3", "_loose4", "_loose5", "_loose6", "_loose7", "_loose8", "_loose9", "_tight0", "_tight1", "_tight2", "_tight3"]
+    labels: ["loose0", "loose1", "loose2", "loose3", "loose4", "loose5", "loose6", "loose7", "loose8", "loose9", "tight0", "tight1", "tight2", "tight3"]
+    n_cols_leg: 2
+
+output:
+  directory: systematics
+  file_name: syst_dzero_seleff.pdf

@@ -3,13 +3,14 @@ Compute cross section from output of cut-variation method
 """
 
 import sys
+import os
 import argparse
 import numpy as np
 import ROOT
 from style_formatter import set_object_style
 
 
-def compute_xsec(input_rawy, input_eff, input_cutvar, input_norm, had, suffix):
+def compute_xsec(input_rawy, input_eff, input_cutvar, input_norm, had, outputdir, suffix):
     """
     Main function for computation of pT-differential and pT-integrated cross sections
     """
@@ -117,7 +118,7 @@ def compute_xsec(input_rawy, input_eff, input_cutvar, input_norm, had, suffix):
     hist_xsec_ptgrt1_np.SetBinContent(1, xsec_ptgrt1_np)
     hist_xsec_ptgrt1_np.SetBinError(1, unc_xsec_ptgrt1_np)
 
-    outfile = ROOT.TFile(f"../../data_shared/{had}_xsec_pp13dot6TeV{suffix}.root", "recreate")
+    outfile = ROOT.TFile(os.path.join(outputdir, f"{had}_xsec_pp13dot6TeV{suffix}.root"), "recreate")
     hist_xsec_p.Write()
     hist_xsec_np.Write()
     hist_xsec_ptint_p.Write()
@@ -131,7 +132,7 @@ def compute_xsec(input_rawy, input_eff, input_cutvar, input_norm, had, suffix):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Arguments")
     parser.add_argument("--input_rawyield", "-ir", metavar="text",
-                        default="rawyields/rawyields_nocut_dzero_LHC24_JPsiD.root",
+                        default="rawyields/rawyields_nocut_dzero_LHC24_JPsiD_y06.root",
                         help="input file with raw yields")
     parser.add_argument("--input_efficiency", "-ie", metavar="text",
                         default="efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
@@ -145,9 +146,11 @@ if __name__ == "__main__":
     parser.add_argument("--particle", "-p", metavar="text",
                         default="dzero",
                         help="Particle species, options [dplus, dstar, dzero]")
+    parser.add_argument("--outputdir", "-o", metavar="text",
+                        default="../../data_shared/", help="output directory")
     parser.add_argument("--suffix", "-s", metavar="text",
                         default="_y06", help="suffix for output file")
     args = parser.parse_args()
 
     compute_xsec(args.input_rawyield, args.input_efficiency, args.input_cutvar,
-                 args.input_normalisation, args.particle, args.suffix)
+                 args.input_normalisation, args.particle, args.outputdir, args.suffix)
