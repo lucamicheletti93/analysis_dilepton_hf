@@ -46,10 +46,10 @@ def compute_efficiencies(input_config):
 
     infile_name = os.path.join(outputdir, f"hist_mcpt{suffix}.root")
 
-    hist_eff_p_nocut = ROOT.TH1F(
+    hist_eff_p_nocut = ROOT.TH1D(
         "hist_eff_prompt", ";#it{p}_{T} (GeV/#it{c}); #font[152]{e} #times Acc",
         len(pt_mins), pt_limits)
-    hist_eff_np_nocut = ROOT.TH1F(
+    hist_eff_np_nocut = ROOT.TH1D(
         "hist_eff_nonprompt", ";#it{p}_{T} (GeV/#it{c}); #font[152]{e} #times Acc",
         len(pt_mins), pt_limits)
     hist_eff_p_nocut.SetDirectory(0)
@@ -58,10 +58,10 @@ def compute_efficiencies(input_config):
     hist_eff_p, hist_eff_np = [], []
     for icut, _ in enumerate(bdt_np_mins):
         hist_eff_p.append(
-            ROOT.TH1F("hist_eff_prompt", ";#it{p}_{T} (GeV/#it{c}); #font[152]{e} #times Acc",
+            ROOT.TH1D("hist_eff_prompt", ";#it{p}_{T} (GeV/#it{c}); #font[152]{e} #times Acc",
                       len(pt_mins), pt_limits))
         hist_eff_np.append(
-            ROOT.TH1F("hist_eff_nonprompt", ";#it{p}_{T} (GeV/#it{c}); #font[152]{e} #times Acc",
+            ROOT.TH1D("hist_eff_nonprompt", ";#it{p}_{T} (GeV/#it{c}); #font[152]{e} #times Acc",
                       len(pt_mins), pt_limits))
         hist_eff_p[icut].SetDirectory(0)
         hist_eff_np[icut].SetDirectory(0)
@@ -138,6 +138,8 @@ def project(input_config):
     bdtbkg_axis = 2
     bdtnp_axis = 3
     ygen_axis = 1
+    ncls_its_axis = None
+    ncls_tpc_axis = None
     sparse_recop, sparse_reconp, sparse_genp, sparse_gennp = ([] for _ in range(4))
     for infile_name in infile_names:
         infile = ROOT.TFile.Open(infile_name)
@@ -157,14 +159,21 @@ def project(input_config):
             sparse_recoall = infile.Get("hf-task-d0/hBdtScoreVsMassVsPtVsPtBVsYVsOriginVsD0Type")
             sparse_recoall.GetAxis(6).SetRange(1, 2) # only non-reflected signal
             sparse_recoall.GetAxis(8).SetRange(2, 2) # prompt
-            sparse_recop.append(sparse_recoall.Projection(5, np.array([0, 1, 2, 3, 4], dtype=np.int32)))
+            reco_axes_tokeep = [0, 1, 2, 3, 4]
+            if cfg["trk_cuts"]["apply"]:
+                reco_axes_tokeep.append(10)
+                reco_axes_tokeep.append(11)
+            reco_axes_tokeep = np.array(reco_axes_tokeep, dtype=np.int32)
+            sparse_recop.append(sparse_recoall.Projection(len(reco_axes_tokeep), reco_axes_tokeep))
             sparse_recop[-1].SetName("hRecoPrompt")
             sparse_recoall.GetAxis(8).SetRange(3, 3) # non-prompt
-            sparse_reconp.append(sparse_recoall.Projection(5, np.array([0, 1, 2, 3, 4], dtype=np.int32)))
+            sparse_reconp.append(sparse_recoall.Projection(len(reco_axes_tokeep), reco_axes_tokeep))
             sparse_reconp[-1].SetName("hRecoNonPrompt")
             pt_axis = 4
             bdtbkg_axis = 0
             bdtnp_axis = 2
+            ncls_its_axis = 5
+            ncls_tpc_axis = 6
     infile.Close()
 
     pt_mins = cfg["pt_mins"]
@@ -214,6 +223,18 @@ def project(input_config):
         pt_bin_min = sparse_recop[0].GetAxis(pt_axis).FindBin(pt_min*1.001)
         pt_bin_max = sparse_recop[0].GetAxis(pt_axis).FindBin(pt_max*0.999)
         for ifile, _ in enumerate(infile_names):
+            if cfg["trk_cuts"]["apply"]:
+                if cfg["hadron"] != "dzero":
+                    print("ERROR: Track cuts not implemented! Exit")
+                    sys.exit()
+                ncls_its_bin_min = sparse_recop[ifile].GetAxis(ncls_its_axis).FindBin(
+                    cfg["trk_cuts"]["ncls_its"]*1.001)
+                ncls_tpc_bin_min = sparse_recop[ifile].GetAxis(ncls_tpc_axis).FindBin(
+                    cfg["trk_cuts"]["ncls_tpc"]*1.001)
+                sparse_recop[ifile].GetAxis(ncls_its_axis).SetRange(ncls_its_bin_min, 100000)
+                sparse_recop[ifile].GetAxis(ncls_tpc_axis).SetRange(ncls_tpc_bin_min, 100000)
+                sparse_reconp[ifile].GetAxis(ncls_its_axis).SetRange(ncls_its_bin_min, 100000)
+                sparse_reconp[ifile].GetAxis(ncls_tpc_axis).SetRange(ncls_tpc_bin_min, 100000)
             sparse_recop[ifile].GetAxis(bdtbkg_axis).SetRange(1, bdt_bkg_bin_max)
             sparse_reconp[ifile].GetAxis(bdtbkg_axis).SetRange(1, bdt_bkg_bin_max)
             sparse_recop[ifile].GetAxis(pt_axis).SetRange(pt_bin_min, pt_bin_max)

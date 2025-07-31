@@ -1,0 +1,29 @@
+input:
+  central:
+    rawyield: rawyields/rawyields_nocut_dzero_LHC24_JPsiD_y06.root
+    efficiency: efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root
+    fraction: cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD_y06.root
+    xsection: ../../data_shared/dzero_xsec_pp13dot6TeV_y06.root
+  variations:
+    directory: systematics
+    suffixes: ["_trkcut0", "_trkcut1", "_trkcut2", "_trkcut3", "_trkcut4", "_trkcut5", "_trkcut6", "_trkcut7", "_trkcut8", "_trkcut9", "_trkcut10", "_trkcut11", "_trkcut12", "_trkcut13", "_trkcut14"]
+    labels: ["#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 70",
+             "#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 80",
+             "#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 90",
+             "#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 100",
+             "#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 110",
+             "#it{N}_{cls}^{ITS} > 6, #it{N}_{cls}^{TPC} > 70",
+             "#it{N}_{cls}^{ITS} > 6, #it{N}_{cls}^{TPC} > 80",
+             "#it{N}_{cls}^{ITS} > 6, #it{N}_{cls}^{TPC} > 90",
+             "#it{N}_{cls}^{ITS} > 6, #it{N}_{cls}^{TPC} > 100",
+             "#it{N}_{cls}^{ITS} > 6, #it{N}_{cls}^{TPC} > 110",
+             "#it{N}_{cls}^{ITS} > 7, #it{N}_{cls}^{TPC} > 70",
+             "#it{N}_{cls}^{ITS} > 7, #it{N}_{cls}^{TPC} > 80",
+             "#it{N}_{cls}^{ITS} > 7, #it{N}_{cls}^{TPC} > 90",
+             "#it{N}_{cls}^{ITS} > 7, #it{N}_{cls}^{TPC} > 100",
+             "#it{N}_{cls}^{ITS} > 7, #it{N}_{cls}^{TPC} > 110"]
+    n_cols_leg: 1
+
+output:
+  directory: systematics
+  file_name: syst_dzero_trkeff.pdf

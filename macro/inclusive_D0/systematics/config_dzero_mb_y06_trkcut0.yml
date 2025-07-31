@@ -1,0 +1,152 @@
+bdt_cuts:
+  bkg:
+  - 0.05
+  - 0.05
+  - 0.05
+  - 0.1
+  - 0.2
+  - 0.2
+  - 0.3
+  - 0.35
+  - 0.4
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  nonprompt: []
+efficiency:
+  include_pitomu: true
+  y_gen: 0.6
+fit:
+  bkg_funcs:
+  - chebpol3
+  - chebpol3
+  - chebpol3
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  - chebpol2
+  fix_frac_bkgcorr:
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  fix_tailpars_from_mc:
+  - false
+  - false
+  - false
+  - false
+  - false
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  - true
+  mass_maxs:
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.05
+  - 2.1
+  - 2.1
+  mass_mins:
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  - 1.72
+  sgn_funcs:
+  - gaussian
+  - gaussian
+  - gaussian
+  - gaussian
+  - gaussian
+  - doublecb
+  - doublecb
+  - doublecb
+  - doublecb
+  - doublecb
+  - doublecb
+  - doublecb
+  - doublecb
+hadron: dzero
+input:
+  corrbkg:
+  - ../../data_shared/effmaps/AnalysisResults_LHC24k3_trackTuner_ptSmearing1p5_phiDep_trksys.root
+  data: ../../data_shared/2024_pass1_minbias/AnalysisResults_LHC24_minBias_sampled_D0_trksys.root
+  mc:
+  - ../../data_shared/effmaps/AnalysisResults_LHC24k3_trackTuner_ptSmearing1p5_phiDep_trksys.root
+  mc_weights:
+  - 1.0
+output:
+  efficiencies:
+    directory: systematics
+    suffix: _dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06_trkcut0
+  rawyields:
+    directory: systematics
+    suffix: _dzero_LHC24_JPsiD_y06_trkcut0
+pt_maxs:
+- 1.0
+- 2.0
+- 3.0
+- 4.0
+- 5.0
+- 6.0
+- 7.0
+- 8.0
+- 9.0
+- 10.0
+- 12.0
+- 16.0
+- 24.0
+pt_mins:
+- 0.5
+- 1.0
+- 2.0
+- 3.0
+- 4.0
+- 5.0
+- 6.0
+- 7.0
+- 8.0
+- 9.0
+- 10.0
+- 12.0
+- 16.0
+trk_cuts:
+  apply: true
+  ncls_its: 5.0
+  ncls_tpc: 70.0
