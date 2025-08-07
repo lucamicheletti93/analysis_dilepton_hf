@@ -1,0 +1,20 @@
+hadron: dzero
+
+inputs:
+  data: rawyields/hist_mass_dzero_LHC24_JPsiD_y06.root
+  mc: rawyields/hist_bkgtempl_dzero_LHC24_JPsiD_y06.root
+
+pt_mins: [0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10., 12., 16.]
+pt_maxs: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10., 12., 16., 24.]
+
+mass_mins: [1.68, 1.70, 1.72]
+mass_maxs: [2.05, 2.08, 2.10]
+sgn_funcs: ["gaussian", "doublecb"]
+bkg_funcs: ["chebpol2", "chebpol3"]
+rebin: [1, 2, 4]
+fix_frac_bkgcorr: [1., 0.5, 1.5]
+fix_tailpars_from_mc: [True] # only in case of CB
+
+output:
+  directory: "systematics"
+  file: "rawyields_dzero_multitrial.root"
