@@ -5,8 +5,14 @@ input:
     fraction: cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD_y06.root
     xsection: ../../data_shared/dzero_xsec_pp13dot6TeV_y06.root
   variations:
+    ingredients_varied:
+      rawyield: true 
+      efficiency: true
+      fraction: true
+    multitrial: null
     directory: systematics
     suffixes: ["_trkcut0", "_trkcut1", "_trkcut2", "_trkcut3", "_trkcut4", "_trkcut5", "_trkcut6", "_trkcut7", "_trkcut8", "_trkcut9", "_trkcut10", "_trkcut11", "_trkcut12", "_trkcut13", "_trkcut14"]
+    plot_leg: true
     labels: ["#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 70",
              "#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 80",
              "#it{N}_{cls}^{ITS} > 5, #it{N}_{cls}^{TPC} > 90",

@@ -10,7 +10,8 @@ import ROOT
 from style_formatter import set_object_style
 
 
-def compute_xsec(input_rawy, input_eff, input_cutvar, input_norm, had, outputdir, suffix):
+def compute_xsec(input_rawy, input_eff, input_cutvar,
+                 input_norm, had, outputdir, suffix, suffix_ryhist):
     """
     Main function for computation of pT-differential and pT-integrated cross sections
     """
@@ -48,7 +49,7 @@ def compute_xsec(input_rawy, input_eff, input_cutvar, input_norm, had, outputdir
     infile_efficiencies.Close()
 
     infile_rawy = ROOT.TFile.Open(input_rawy)
-    hist_rawyield = infile_rawy.Get("hist_rawyield")
+    hist_rawyield = infile_rawy.Get(f"hist_rawyield{suffix_ryhist}")
     hist_rawyield.SetDirectory(0)
     hist_rawyield.Sumw2()
     infile_rawy.Close()
@@ -150,7 +151,10 @@ if __name__ == "__main__":
                         default="../../data_shared/", help="output directory")
     parser.add_argument("--suffix", "-s", metavar="text",
                         default="_y06", help="suffix for output file")
+    parser.add_argument("--suffix_ryhist", "-sry", metavar="text",
+                        default="", help="suffix in raw-yield histo names (for multitrial)")
     args = parser.parse_args()
 
     compute_xsec(args.input_rawyield, args.input_efficiency, args.input_cutvar,
-                 args.input_normalisation, args.particle, args.outputdir, args.suffix)
+                 args.input_normalisation, args.particle, args.outputdir, args.suffix,
+                 args.suffix_ryhist)

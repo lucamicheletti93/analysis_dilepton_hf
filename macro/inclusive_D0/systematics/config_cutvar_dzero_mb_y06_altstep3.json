@@ -1,0 +1,55 @@
+{
+    "rawyields": {
+        "inputdir": "rawyields",
+        "inputfiles": [
+            "rawyields_bdtnp0.20_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.26_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.32_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.38_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.44_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.50_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.56_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.62_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.68_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.74_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.80_dzero_LHC24_JPsiD.root"
+        ],
+        "histoname": "hist_rawyield"
+    },
+    "efficiencies": {
+        "inputdir": "efficiencies",
+        "inputfiles": [
+            "efficiencies_bdtnp0.20_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.26_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.32_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.38_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.44_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.50_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.56_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.62_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.68_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.74_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.80_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root"
+        ],
+        "histonames": {
+            "prompt": "hist_eff_prompt",
+            "nonprompt": "hist_eff_nonprompt"
+        }
+    },
+    "minimisation": {
+        "correlated": true
+    },
+    "central_efficiency": {
+        "computerawfrac": true,
+        "inputdir": "efficiencies",
+        "inputfile": "efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD.root",
+        "histonames": {
+            "prompt": "hist_eff_prompt",
+            "nonprompt": "hist_eff_nonprompt"
+        }
+    },
+    "output": {
+        "directory": "systematics",
+        "file": "promptfrac_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06_altstep3.root"
+    }
+}

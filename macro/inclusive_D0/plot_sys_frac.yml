@@ -1,0 +1,21 @@
+input:
+  central:
+    rawyield: rawyields/rawyields_nocut_dzero_LHC24_JPsiD_y06.root
+    efficiency: efficiencies/efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root
+    fraction: cutvariation/promptfrac_dzero_pp13dot6tev_LHC24_JPsiD_y06.root
+    xsection: ../../data_shared/dzero_xsec_pp13dot6TeV_y06.root
+  variations:
+    ingredients_varied:
+      rawyield: false 
+      efficiency: false 
+      fraction: true
+    multitrial: null
+    directory: systematics
+    suffixes: ["_altstep1", "_altstep2", "_altstep3", "_widerleft1", "_widerleft2", "_widerright1", "_widerright2", "_widerboth", "_strictleft1", "_strictleft2", "_strictright1", "_strictright2", "_strictboth"]
+    plot_leg: true
+    labels: ["alt. step 1", "alt. step 2", "alt. step 3", "wide left 1", "wide left 2", "wide right 1", "wide right 2", "wide both sides", "strict left 1", "strict left 2", "strict right 1", "strict right 2", "strict both sides"]
+    n_cols_leg: 2
+
+output:
+  directory: systematics
+  file_name: syst_dzero_fraction.pdf
