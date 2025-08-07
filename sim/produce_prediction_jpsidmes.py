@@ -1,26 +1,143 @@
 """
+Script for the production of the histograms for the predictions
 """
 
 import argparse
 import uproot
 import numpy as np
+import pandas as pd
 import ROOT
 
-COLORS = [ROOT.kRed+1, ROOT.kAzure+4, ROOT.kGray+2]
+COLORS = [ROOT.kRed+1, ROOT.kBlue+1, ROOT.kGray+2]
+COLORS_HELAC = [ROOT.kOrange+6, ROOT.kAzure+2, ROOT.kGray+1]
 
-def set_style(hist, color, markerstyle=ROOT.kFullCircle, marksersize=1):
+
+def set_style(hist, color, markerstyle=ROOT.kFullCircle, marksersize=0, fillstyle=0):
     """
+    Simple method to set the style
     """
 
-    hist.SetLineWidth(2)
+    if isinstance(hist, ROOT.TH1):
+        hist.SetDirectory(0)
+
+    hist.SetLineWidth(3)
     hist.SetMarkerStyle(markerstyle)
+    hist.SetMarkerSize(marksersize)
     hist.SetLineColor(color)
     hist.SetMarkerColor(color)
-    hist.SetMarkerSize(marksersize)
+
+    if fillstyle > 0:
+        hist.SetFillStyle(fillstyle)
+        hist.SetFillColorAlpha(color, 0.4)
 
 
-def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
+def get_helac_predictions(variant):
     """
+    Method to convert Helac ONIA predictions from text to ROOT
+    """
+
+    df_dps_jpsiincl_dmesprompt, df_sps_jpsiprompt_dmesprompt = None, None
+    if variant == "fwd_cuts":
+        df_dps_jpsiincl_dmesprompt = pd.read_csv(
+            "HelacOniaPYTHIA8/DPS_DeltaY_PromptD0InclusiveJpsi_JpsiForwardRap.dat",
+            sep=" ", names=["deltay_min", "deltay_max", "sigma_nb"]
+        )
+        df_sps_jpsiprompt_dmesprompt = pd.read_csv(
+            "HelacOniaPYTHIA8/SPS_DeltaY_PromptD0PromptJpsi_JpsiForwardRap.dat",
+            sep=" ", names=["deltay_min", "deltay_max", "sigma_nb", "sigma_min_scale_nb",
+                            "sigma_max_scale_nb", "sigma_min_pdf_nb", "sigma_max_pdf_nb"]
+        )
+    elif variant == "mid_cuts":
+        df_dps_jpsiincl_dmesprompt = pd.read_csv(
+            "HelacOniaPYTHIA8/DPS_DeltaY_PromptD0InclusiveJpsi_JpsiMiddleRap.dat",
+            sep=" ", names=["deltay_min", "deltay_max", "sigma_nb"]
+        )
+        df_sps_jpsiprompt_dmesprompt = pd.read_csv(
+            "HelacOniaPYTHIA8/SPS_DeltaY_PromptD0PromptJpsi_JpsiMiddleRap.dat",
+            sep=" ", names=["deltay_min", "deltay_max", "sigma_nb", "sigma_min_scale_nb",
+                            "sigma_max_scale_nb", "sigma_min_pdf_nb", "sigma_max_pdf_nb"]
+        )
+        # we symmetrise the distribution
+        df_dps_jpsiincl_dmesprompt["sigma_nb"] = df_dps_jpsiincl_dmesprompt["sigma_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_min_scale_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_max_scale_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_min_pdf_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_max_pdf_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
+        for irow, row in enumerate(zip(df_dps_jpsiincl_dmesprompt["deltay_min"].to_numpy(),
+                                       df_dps_jpsiincl_dmesprompt["deltay_max"].to_numpy(),
+                                       df_dps_jpsiincl_dmesprompt["sigma_nb"].to_numpy())):
+            df_dps_jpsiincl_dmesprompt.loc[irow+len(df_dps_jpsiincl_dmesprompt)] = (-row[1], -row[0], row[2])
+        for irow, row in enumerate(zip(df_sps_jpsiprompt_dmesprompt["deltay_min"].to_numpy(),
+                                       df_sps_jpsiprompt_dmesprompt["deltay_max"].to_numpy(),
+                                       df_sps_jpsiprompt_dmesprompt["sigma_nb"].to_numpy(),
+                                       df_sps_jpsiprompt_dmesprompt["sigma_min_scale_nb"].to_numpy(),
+                                       df_sps_jpsiprompt_dmesprompt["sigma_max_scale_nb"].to_numpy(),
+                                       df_sps_jpsiprompt_dmesprompt["sigma_min_pdf_nb"].to_numpy(),
+                                       df_sps_jpsiprompt_dmesprompt["sigma_max_pdf_nb"].to_numpy())):
+            df_sps_jpsiprompt_dmesprompt.loc[irow+len(df_sps_jpsiprompt_dmesprompt)] = (
+                -row[1], -row[0], row[2], row[3], row[4], row[5], row[6])
+    else:
+        print(f"ERROR: no Helac ONIA input for {variant}, returning None")
+        return None, None, None
+
+    graph_deltay_sps_jpsiprompt_dmesprompt = ROOT.TGraphAsymmErrors(80)
+    graph_deltay_dps_jpsiincl_dmesprompt = ROOT.TGraphAsymmErrors(80)
+    graph_deltay_tot_jpsi_dmes = ROOT.TGraphAsymmErrors(80)
+    set_style(graph_deltay_sps_jpsiprompt_dmesprompt, COLORS_HELAC[0], 0, 0, 1000)
+    set_style(graph_deltay_dps_jpsiincl_dmesprompt, COLORS_HELAC[1])
+    set_style(graph_deltay_tot_jpsi_dmes, COLORS_HELAC[2], 0, 0, 1000)
+    graph_deltay_sps_jpsiprompt_dmesprompt.SetNameTitle(
+        "graph_helac_deltay_sps_jpsiprompt_dmesprompt", ";#Delta#it{y};d#sigma/d#Delta#it{y} (#mub)")
+    graph_deltay_dps_jpsiincl_dmesprompt.SetNameTitle(
+        "graph_helac_deltay_dps_jpsiincl_dmesincl", ";#Delta#it{y};d#sigma/d#Delta#it{y} (#mub)")
+    graph_deltay_tot_jpsi_dmes.SetNameTitle(
+        "graph_helac_deltay_tot_jpsi_dmes", ";#Delta#it{y};d#sigma/d#Delta#it{y} (#mub)")
+    for i_dy, (dy_min, dy_max) in enumerate(zip(np.arange(-10., 10., 0.25), np.arange(-9.75, 10.25, 0.25))):
+        delta_dy = dy_max - dy_min
+        cut = f"deltay_min >= {dy_min} and deltay_max <= {dy_max}"
+        # DPS
+        df_dps_jpsiincl_dmesprompt_sel = df_dps_jpsiincl_dmesprompt.query(cut)
+        xsec = 0.
+        for xsec_finebins in df_dps_jpsiincl_dmesprompt_sel["sigma_nb"].to_numpy():
+            xsec += xsec_finebins
+        graph_deltay_dps_jpsiincl_dmesprompt.SetPoint(i_dy, (dy_min + dy_max)/2, xsec * 1.e-3 / delta_dy) #nb->mub
+        graph_deltay_dps_jpsiincl_dmesprompt.SetPointError(i_dy, delta_dy / 2, delta_dy / 2, 0., 0.)
+        xsec_dps = xsec
+        # SPS
+        df_sps_jpsiprompt_dmesprompt_sel = df_sps_jpsiprompt_dmesprompt.query(cut)
+        xsec, xsec_min_scale, xsec_max_scale, xsec_min_pdf, xsec_max_pdf = (0. for _ in range(5))
+        for xsec_finebins, xsec_finebins_min_scale, xsec_finebins_max_scale, xsec_finebins_min_pdf, xsec_finebins_max_pdf in zip(
+            df_sps_jpsiprompt_dmesprompt_sel["sigma_nb"].to_numpy(),
+            df_sps_jpsiprompt_dmesprompt_sel["sigma_min_scale_nb"].to_numpy(),
+            df_sps_jpsiprompt_dmesprompt_sel["sigma_max_scale_nb"].to_numpy(),
+            df_sps_jpsiprompt_dmesprompt_sel["sigma_min_pdf_nb"].to_numpy(),
+            df_sps_jpsiprompt_dmesprompt_sel["sigma_max_pdf_nb"].to_numpy()):
+            xsec += xsec_finebins
+            xsec_min_scale += xsec_finebins_min_scale
+            xsec_max_scale += xsec_finebins_max_scale
+            xsec_min_pdf += xsec_finebins_min_pdf
+            xsec_max_pdf += xsec_finebins_max_pdf
+
+        unc_scale_low = xsec - xsec_min_scale
+        unc_scale_high = xsec_max_scale - xsec
+        unc_pdf_low = xsec - xsec_min_pdf
+        unc_pdf_high = xsec_max_pdf - xsec
+        unc_low = np.sqrt(unc_scale_low**2 + unc_pdf_low**2)
+        unc_high = np.sqrt(unc_scale_high**2 + unc_pdf_high**2)
+        graph_deltay_sps_jpsiprompt_dmesprompt.SetPoint(i_dy, (dy_min + dy_max)/2, xsec * 1.e-3 / delta_dy) #nb->mub
+        graph_deltay_sps_jpsiprompt_dmesprompt.SetPointError(i_dy, delta_dy / 2, delta_dy / 2, #nb->mub
+                                                             unc_low * 1.e-3 / delta_dy, unc_high * 1.e-3 / delta_dy) #nb->mub
+        graph_deltay_tot_jpsi_dmes.SetPoint(i_dy, (dy_min + dy_max)/2, (xsec_dps + xsec) * 1.e-3 / delta_dy)
+        graph_deltay_tot_jpsi_dmes.SetPointError(i_dy, delta_dy / 2, delta_dy / 2, #nb->mub
+                                                 unc_low * 1.e-3 / delta_dy, unc_high * 1.e-3 / delta_dy) #nb->mub
+
+    return graph_deltay_sps_jpsiprompt_dmesprompt, graph_deltay_dps_jpsiincl_dmesprompt, graph_deltay_tot_jpsi_dmes
+
+
+def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb, enable_helac):
+    """
+    Main method to produce the prediction files
     """
 
     ROOT.gStyle.SetTitleSize(0.045, "xy")
@@ -32,6 +149,9 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPadTickX(1)
     ROOT.gStyle.SetPadTickY(1)
+
+    cuts = ["no_kine_cuts"] + kine_cuts
+    n_cuts = len(cuts)
 
     infile_root = ROOT.TFile(infile_name)
     hist_xsec = infile_root.Get("histXsec_42")
@@ -47,10 +167,14 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
 
     df = uproot.open(infile_name)["tuplePairs"].arrays(library="pd")
 
-    cuts = ["no_kine_cuts"] + kine_cuts
-    n_cuts = len(cuts)
     outfile = ROOT.TFile(outfile_name, "recreate")
     canv, leg = {}, {}
+    canv_helac, leg_helac, leg_pythia = {}, {}, {}
+
+    hist_dmesincl_ptint = ROOT.TH1D("hist_dmesincl_ptint", ";;#sigma(D^{0}) (#mub)", n_cuts, -0.5, n_cuts-0.5)
+    hist_dmesprompt_ptint = ROOT.TH1D("hist_dmesprompt_ptint", ";;#sigma(D^{0}) (#mub)", n_cuts, -0.5, n_cuts-0.5)
+    hist_jpsiincl_ptint = ROOT.TH1D("hist_jpsiincl_ptint", ";;#sigma(J/#Psi) (#mub)", n_cuts, -0.5, n_cuts-0.5)
+    hist_jpsiprompt_ptint = ROOT.TH1D("hist_jpsiprompt_ptint", ";;#sigma(J/#Psi) (#mub)", n_cuts, -0.5, n_cuts-0.5)
     hist_ratio_tot_jpsiincl_dmesincl = ROOT.TH1D("hist_ratio_tot_jpsiincl_dmesincl", ";;#it{R}_{DJ/#Psi} (#mub)", n_cuts, -0.5, n_cuts - 0.5)
     hist_ratio_sps_jpsiincl_dmesincl = ROOT.TH1D("hist_ratio_sps_jpsiincl_dmesincl", ";;#it{R}_{DJ/#Psi} (#mub)", n_cuts, -0.5, n_cuts - 0.5)
     hist_ratio_dps_jpsiincl_dmesincl = ROOT.TH1D("hist_ratio_dps_jpsiincl_dmesincl", ";;#it{R}_{DJ/#Psi} (#mub)", n_cuts, -0.5, n_cuts - 0.5)
@@ -60,6 +184,9 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
     hist_ratio_tot_jpsiprompt_dmesprompt = ROOT.TH1D("hist_ratio_tot_jpsiprompt_dmesprompt", ";;#it{R}_{DJ/#Psi} (#mub)", n_cuts, -0.5, n_cuts - 0.5)
     hist_ratio_sps_jpsiprompt_dmesprompt = ROOT.TH1D("hist_ratio_sps_jpsiprompt_dmesprompt", ";;#it{R}_{DJ/#Psi} (#mub)", n_cuts, -0.5, n_cuts - 0.5)
     hist_ratio_dps_jpsiprompt_dmesprompt = ROOT.TH1D("hist_ratio_dps_jpsiprompt_dmesprompt", ";;#it{R}_{DJ/#Psi} (#mub)", n_cuts, -0.5, n_cuts-0.5)
+    hist_ratio_singlehad_jpsiprompt_dmesprompt = ROOT.TH1D("hist_ratio_singlehad_jpsiprompt_dmesprompt", ";;#sigma(J/#Psi)/#sigma(D^{0})", n_cuts, -0.5, n_cuts-0.5)
+    hist_ratio_singlehad_jpsiincl_dmesprompt = ROOT.TH1D("hist_ratio_singlehad_jpsiincl_dmesprompt", ";;#sigma(J/#Psi)/#sigma(D^{0})", n_cuts, -0.5, n_cuts-0.5)
+    hist_ratio_singlehad_jpsiincl_dmesincl = ROOT.TH1D("hist_ratio_singlehad_jpsiincl_dmesincl", ";;#sigma(J/#Psi)/#sigma(D^{0})", n_cuts, -0.5, n_cuts-0.5)
     set_style(hist_ratio_sps_jpsiincl_dmesincl, COLORS[0])
     set_style(hist_ratio_dps_jpsiincl_dmesincl, COLORS[1])
     set_style(hist_ratio_tot_jpsiincl_dmesincl, COLORS[2])
@@ -69,6 +196,13 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
     set_style(hist_ratio_sps_jpsiprompt_dmesprompt, COLORS[0])
     set_style(hist_ratio_dps_jpsiprompt_dmesprompt, COLORS[1])
     set_style(hist_ratio_tot_jpsiprompt_dmesprompt, COLORS[2])
+    set_style(hist_ratio_singlehad_jpsiprompt_dmesprompt, COLORS[2])
+    set_style(hist_ratio_singlehad_jpsiincl_dmesprompt, COLORS[2])
+    set_style(hist_ratio_singlehad_jpsiincl_dmesincl, COLORS[2])
+    set_style(hist_dmesincl_ptint, COLORS[2])
+    set_style(hist_dmesprompt_ptint, COLORS[2])
+    set_style(hist_jpsiincl_ptint, COLORS[2])
+    set_style(hist_jpsiprompt_ptint, COLORS[2])
     hist_ratio_sps_jpsiincl_dmesincl.GetXaxis().SetLabelSize(0.05)
     hist_ratio_dps_jpsiincl_dmesincl.GetXaxis().SetLabelSize(0.05)
     hist_ratio_tot_jpsiincl_dmesincl.GetXaxis().SetLabelSize(0.05)
@@ -78,6 +212,13 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
     hist_ratio_sps_jpsiprompt_dmesprompt.GetXaxis().SetLabelSize(0.05)
     hist_ratio_dps_jpsiprompt_dmesprompt.GetXaxis().SetLabelSize(0.05)
     hist_ratio_tot_jpsiprompt_dmesprompt.GetXaxis().SetLabelSize(0.05)
+    hist_ratio_singlehad_jpsiprompt_dmesprompt.GetXaxis().SetLabelSize(0.05)
+    hist_ratio_singlehad_jpsiincl_dmesprompt.GetXaxis().SetLabelSize(0.05)
+    hist_ratio_singlehad_jpsiincl_dmesincl.GetXaxis().SetLabelSize(0.05)
+    hist_dmesincl_ptint.GetXaxis().SetLabelSize(0.05)
+    hist_dmesprompt_ptint.GetXaxis().SetLabelSize(0.05)
+    hist_jpsiincl_ptint.GetXaxis().SetLabelSize(0.05)
+    hist_jpsiprompt_ptint.GetXaxis().SetLabelSize(0.05)
 
     if plot_lhcb and "lhcb_cuts" not in kine_cuts:
         print("WARNING: disabling comparison with LHCb, since no corresponding kine cuts enabled")
@@ -94,6 +235,13 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
         hist_ratio_tot_jpsiprompt_dmesprompt.GetXaxis().SetBinLabel(ivar+1, variant)
         hist_ratio_sps_jpsiprompt_dmesprompt.GetXaxis().SetBinLabel(ivar+1, variant)
         hist_ratio_dps_jpsiprompt_dmesprompt.GetXaxis().SetBinLabel(ivar+1, variant)
+        hist_ratio_singlehad_jpsiprompt_dmesprompt.GetXaxis().SetBinLabel(ivar+1, variant)
+        hist_ratio_singlehad_jpsiincl_dmesprompt.GetXaxis().SetBinLabel(ivar+1, variant)
+        hist_ratio_singlehad_jpsiincl_dmesincl.GetXaxis().SetBinLabel(ivar+1, variant)
+        hist_dmesincl_ptint.GetXaxis().SetBinLabel(ivar+1, variant)
+        hist_dmesprompt_ptint.GetXaxis().SetBinLabel(ivar+1, variant)
+        hist_jpsiincl_ptint.GetXaxis().SetBinLabel(ivar+1, variant)
+        hist_jpsiprompt_ptint.GetXaxis().SetBinLabel(ivar+1, variant)
 
         canv[variant] = ROOT.TCanvas(f"canv_{variant}", "", 1000, 500)
         canv[variant].Divide(2, 1)
@@ -105,14 +253,15 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
             header = "D^{0}(mid)-J/#Psi(mid)"
         elif variant == "lhcb_cuts":
             header = "D^{0}-J/#Psi LHCb"
-        leg[variant] = ROOT.TLegend(0.2, 0.7, 0.5, 0.9)
+        leg[variant] = ROOT.TLegend(0.2, 0.65, 0.5, 0.9)
         leg[variant].SetFillStyle(0)
         leg[variant].SetBorderSize(0)
         leg[variant].SetTextSize(0.045)
         leg[variant].SetHeader(header)
-        leg[variant].AddEntry(hist_ratio_tot_jpsiincl_dmesincl, "Total", "lp")
-        leg[variant].AddEntry(hist_ratio_sps_jpsiincl_dmesincl, "SPS", "lp")
-        leg[variant].AddEntry(hist_ratio_dps_jpsiincl_dmesincl, "DPS", "lp")
+        leg[variant].AddEntry("", "PYTHIA 8 CharmoniumShower:all", "")
+        leg[variant].AddEntry(hist_ratio_sps_jpsiincl_dmesincl, "SPS", "l")
+        leg[variant].AddEntry(hist_ratio_dps_jpsiincl_dmesincl, "DPS", "l")
+        leg[variant].AddEntry(hist_ratio_tot_jpsiincl_dmesincl, "Total", "l")
 
         cuts_string = ""
         xsec_jpsi, xsec_dmes, xsec_dmes_prompt, xsec_jpsi_prompt = 0., 0., 0., 0.
@@ -163,6 +312,34 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
         xsec_dmes = hist_dmes.Integral(ptdmes_min, ptdmes_max, ydmes_min, ydmes_max, 1, 2) * xsec / nevents
         xsec_dmes_prompt = hist_dmes.Integral(ptdmes_min, ptdmes_max, ydmes_min, ydmes_max, 1, 1) * xsec / nevents
 
+        hist_jpsiprompt_ptint.SetBinContent(ivar+1, xsec_jpsi_prompt)
+        unc_xsec_jpsi_prompt = np.sqrt(xsec_jpsi_prompt / xsec * nevents) * xsec / nevents
+        hist_jpsiprompt_ptint.SetBinError(ivar+1, unc_xsec_jpsi_prompt)
+        hist_jpsiincl_ptint.SetBinContent(ivar+1, xsec_jpsi)
+        unc_xsec_jpsi = np.sqrt(xsec_jpsi / xsec * nevents) * xsec / nevents
+        hist_jpsiincl_ptint.SetBinError(ivar+1, unc_xsec_jpsi)
+        hist_dmesprompt_ptint.SetBinContent(ivar+1, xsec_dmes_prompt)
+        unc_xsec_dmes_prompt = np.sqrt(xsec_dmes_prompt / xsec * nevents) * xsec / nevents
+        hist_dmesprompt_ptint.SetBinError(ivar+1, unc_xsec_dmes_prompt)
+        hist_dmesincl_ptint.SetBinContent(ivar+1, xsec_dmes)
+        unc_xsec_dmes = np.sqrt(xsec_dmes / xsec * nevents) * xsec / nevents
+        hist_dmesincl_ptint.SetBinError(ivar+1, unc_xsec_dmes)
+
+        ratio = xsec_jpsi_prompt/xsec_dmes_prompt
+        hist_ratio_singlehad_jpsiprompt_dmesprompt.SetBinContent(ivar+1, ratio)
+        hist_ratio_singlehad_jpsiprompt_dmesprompt.SetBinError(
+            ivar+1, np.sqrt((unc_xsec_dmes_prompt/xsec_dmes_prompt)**2 + unc_xsec_jpsi_prompt/xsec_jpsi_prompt) * ratio)
+
+        ratio = xsec_jpsi/xsec_dmes_prompt
+        hist_ratio_singlehad_jpsiincl_dmesprompt.SetBinContent(ivar+1, xsec_jpsi/xsec_dmes_prompt)
+        hist_ratio_singlehad_jpsiincl_dmesprompt.SetBinError(
+            ivar+1, np.sqrt((unc_xsec_dmes_prompt/xsec_dmes_prompt)**2 + unc_xsec_jpsi/xsec_jpsi) * ratio)
+
+        ratio = xsec_jpsi/xsec_dmes
+        hist_ratio_singlehad_jpsiincl_dmesincl.SetBinContent(ivar+1, xsec_jpsi/xsec_dmes)
+        hist_ratio_singlehad_jpsiincl_dmesincl.SetBinError(
+            ivar+1, np.sqrt((unc_xsec_dmes/xsec_dmes)**2 + unc_xsec_jpsi/xsec_jpsi) * ratio)
+
         df["deltaY"] = df["yJPsi"] - df["yD"]
         df["deltaPhi"] = df.apply(lambda row: abs(row.phiJPsi - row.phiD) / np.pi if abs(row.phiJPsi - row.phiD) < np.pi else (2*np.pi - abs(row.phiJPsi - row.phiD)) / np.pi, axis=1)
 
@@ -198,7 +375,7 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
                 if not jpsifromb:
                     hist_deltay_sps_jpsiprompt_dmesprompt.Fill(deltay)
                     hist_deltaphi_sps_jpsiprompt_dmesprompt.Fill(deltaphi)
-        
+
         xsec_sps_jpsidmesincl = hist_deltay_sps_jpsiincl_dmesincl.Integral() * xsec / nevents / 2 # / 2 is for charge average
         unc_sps_incl = np.sqrt(hist_deltay_sps_jpsiincl_dmesincl.Integral()) * xsec / nevents / 2
         xsec_sps_jpsiincl_dmesprompt = hist_deltay_sps_jpsiincl_dmesprompt.Integral() * xsec / nevents / 2
@@ -393,10 +570,11 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
             leg_lhcb_pythia.SetBorderSize(0)
             leg_lhcb_pythia.SetFillStyle(0)
             leg_lhcb_pythia.SetTextSize(0.045)
-            leg_lhcb_pythia.SetHeader("PYTHIA 8, D^{0}-J/#Psi")
-            leg_lhcb_pythia.AddEntry(hist_deltaphi_tot_pythia4lhcb, "Total", "lp")
-            leg_lhcb_pythia.AddEntry(hist_deltaphi_sps_pythia4lhcb, "SPS", "lp")
-            leg_lhcb_pythia.AddEntry(hist_deltaphi_dps_pythia4lhcb, "DPS", "lp")
+            leg_lhcb_pythia.SetHeader("D^{0}-J/#Psi")
+            leg_lhcb_pythia.AddEntry("", "PYTHIA 8 CharmoniumShower:all", "")
+            leg_lhcb_pythia.AddEntry(hist_deltaphi_tot_pythia4lhcb, "Total", "l")
+            leg_lhcb_pythia.AddEntry(hist_deltaphi_sps_pythia4lhcb, "SPS", "l")
+            leg_lhcb_pythia.AddEntry(hist_deltaphi_dps_pythia4lhcb, "DPS", "l")
             leg_lhcb_pythia.Draw()
             frame = canv_lhcb.cd(2).DrawFrame(-2., 0., 2., 0.25, ";#Delta#it{y};d#sigma/(d#Delta#it{y}) (a.u.)")
             frame.GetYaxis().SetDecimals()
@@ -415,7 +593,7 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
             leg_lhcb_data.SetBorderSize(0)
             leg_lhcb_data.SetFillStyle(0)
             leg_lhcb_data.SetTextSize(0.045)
-            leg_lhcb_data.AddEntry(graph_deltay_lhcb, "LHCb D^{0}-J/#Psi", "lp")
+            leg_lhcb_data.AddEntry(graph_deltay_lhcb, "LHCb D^{0}-J/#Psi", "l")
             leg_lhcb_data.AddEntry("", "LHCb JHEP 06 (2012) 141", "")
             leg_lhcb_data.Draw()
             canv_lhcb.cd(3).SetLogy()
@@ -437,7 +615,7 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
             hist_deltay_sps_pythia4lhcb.Write()
             hist_deltay_dps_pythia4lhcb.Write()
             hist_ratio_tot_jpsiincl_dmesprompt.Write()
-            graph_deltaphi_lhcb
+            graph_deltaphi_lhcb.Write()
             graph_deltay_lhcb.Write()
             graph_ratio_lhcb.Write()
 
@@ -464,6 +642,58 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
         hist_deltaphi_tot_jpsiincl_dmesprompt.Write()
         hist_deltaphi_tot_jpsiprompt_dmesprompt.Write()
 
+        if enable_helac and variant in ["fwd_cuts", "mid_cuts"]:
+            graph_deltay_sps_jpsiprompt_dmesprompt, graph_deltay_dps_jpsiincl_dmesprompt, \
+                graph_deltay_tot_jpsi_dmes = get_helac_predictions(variant)
+
+            canv_helac[variant] = ROOT.TCanvas(f"canv_helac{variant}", "", 500, 500)
+            graph_deltay_sps_jpsiprompt_dmesprompt.GetYaxis().SetDecimals()
+            graph_deltay_sps_jpsiprompt_dmesprompt.GetYaxis().SetRangeUser(
+                0., hist_deltay_tot_jpsiincl_dmesprompt.GetMaximum()*1.5)
+            graph_deltay_sps_jpsiprompt_dmesprompt.GetXaxis().SetRangeUser(-2.5, 5.5)
+            graph_deltay_sps_jpsiprompt_dmesprompt.Draw("a2")
+            graph_deltay_dps_jpsiincl_dmesprompt.Draw("pz")
+            graph_deltay_tot_jpsi_dmes.Draw("2")
+            hist_deltay_tot_jpsiincl_dmesprompt.DrawCopy("same")
+            hist_deltay_sps_jpsiincl_dmesprompt.DrawCopy("same")
+            hist_deltay_dps_jpsiincl_dmesprompt.DrawCopy("same")
+
+            leg_helac[variant] = ROOT.TLegend(0.2, 0.53, 0.5, 0.71)
+            leg_helac[variant].SetFillStyle(0)
+            leg_helac[variant].SetBorderSize(0)
+            leg_helac[variant].SetTextSize(0.04)
+            leg_helac[variant].SetHeader("HELAC-Onia")
+            leg_helac[variant].AddEntry(graph_deltay_sps_jpsiprompt_dmesprompt, "SPS (LO + PYTHIA 8)", "f")
+            leg_helac[variant].AddEntry(graph_deltay_dps_jpsiincl_dmesprompt, "DPS (#sigma_{eff} = 15 mb)", "l")
+            leg_helac[variant].AddEntry(graph_deltay_tot_jpsi_dmes, "Total", "f")
+            leg_helac[variant].Draw()
+
+            leg_pythia[variant] = ROOT.TLegend(0.2, 0.72, 0.5, 0.9)
+            leg_pythia[variant].SetFillStyle(0)
+            leg_pythia[variant].SetBorderSize(0)
+            leg_pythia[variant].SetTextSize(0.04)
+            leg_pythia[variant].SetHeader("PYTHIA 8 CharmoniumShower:all")
+            leg_pythia[variant].AddEntry(hist_ratio_sps_jpsiincl_dmesincl, "SPS", "l")
+            leg_pythia[variant].AddEntry(hist_ratio_dps_jpsiincl_dmesincl, "DPS", "l")
+            leg_pythia[variant].AddEntry(hist_ratio_tot_jpsiincl_dmesincl, "Total", "l")
+            leg_pythia[variant].Draw()
+
+            canv_helac[variant].Write()
+            graph_deltay_sps_jpsiprompt_dmesprompt.Write()
+            graph_deltay_dps_jpsiincl_dmesprompt.Write()
+            graph_deltay_tot_jpsi_dmes.Write()
+
+            canv_helac[variant].SaveAs(outfile_name.replace(".root", f"_{variant}_wHelacONIA.pdf"))
+
+    canv_xsec = ROOT.TCanvas("canv_xsec", "", 1000, 1000)
+    canv_xsec.Divide(1, 2)
+    canv_xsec.cd(1).SetLogy()
+    hist_dmesprompt_ptint.GetYaxis().SetRangeUser(1., 4.e4)
+    hist_dmesprompt_ptint.DrawCopy()
+    canv_xsec.cd(2).SetLogy()
+    hist_jpsiincl_ptint.DrawCopy()
+    canv_xsec.SaveAs(outfile_name.replace(".root", "_xsec_single_hadrons.pdf"))
+
     canv_ratio = ROOT.TCanvas("canv_ratio", "", 1000, 500)
     canv_ratio.SetLogy()
     hist_ratio_dps_jpsiincl_dmesprompt.GetYaxis().SetRangeUser(1.e2, 1.e6)
@@ -472,14 +702,28 @@ def produce_predictions(infile_name, outfile_name, kine_cuts, plot_lhcb):
     hist_ratio_tot_jpsiincl_dmesprompt.DrawCopy("same")
     canv_ratio.SaveAs(outfile_name.replace(".root", "_ratio.pdf"))
 
+    canv_ratio_singlehad = ROOT.TCanvas("canv_ratio_singlehad", "", 1000, 500)
+    canv_ratio_singlehad.SetLogy()
+    hist_ratio_singlehad_jpsiincl_dmesprompt.DrawCopy()
+    canv_ratio_singlehad.SaveAs(outfile_name.replace(".root", "_ratio_single_hadrons.pdf"))
+
     outfile.cd()
+    canv_xsec.Write()
     canv_ratio.Write()
+    canv_ratio_singlehad.Write()
+    hist_dmesincl_ptint.Write()
+    hist_dmesprompt_ptint.Write()
+    hist_jpsiincl_ptint.Write()
+    hist_jpsiprompt_ptint.Write()
     hist_ratio_dps_jpsiincl_dmesincl.Write()
     hist_ratio_sps_jpsiincl_dmesincl.Write()
     hist_ratio_tot_jpsiincl_dmesincl.Write()
     hist_ratio_dps_jpsiincl_dmesprompt.Write()
     hist_ratio_sps_jpsiincl_dmesprompt.Write()
     hist_ratio_tot_jpsiincl_dmesprompt.Write()
+    hist_ratio_singlehad_jpsiprompt_dmesprompt.Write()
+    hist_ratio_singlehad_jpsiincl_dmesprompt.Write()
+    hist_ratio_singlehad_jpsiincl_dmesincl.Write()
     outfile.Close()
 
 
@@ -491,8 +735,10 @@ if __name__ == "__main__":
                         help="ROOT output file name")
     parser.add_argument("-k", "--kine_cuts", nargs="+", type=str, help="list of kine cuts to be applied",
                         default=["fwd_cuts", "mid_cuts"], required=False) # options: ["fwd_cuts", "mid_cuts", "lhcb_cuts"]
-    parser.add_argument("-p", "--plot_lhcb", action="store_true", help="option to plot predictions vs LHCb data", 
+    parser.add_argument("-p", "--plot_lhcb", action="store_true", help="option to plot predictions vs LHCb data",
+                        default=False, required=False)
+    parser.add_argument("-e", "--enable_helac", action="store_true", help="option to enable HELAC predictions",
                         default=False, required=False)
     args = parser.parse_args()
 
-    produce_predictions(args.infile, args.outfile, args.kine_cuts, args.plot_lhcb)
+    produce_predictions(args.infile, args.outfile, args.kine_cuts, args.plot_lhcb, args.enable_helac)
