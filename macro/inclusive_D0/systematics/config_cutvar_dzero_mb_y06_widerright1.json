@@ -1,0 +1,99 @@
+{
+    "rawyields": {
+        "inputdir": "rawyields",
+        "inputfiles": [
+            "rawyields_bdtnp0.20_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.22_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.24_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.26_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.28_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.30_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.32_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.34_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.36_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.38_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.40_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.42_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.44_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.46_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.48_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.50_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.52_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.54_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.56_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.58_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.60_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.62_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.64_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.66_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.68_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.70_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.72_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.74_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.76_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.78_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.80_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.82_dzero_LHC24_JPsiD.root",
+            "rawyields_bdtnp0.84_dzero_LHC24_JPsiD.root"
+        ],
+        "histoname": "hist_rawyield"
+    },
+    "efficiencies": {
+        "inputdir": "efficiencies",
+        "inputfiles": [
+            "efficiencies_bdtnp0.20_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.22_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.24_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.26_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.28_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.30_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.32_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.34_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.36_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.38_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.40_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.42_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.44_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.46_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.48_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.50_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.52_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.54_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.56_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.58_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.60_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.62_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.64_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.66_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.68_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.70_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.72_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.74_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.76_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.78_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.80_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.82_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root",
+            "efficiencies_bdtnp0.84_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06.root"
+        ],
+        "histonames": {
+            "prompt": "hist_eff_prompt",
+            "nonprompt": "hist_eff_nonprompt"
+        }
+    },
+    "minimisation": {
+        "correlated": true
+    },
+    "central_efficiency": {
+        "computerawfrac": true,
+        "inputdir": "efficiencies",
+        "inputfile": "efficiencies_nocutnp_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD.root",
+        "histonames": {
+            "prompt": "hist_eff_prompt",
+            "nonprompt": "hist_eff_nonprompt"
+        }
+    },
+    "output": {
+        "directory": "systematics",
+        "file": "promptfrac_dzero_LHC24k3_trackTuner_ptSmearing1p5_JPsiD_y06_widerright1.root"
+    }
+}
