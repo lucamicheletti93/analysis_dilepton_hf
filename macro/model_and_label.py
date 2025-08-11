@@ -24,7 +24,7 @@ def getGlobalLabel(config):
     return config["inputs"]["inputLabel"]+("_weightedFit" if config['fit']['weighted'] else "")+"_dRap_min"+getLabel(config['fit']['min_dRap'])+"_max"+getLabel(config['fit']['max_dRap'])+"rapJpsi_min"+getLabel(config['fit']['min_jpsi_rap'])+"_max"+getLabel(config['fit']['max_jpsi_rap'])+"_ptJpsi_min"+getLabel(config['fit']['min_jpsi_pt'])+"_max"+getLabel(config['fit']['max_jpsi_pt'])+"_rapD0_min"+getLabel(config['fit']['min_d0_rap'])+"_max"+getLabel(config['fit']['max_d0_rap'])+"_ptD0_min"+getLabel(config['fit']['min_d0_pt'])+"_max"+getLabel(config['fit']['max_d0_pt'])
     
     
-def constructWorkspace(config, includeJpsi, includeD0, nEvent):
+def constructWorkspace(config, includeJpsi, includeD0, nEvent, variations):
     '''
     This function reconstructs the model for all fits to avoid many copy-pastes in different functions
     '''
@@ -41,10 +41,24 @@ def constructWorkspace(config, includeJpsi, includeD0, nEvent):
     if includeD0:  wsLabel += "D0"
     wsLabel += getGlobalLabel(config)
 
+    ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
     ws = ROOT.RooWorkspace(wsLabel)
 
-    mD0   = ROOT.RooRealVar("fMassDmes", "#it{m}_{#piK} (GeV/#it{c}^{2})", config["fit"]["min_fit_range_d0"], config["fit"]["max_fit_range_d0"]); getattr(ws, "import")(mD0)
-    mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", config["fit"]["min_fit_range_jpsi"], config["fit"]["max_fit_range_jpsi"]); getattr(ws, "import")(mJpsi)
+    minFitRangeD0 = config["fit"]["min_fit_range_d0"]
+    maxFitRangeD0 = config["fit"]["max_fit_range_d0"]
+    minFitRangeJpsi = config["fit"]["min_fit_range_jpsi"]
+    maxFitRangeJpsi = config["fit"]["max_fit_range_jpsi"]
+
+    minFitRangeD0 = minFitRangeD0 + config["fit"]["var_min_fit_range_d0"][variations[0]]
+    maxFitRangeD0 = maxFitRangeD0 + config["fit"]["var_max_fit_range_d0"][variations[0]]
+    minFitRangeJpsi = minFitRangeJpsi + config["fit"]["var_min_fit_range_jpsi"][variations[1]]
+    maxFitRangeJpsi = maxFitRangeJpsi + config["fit"]["var_max_fit_range_jpsi"][variations[1]]
+
+    print(f'[INFO] Fit Range D0: {minFitRangeD0} - {maxFitRangeD0}')
+    print(f'[INFO] Fit Range Jpsi: {minFitRangeJpsi} - {maxFitRangeJpsi}')
+
+    mD0   = ROOT.RooRealVar("fMassDmes", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0); getattr(ws, "import")(mD0)
+    mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", minFitRangeJpsi, maxFitRangeJpsi); getattr(ws, "import")(mJpsi)
     ptD0   = ROOT.RooRealVar("fPtDmes", "#it{p}_{T,#piK} (GeV/#it{c}^{2})", config["fit"]["min_d0_pt"], config["fit"]["max_d0_pt"]); getattr(ws, "import")(ptD0)
     ptJpsi = ROOT.RooRealVar("fPtJpsi", f"#it{{p}}_{{T,{titleSuffix}}} (GeV/#it{{c}}^{{2}})", config["fit"]["min_jpsi_pt"], config["fit"]["max_jpsi_pt"]); getattr(ws, "import")(ptJpsi)
     dRap = ROOT.RooRealVar("fDeltaY", f"y_{{{titleSuffix}}} - y_{{#piK}}", config["fit"]["min_dRap"], config["fit"]["max_dRap"]); getattr(ws, "import")(dRap)
@@ -86,10 +100,10 @@ def constructWorkspace(config, includeJpsi, includeD0, nEvent):
     fRefl = ROOT.TFile(config["reflections"]["data"], "READ")
     hRefl = fRefl.Get(config["reflections"]["refl"])
     hSig = fRefl.Get(config["reflections"]["signal"])
-    bin_min_refl = hRefl.FindBin(config["fit"]["min_fit_range_d0"])
-    bin_max_refl = hRefl.FindBin(config["fit"]["max_fit_range_d0"])
-    bin_min_sig = hSig.FindBin(config["fit"]["min_fit_range_d0"])
-    bin_max_sig = hSig.FindBin(config["fit"]["max_fit_range_d0"])
+    bin_min_refl = hRefl.FindBin(minFitRangeD0)
+    bin_max_refl = hRefl.FindBin(maxFitRangeD0)
+    bin_min_sig = hSig.FindBin(minFitRangeD0)
+    bin_max_sig = hSig.FindBin(maxFitRangeD0)
 
     integral_hRefl = hRefl.Integral(bin_min_refl, bin_max_refl)
     integral_hSig = hSig.Integral(bin_min_sig, bin_max_sig)

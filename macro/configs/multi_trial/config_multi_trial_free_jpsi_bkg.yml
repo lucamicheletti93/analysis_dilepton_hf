@@ -1,0 +1,102 @@
+---
+inputs:
+  data: ../data_shared/2024_pass1_skimmed/fDiMuon/tree_jpsi_d0_reduced_data_merged_std_assoc_BDT_modular_cut_weighted.root
+  inputLabel: "LHC24Pass1"
+  tree: "O2rtdilptdmesall"
+  
+reflections:
+  data: reflections_D0_cuts.root
+  refl: hist_refl_smooth
+  signal: hist_signal
+
+fit:
+  toy_mc: False
+  unbinned: True
+  weighted: True
+  min_fit_range_d0: 1.70
+  max_fit_range_d0: 2.05
+  min_fit_range_jpsi: 2.50
+  max_fit_range_jpsi: 4.00
+  JpsiChannel: "Jpsi2mumu"
+  add_psi2s: True ## if true, the psi2s is added to the fit
+
+  # variations for multi trial
+  var_min_fit_range_d0: [0.] # First variation is always zero
+  var_max_fit_range_d0: [0.] # First variation is always zero
+  var_min_fit_range_jpsi: [0., -0.10, -0.20, -0.30, -0.40] # First variation is always zero
+  var_max_fit_range_jpsi: [0.,  0.10, +0.20, +0.30, +0.40] # First variation is always zero
+
+  min_jpsi_rap : -4
+  max_jpsi_rap : -2.50
+
+  min_jpsi_pt : 0
+  max_jpsi_pt : 20
+
+  min_d0_rap : -0.6
+  max_d0_rap : 0.6
+
+  min_d0_pt : 0.5
+  max_d0_pt : 24
+
+  min_dRap : -100
+  max_dRap : 100
+  
+  
+  norm_par_sig_name: [nJPsiD0, nBkgJPsi, nBkgD0, nBkgBkg, rPsi2sJPsi]
+  norm_par_sig_val: [5.e+04,  7.e+05, 1.e+05, 1.e+06, 0.023]
+  norm_par_sig_lw_lim: [1.e+03, 1.e+03, 1.e+03, 1.e+03, 0.02]
+  norm_par_sig_up_lim: [1.e+06, 1.e+07, 1.e+07, 1.e+08, 0.03]
+  norm_par_sig_is_const: [False, False, False, False, True]
+
+  cb_par_jpsi_name: [meanJpsi, sigmaJpsi, alphaJpsi, nJpsi]
+  cb_par_jpsi_val: [3.0821e+00, 7.7994e-02, 1.0725e+00, 1.0000e+01] # [3.0823e+00, 7.6689e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_jpsi_lw_lim: [2.9000e+00, 7.5466e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_jpsi_up_lim: [3.2000e+00, 9.5466e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_jpsi_is_const: [True, True, True, True]
+
+  cb_par_psi2s_name: [meanPsi2s, sigmaPsi2s, alphaPsi2s, nPsi2s]
+  cb_par_psi2s_val: [3.6725e+00, 8.9739e-02, 1.0725e+00, 1.0000e+01] # [3.6475e+00, 7.6689e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_psi2s_lw_lim: [3.6000e+00, 7.5466e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_psi2s_up_lim: [3.8000e+00, 9.5466e-02, 1.0725e+00, 1.0000e+01]
+  cb_par_psi2s_is_const: [True, True, True, True]
+
+  cheby_par_jpsi_name: [cheb_coeff_jpsi_0, cheb_coeff_jpsi_1, cheb_coeff_jpsi_2]
+  cheby_par_jpsi_val: [-9.7617e-01, 2.9698e-01, -8.8384e-03] # [-7.9217e-01, 1.3174e-01, 5.0793e-02]
+  cheby_par_jpsi_lw_lim: [-10, 0, -10]
+  cheby_par_jpsi_up_lim: [10, 1, 10]
+  cheby_par_jpsi_is_const: [False, False, False]
+
+  cb_par_d0_name: [meanD0, sigmaD0, alphaD0, nD0]
+  cb_par_d0_val: [1.8557e+00, 1.4930e-02, 3.2386e+00, 2.3591e-09] # [1.8576e+00, 1.5665e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_lw_lim: [1.7592e+00, 1.0e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_up_lim: [1.9592e+00, 3.0e-02, 3.2386e+00, 2.3591e-09]
+  cb_par_d0_is_const: [True, True, True, True]
+
+  cheby_par_d0_name: [cheb_coeff_d0_0, cheb_coeff_d0_1, cheb_coeff_d0_2]
+  cheby_par_d0_val: [-5.0453e-01, 8.8188e-02, -1.2548e-02]
+  cheby_par_d0_lw_lim: [-10, 0, 0]
+  cheby_par_d0_up_lim: [10, 1, 1]
+  cheby_par_d0_is_const: [True, True, True]
+
+plot_results:
+  dataBins: 50
+  jpsiFrame:
+    x_title: "#it{m}_{#mu#mu} (GeV/#it{c}^{2})"
+    y_title: ## if you want to use the default title, just leave it empty
+    x_title_offset: 1.1
+    y_title_offset: 2.1
+    x_range: [2.51, 4.0]
+    y_range: [0.1, 30000]
+    y_range_log: [1.1, 1.e+9]
+    y_title_offset_log: 1.5
+  d0Frame:
+    x_title: "#it{m}_{#piK} (GeV/#it{c}^{2})"
+    y_title: ## if you want to use the default title, just leave it empty
+    x_title_offset: 1.1
+    y_title_offset: 2.1
+    x_range: [1.7, 2.05]
+    y_range: [0.1, 20000]
+    y_range_log: [1.1, 1.e+9]
+
+output:
+  directory: multi_trial
