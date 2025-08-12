@@ -16,7 +16,7 @@ from plot_library import LoadStyle, SetGraStat, SetGraSyst, SetLegend
 
 from model_and_label import getLabel, getGlobalLabel, constructWorkspace
 
-def multi_trial(config):
+def multi_trial(config, tailParamSet):
     """
     function to fit the 2D distribution of D0 - J/psi masses doing trial variation
     """    
@@ -70,7 +70,7 @@ def multi_trial(config):
     directory = config["output"]["directory"]
     
     vecPdfs = ["cb_par_jpsi", "cb_par_psi2s", "cheby_par_jpsi", "cb_par_d0", "cheby_par_d0"]
-    strFreePars = ""
+    strFreePars = config["fit"]["pdf_jpsi_name"] + "_" + config["fit"]["bkg_jpsi_name"] + "_" + config["fit"]["pdf_d0_name"] + "_" + config["fit"]["bkg_d0_name"]
 
     for pdf in vecPdfs:
         vecFreePars = []
@@ -81,9 +81,9 @@ def multi_trial(config):
             strFreePars = strFreePars + "_" + pdf
             for par in vecFreePars:
                 strFreePars = strFreePars + "_" + str(par)
-    strFreePars = strFreePars + "_free"
+            strFreePars = strFreePars + "_free"
 
-    fOutName = f'{directory}/multi_trial_{strFreePars}.root'
+    fOutName = f'{directory}/multi_trial_{strFreePars}_{tailParamSet}.root'
 
     fOut = ROOT.TFile(fOutName, "RECREATE")
     iTrial = 0
@@ -300,6 +300,7 @@ def multi_trial(config):
 
     input()
 
+    print(f'[INFO] Writing output on {fOutName} ...')
     histMultiTrial.Write()
     histCovMatrStatus.Write()
     fOut.Close()
@@ -309,25 +310,71 @@ def combine_systematics(fileList):
     LoadStyle()
     ROOT.gStyle.SetOptStat(False)
 
-    histSystCombined = ROOT.TH1D("histSystCombined", ";N_{J/#psi-D^{0}}", 10000, 0, 1e5)
-
+    vecYield = []
+    vecStatErrYield = []
     with open(fileList, "r") as fInList:
         for fInName in fInList:
             fIn = ROOT.TFile(fInName.strip(), "READ")
-            histTrial = fIn.Get("histMultiTrial")
-            for iBin in range(0, histTrial.GetNbinsX()):
-                histSystCombined.Fill(histTrial.GetBinContent(iBin+1))
+            histMultiTrial = fIn.Get("histMultiTrial")
+            histCovMatrStatus = fIn.Get("histCovMatrStatus")
+            for iBin in range(0, histMultiTrial.GetNbinsX()):
+                if histCovMatrStatus.GetBinContent(iBin+1) == 3:
+                    vecYield.append(histMultiTrial.GetBinContent(iBin+1))
+                    vecStatErrYield.append(histMultiTrial.GetBinError(iBin+1))
+
+    histYield = ROOT.TH1D("histYield", ";N_{J/#psi-D^{0}}", 100, 0, 2 * mean(vecYield))
+    histYield.SetLineColor(ROOT.kAzure+4)
+    histYield.SetFillStyle(3001)
+    histYield.SetFillColorAlpha(ROOT.kAzure+4, 0.5)
+
+    histStatErrYield = ROOT.TH1D("histStatErrYield", ";(stat. error)_{J/#psi-D^{0}}", 100, 0, 2 * mean(vecStatErrYield))
+    histStatErrYield.SetLineColor(ROOT.kAzure+4)
+    histStatErrYield.SetFillStyle(3001)
+    histStatErrYield.SetFillColorAlpha(ROOT.kAzure+4, 0.5)
+
+    for (val, err) in zip(vecYield, vecStatErrYield):
+        histYield.Fill(val)
+        histStatErrYield.Fill(err)
 
     latexTitle = ROOT.TLatex()
     latexTitle.SetTextSize(0.04)
     latexTitle.SetNDC()
     latexTitle.SetTextFont(42)
+
+    meanYield = histYield.GetMean()
+    meanStatErrYield = histStatErrYield.GetMean()
+    RmsYield = histYield.GetRMS()
+
+    lineYieldMean = ROOT.TLine(meanYield, 0, meanYield, histYield.GetMaximum())
+    lineYieldMean.SetLineStyle(ROOT.kSolid)
+    lineYieldMean.SetLineColor(ROOT.kRed+1)
+    lineYieldMean.SetLineWidth(2)
+
+    lineYieldRmsUp = ROOT.TLine(meanYield+RmsYield, 0, meanYield+RmsYield, histYield.GetMaximum())
+    lineYieldRmsUp.SetLineStyle(ROOT.kDashed)
+    lineYieldRmsUp.SetLineColor(ROOT.kRed+1)
+    lineYieldRmsUp.SetLineWidth(2)
+
+    lineYieldRmsLow = ROOT.TLine(meanYield-RmsYield, 0, meanYield-RmsYield, histYield.GetMaximum())
+    lineYieldRmsLow.SetLineStyle(ROOT.kDashed)
+    lineYieldRmsLow.SetLineColor(ROOT.kRed+1)
+    lineYieldRmsLow.SetLineWidth(2)
     
-    canvasMultiTrial = ROOT.TCanvas("canvasMultiTrial", "", 800, 600)
-    histSystCombined.Draw("EP")
-    latexTitle.DrawLatex(0.70, 0.80, f'Mean = {histSystCombined.GetMean():.0f}')
-    latexTitle.DrawLatex(0.70, 0.73, f'RMS = {histSystCombined.GetRMS():.0f}')
-    canvasMultiTrial.Update()
+    canvasYield = ROOT.TCanvas("canvasYield", "", 800, 600)
+    histYield.Draw("H")
+    lineYieldMean.Draw("SAME")
+    lineYieldRmsUp.Draw("SAME")
+    lineYieldRmsLow.Draw("SAME")
+    latexTitle.DrawLatex(0.70, 0.85, f'N. trials = {len(vecYield)}')
+    latexTitle.DrawLatex(0.70, 0.80, f'Mean = {meanYield:.0f}')
+    latexTitle.DrawLatex(0.70, 0.75, f'RMS = {RmsYield:.0f} ({(RmsYield/meanYield)*100:.0f}%)')
+    canvasYield.Update()
+
+    canvasStatErrYield = ROOT.TCanvas("canvasStatErrYield", "", 800, 600)
+    histStatErrYield.Draw("H")
+    latexTitle.DrawLatex(0.70, 0.85, f'N. trials = {len(vecYield)}')
+    latexTitle.DrawLatex(0.70, 0.80, f'Mean = {meanStatErrYield:.0f}')
+    canvasStatErrYield.Update()
 
     input()
 
@@ -349,20 +396,28 @@ def ComputeRMS(parValArray):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Arguments to pass')
-    parser.add_argument('cfgFileName', metavar='text', default='config.yml', help='config file name')
+    parser.add_argument('cfgFileName', metavar='text', nargs='?', default='config.yml', help='config file name')
     parser.add_argument("--run", help="Run multi-trial fit", action="store_true")
-    parser.add_argument("--merge", help="Combine multi-trial files [requires filesToMerge]", action="store_true")
+    parser.add_argument("--combine", help="Combine multi-trial files [requires filesToMerge]", action="store_true")
     parser.add_argument("-t", "--text", dest="fileList", type=str, help="List of files to be combined", required=False)
     
     args = parser.parse_args()
     
-
-    with open(args.cfgFileName, 'r') as yml_cfg:
-        inputCfg = yaml.load(yml_cfg, yaml.FullLoader)
-    
     if args.run:
-        multi_trial(inputCfg)
+        if args.cfgFileName is not None:
+            with open(args.cfgFileName, 'r') as yml_cfg:
+                inputCfg = yaml.load(yml_cfg, yaml.FullLoader)
+            
+            tailParamSet = ""
+            if "data_tails" in args.cfgFileName:
+                tailParamSet = "data_tails"
+            if "mc_tails" in args.cfgFileName:
+                tailParamSet = "mc_tails"
 
-    if args.merge and args.fileList:
+            multi_trial(inputCfg, tailParamSet)
+        else: 
+            print(f'[ERROR] No configuration passed to the function')
+
+    if args.combine and args.fileList:
         combine_systematics(args.fileList)
 
