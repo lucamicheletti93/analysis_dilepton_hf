@@ -60,10 +60,10 @@ def get_helac_predictions(variant):
         # we symmetrise the distribution
         df_dps_jpsiincl_dmesprompt["sigma_nb"] = df_dps_jpsiincl_dmesprompt["sigma_nb"] * 1./2
         df_sps_jpsiprompt_dmesprompt["sigma_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
-        df_sps_jpsiprompt_dmesprompt["sigma_min_scale_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
-        df_sps_jpsiprompt_dmesprompt["sigma_max_scale_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
-        df_sps_jpsiprompt_dmesprompt["sigma_min_pdf_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
-        df_sps_jpsiprompt_dmesprompt["sigma_max_pdf_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_min_scale_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_min_scale_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_max_scale_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_max_scale_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_min_pdf_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_min_pdf_nb"] * 1./2
+        df_sps_jpsiprompt_dmesprompt["sigma_max_pdf_nb"] = df_sps_jpsiprompt_dmesprompt["sigma_max_pdf_nb"] * 1./2
         for irow, row in enumerate(zip(df_dps_jpsiincl_dmesprompt["deltay_min"].to_numpy(),
                                        df_dps_jpsiincl_dmesprompt["deltay_max"].to_numpy(),
                                        df_dps_jpsiincl_dmesprompt["sigma_nb"].to_numpy())):
@@ -94,7 +94,7 @@ def get_helac_predictions(variant):
     graph_deltay_tot_jpsi_dmes.SetNameTitle(
         "graph_helac_deltay_tot_jpsi_dmes", ";#Delta#it{y};d#sigma/d#Delta#it{y} (#mub)")
     for i_dy, (dy_min, dy_max) in enumerate(zip(np.arange(-10., 10., 0.25), np.arange(-9.75, 10.25, 0.25))):
-        delta_dy = dy_max - dy_min
+        delta_dy = abs(dy_max - dy_min)
         cut = f"deltay_min >= {dy_min} and deltay_max <= {dy_max}"
         # DPS
         df_dps_jpsiincl_dmesprompt_sel = df_dps_jpsiincl_dmesprompt.query(cut)
