@@ -1,0 +1,21 @@
+dzero:
+  yield_extraction: 0.05
+  sel_eff: 0.02
+  trk_eff: 0.01
+  match_eff: 0.04
+  frac: 0.
+  br: 0.008
+  lumi: 0.1
+
+jpsi:
+  yield_extraction: 0.02
+  sel_eff: 0.02
+  trk_eff: 0.01
+  match_eff: 0.03
+  frac: 0.
+  br: 0.005
+  lumi: 0.1
+
+dzerojpsi:
+  yield_extraction: 0.09
+
