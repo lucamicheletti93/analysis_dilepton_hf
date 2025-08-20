@@ -75,10 +75,36 @@ def weightdata(config):
     treeOut = treeIn.CloneTree(0)
 
     fInAxeJpsi = ROOT.TFile(config["inputs"]["axeJpsi"], "READ")
-    histAxeJpsi = fInAxeJpsi.Get("histAxeJpsi")
+    histAxeJpsi = fInAxeJpsi.Get("histPtRapAxes_muonLowPt210SigmaPDCA")
 
     fInAxeD0 = ROOT.TFile(config["inputs"]["axeD0"], "READ")
     histAxeD0 = fInAxeD0.Get("histAxeD0_prompt")
+    fInPromptFracD0 = ROOT.TFile(config["inputs"]["promptFracD0"], "READ")
+    histPromptFracD0 = fInPromptFracD0.Get("hRawFracPrompt")
+
+    nBinsXAxeD0 = histAxeD0.GetNbinsX()
+    nBinsYAxeD0 = histAxeD0.GetNbinsY()
+
+    #print(f'nBinsX = {nBinsXAxeD0} ; nBinsX = {nBinsYAxeD0}')
+
+    for iPt in range(0, nBinsXAxeD0):
+        binCenterXAxeD0 = histAxeD0.GetXaxis().GetBinCenter(iPt+1)
+        binXPromptFracD0 = histPromptFracD0.FindBin(binCenterXAxeD0)
+        promptFracD0 = histPromptFracD0.GetBinContent(binXPromptFracD0)
+        errPromptFracD0 = histPromptFracD0.GetBinError(binXPromptFracD0)
+        #print(f'X bin center Axe = {binCenterXAxeD0} ; prompt frac. = {promptFracD0} ;')
+        for iRap in range(0, nBinsYAxeD0):
+            axeVal = histAxeD0.GetBinContent(iPt+1, iRap+1)
+            errAxeVal = histAxeD0.GetBinError(iPt+1, iRap+1)
+            if promptFracD0 == 0 or axeVal == 0:
+                histAxeD0.SetBinContent(iPt+1, iRap+1, 0.)
+                histAxeD0.SetBinError(iPt+1, iRap+1, 0.)
+            else:
+                histAxeD0.SetBinContent(iPt+1, iRap+1, axeVal / promptFracD0)
+                histAxeD0.SetBinError(iPt+1, iRap+1, (axeVal / promptFracD0) * ROOT.TMath.Sqrt((errPromptFracD0/promptFracD0)**2 + (errAxeVal/axeVal)**2))
+
+            #print(f'Axe = {axeVal} ; prompt frac = {promptFracD0} ; Axe corr = {histAxeD0.GetBinContent(iPt+1, iRap+1)}')
+        #print("-----------------------------")
 
     weight = np.zeros(1, dtype=np.double)
     treeOut.Branch("weight", weight, "weight/D")
@@ -86,7 +112,7 @@ def weightdata(config):
     for entry in range(treeIn.GetEntries()):
         treeIn.GetEntry(entry)
         
-        if (abs(treeIn.fRapDmes) > 0.6 or treeIn.fPtDmes > 30): continue
+        if (abs(treeIn.fRapDmes) > 0.6 or treeIn.fPtDmes > 24 or treeIn.fPtDmes < 0.5): continue
         if (abs(treeIn.fRapJpsi) > 4 or abs(treeIn.fRapJpsi) < 2.5 or treeIn.fPtJpsi > 20): continue
 
         ptBinD0 = histAxeD0.GetXaxis().FindBin(treeIn.fPtDmes)
@@ -101,13 +127,15 @@ def weightdata(config):
         #weightJpsi = histAxeJpsi.GetBinContent(ptBinJpsi, rapBinJpsi, phiBinJpsi) #WARNING: 3D histograms
         weightD0 = histAxeD0.GetBinContent(ptBinD0, rapBinD0)
         weightJpsi = histAxeJpsi.GetBinContent(ptBinJpsi, rapBinJpsi)
-        print(weightD0, weightJpsi)
+        print(f'D0 [{treeIn.fPtDmes} {treeIn.fRapDmes}] = ', weightD0, f', J/psi [{treeIn.fPtDmes} {treeIn.fRapDmes}] = ', weightJpsi)
         weight[0] = 1. / (weightD0 * weightJpsi)
 
         treeOut.Fill()
 
     fOut.cd()
     treeOut.Write()
+    histAxeD0.Write("histAxePromptD0")
+    histAxeJpsi.Write("histAxeJpsi")
     fOut.Close()
     fIn.Close()
 
@@ -255,7 +283,8 @@ def fit1D(config):
         sample.Draw("1>>h", "weight")
         nEvent = h.Integral()
     
-    workSpaceD0 = constructWorkspace(config, includeJpsi=False, includeD0=True, nEvent=nEvent)
+    variations = [0, 0]
+    workSpaceD0 = constructWorkspace(config, includeJpsi=False, includeD0=True, nEvent=nEvent, variations=variations)
     
     if config["fit"]["unbinned"]:
         if config["fit"]["weighted"]:
@@ -394,17 +423,22 @@ def fit(config):
         sample.Draw("1>>h", "weight")
         nEvent = h.Integral()
 
-    workSpace = constructWorkspace(config, includeJpsi=True, includeD0=True, nEvent=nEvent)
+    variations = [0, 0, 0]
+    workSpace = constructWorkspace(config, includeJpsi=True, includeD0=True, nEvent=nEvent, variations=variations)
     model =  workSpace.pdf("model")
 
     if config["fit"]["unbinned"]:
         if config["fit"]["weighted"]:
             sampleToFit = ROOT.RooDataSet("dataTree", "dataset with weights", sample, ROOT.RooArgSet(workSpace.var("fMassDmes"), workSpace.var("fMass"), workSpace.var("fPtDmes"),  workSpace.var("fPtJpsi"), workSpace.var("fDeltaY"), workSpace.var("fRapJpsi"), workSpace.var("weight")), "", "weight")
         else:
+            print("---------> Inside the not weighted fit")
+            print("sample entries", sample.GetEntries())
             sampleToFit = ROOT.RooDataSet("dataTree", "dataTree", [workSpace.var("fMassDmes"), workSpace.var("fMass"), workSpace.var("fPtDmes"),  workSpace.var("fPtJpsi"), workSpace.var("fDeltaY"), workSpace.var("fRapJpsi")], Import=sample)
+            print("Numero di entries: ", sampleToFit.numEntries())
     else:
         sampleToFit = ROOT.RooDataHist("dataHist", "dataHist", [workSpace.var("fMassDmes"), workSpace.var("fMass"), workSpace.var("fPtDmes"),  workSpace.var("fPtJpsi"), workSpace.var("fDeltaY"), workSpace.var("fRapJpsi")], Import=sample)
-
+    #input()
+    #exit()
     if config["fit"]["unbinned"]:
         ## jpsi rapidity cut
         sampleToFit = sampleToFit.reduce(f"fRapJpsi>{config['fit']['min_jpsi_rap']} && fRapJpsi<{config['fit']['max_jpsi_rap']}")
@@ -431,6 +465,8 @@ def fit(config):
     dataw_BkgD0 = ROOT.RooDataSet("dataw_BkgD0", "dataw_BkgD0", sampleToFit_sPlot, ROOT.RooArgSet(workSpace.var("fPtDmes"),  workSpace.var("fPtJpsi"), workSpace.var("fDeltaY"), nBkgD0_sw), "", "nBkgD0_sw")
     dataw_BkgBkg = ROOT.RooDataSet("dataw_BkgBkg", "dataw_BkgBkg", sampleToFit_sPlot, ROOT.RooArgSet(workSpace.var("fPtDmes"),  workSpace.var("fPtJpsi"), workSpace.var("fDeltaY"), nBkgBkg_sw), "", "nBkgBkg_sw")
 
+    if not os.path.isdir(config["output"]["directory"]):
+        os.makedirs(config["output"]["directory"])
     fOut = ROOT.TFile(f'{config["output"]["directory"]}/datasets_splot_{getGlobalLabel(config)}.root', "RECREATE")
     sampleToFit_sPlot.Write()
     dataw_JPsiD0.Write()
@@ -692,6 +728,8 @@ def fit(config):
 
     fitResult.Print()
 
+    if not os.path.isdir(config["output"]["directory"]):
+        os.makedirs(config["output"]["directory"])
     fOut = ROOT.TFile(f'{config["output"]["directory"]}/results_{weighted_label}_{getGlobalLabel(config)}.root', "RECREATE")
     #canvasFit.Write()
     canvasFitJpsi.Write()
@@ -1006,7 +1044,8 @@ def plot_results(config):
     ## plot D0 results
     frameD0 = listOfPrimitivesD0.At(1)
     frameD0.SetTitle(" ")
-    frameD0.GetXaxis().SetRangeUser(config["plot_results"]["d0Frame"]["x_range"][0], config["plot_results"]["d0Frame"]["x_range"][1])
+    #frameD0.GetXaxis().SetRangeUser(config["plot_results"]["d0Frame"]["x_range"][0], config["plot_results"]["d0Frame"]["x_range"][1])
+    frameD0.GetXaxis().SetRangeUser(0.1, 2e5)
     frameD0.GetXaxis().SetTitle(config["plot_results"]["d0Frame"]["x_title"])
     frameD0.GetXaxis().SetTitleOffset(config["plot_results"]["d0Frame"]["x_title_offset"])
     # frameD0.GetXaxis().SetTitleSize(0.05)

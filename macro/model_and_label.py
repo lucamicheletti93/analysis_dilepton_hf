@@ -53,9 +53,11 @@ def constructWorkspace(config, includeJpsi, includeD0, nEvent, variations):
     maxFitRangeD0 = maxFitRangeD0 + config["fit"]["var_max_fit_range_d0"][variations[0]]
     minFitRangeJpsi = minFitRangeJpsi + config["fit"]["var_min_fit_range_jpsi"][variations[1]]
     maxFitRangeJpsi = maxFitRangeJpsi + config["fit"]["var_max_fit_range_jpsi"][variations[1]]
+    d0ReflRatio = config["fit"]["var_d0_refl_ratio"][variations[2]]
 
     print(f'[INFO] Fit Range D0: {minFitRangeD0} - {maxFitRangeD0}')
     print(f'[INFO] Fit Range Jpsi: {minFitRangeJpsi} - {maxFitRangeJpsi}')
+    print(f'[INFO] D0 Refl. ratio: {d0ReflRatio}')
 
     mD0   = ROOT.RooRealVar("fMassDmes", "#it{m}_{#piK} (GeV/#it{c}^{2})", minFitRangeD0, maxFitRangeD0); getattr(ws, "import")(mD0)
     mJpsi = ROOT.RooRealVar("fMass", f"#it{{m}}_{{{titleSuffix}}} (GeV/#it{{c}}^{{2}})", minFitRangeJpsi, maxFitRangeJpsi); getattr(ws, "import")(mJpsi)
@@ -67,34 +69,87 @@ def constructWorkspace(config, includeJpsi, includeD0, nEvent, variations):
         weight = ROOT.RooRealVar("weight", "weight", 0, 1e10); getattr(ws, "import")(weight)
             
     # Pdfs
-    meanJpsi  = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_val"][0], config["fit"]["cb_par_jpsi_lw_lim"][0], config["fit"]["cb_par_jpsi_up_lim"][0]); meanJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][0])
-    sigmaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_val"][1], config["fit"]["cb_par_jpsi_lw_lim"][1], config["fit"]["cb_par_jpsi_up_lim"][1]); sigmaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][1])
-    alphaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_val"][2], config["fit"]["cb_par_jpsi_lw_lim"][2], config["fit"]["cb_par_jpsi_up_lim"][2]); alphaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][2])
-    nJpsi     = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_val"][3], config["fit"]["cb_par_jpsi_lw_lim"][3], config["fit"]["cb_par_jpsi_up_lim"][3]); nJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][3])
-    cbPdfJpsi = ROOT.RooCBShape("cbPdfJpsi", "Crystal Ball J/psi", mJpsi, meanJpsi, sigmaJpsi, alphaJpsi, nJpsi)
+    if config["fit"]["pdf_jpsi_name"] == "CB":
+        meanJpsi  = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_val"][0], config["fit"]["cb_par_jpsi_lw_lim"][0], config["fit"]["cb_par_jpsi_up_lim"][0]); meanJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][0])
+        sigmaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_val"][1], config["fit"]["cb_par_jpsi_lw_lim"][1], config["fit"]["cb_par_jpsi_up_lim"][1]); sigmaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][1])
+        alphaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_val"][2], config["fit"]["cb_par_jpsi_lw_lim"][2], config["fit"]["cb_par_jpsi_up_lim"][2]); alphaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][2])
+        nJpsi     = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_val"][3], config["fit"]["cb_par_jpsi_lw_lim"][3], config["fit"]["cb_par_jpsi_up_lim"][3]); nJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][3])
+        cbPdfJpsi = ROOT.RooCBShape("cbPdfJpsi", "Crystal Ball J/psi", mJpsi, meanJpsi, sigmaJpsi, alphaJpsi, nJpsi)
+    elif config["fit"]["pdf_jpsi_name"] == "CB2":
+        ROOT.gROOT.ProcessLineSync(".x ../fit_library/CB2Pdf.cxx+")
+        meanJpsi  = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_name"][0], config["fit"]["cb_par_jpsi_val"][0], config["fit"]["cb_par_jpsi_lw_lim"][0], config["fit"]["cb_par_jpsi_up_lim"][0]); meanJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][0])
+        sigmaJpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_name"][1], config["fit"]["cb_par_jpsi_val"][1], config["fit"]["cb_par_jpsi_lw_lim"][1], config["fit"]["cb_par_jpsi_up_lim"][1]); sigmaJpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][1])
+        alpha1Jpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_name"][2], config["fit"]["cb_par_jpsi_val"][2], config["fit"]["cb_par_jpsi_lw_lim"][2], config["fit"]["cb_par_jpsi_up_lim"][2]); alpha1Jpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][2])
+        n1Jpsi     = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_name"][3], config["fit"]["cb_par_jpsi_val"][3], config["fit"]["cb_par_jpsi_lw_lim"][3], config["fit"]["cb_par_jpsi_up_lim"][3]); n1Jpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][3])
+        alpha2Jpsi = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][4], config["fit"]["cb_par_jpsi_name"][4], config["fit"]["cb_par_jpsi_val"][4], config["fit"]["cb_par_jpsi_lw_lim"][4], config["fit"]["cb_par_jpsi_up_lim"][4]); alpha2Jpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][4])
+        n2Jpsi     = ROOT.RooRealVar(config["fit"]["cb_par_jpsi_name"][5], config["fit"]["cb_par_jpsi_name"][5], config["fit"]["cb_par_jpsi_val"][5], config["fit"]["cb_par_jpsi_lw_lim"][5], config["fit"]["cb_par_jpsi_up_lim"][5]); n2Jpsi.setConstant(config["fit"]["cb_par_jpsi_is_const"][5])
+        cbPdfJpsi = ROOT.CB2Pdf("cbPdfJpsi", "Double Crystal Ball J/psi", mJpsi, meanJpsi, sigmaJpsi, alpha1Jpsi, n1Jpsi, alpha2Jpsi, n2Jpsi)
+    else:
+        print("[ERROR] No J/psi PDF defined!!!")
+        exit()
 
     ## adding the psi2S
     if config["fit"]["add_psi2s"]:
-        meanPsi2S  = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_val"][0], config["fit"]["cb_par_psi2s_lw_lim"][0], config["fit"]["cb_par_psi2s_up_lim"][0]); meanPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][0])
-        sigmaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_val"][1], config["fit"]["cb_par_psi2s_lw_lim"][1], config["fit"]["cb_par_psi2s_up_lim"][1]); sigmaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][1])
-        alphaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_val"][2], config["fit"]["cb_par_psi2s_lw_lim"][2], config["fit"]["cb_par_psi2s_up_lim"][2]); alphaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][2])
-        nPsi2S     = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_val"][3], config["fit"]["cb_par_psi2s_lw_lim"][3], config["fit"]["cb_par_psi2s_up_lim"][3]); nPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][3])
-        cbPdfPsi2S = ROOT.RooCBShape("cbPdfPsi2S", "Crystal Ball J/psi", mJpsi, meanPsi2S, sigmaJpsi, alphaPsi2S, nPsi2S)
+        if config["fit"]["pdf_psi2s_name"] == "CB":
+            meanPsi2S  = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_val"][0], config["fit"]["cb_par_psi2s_lw_lim"][0], config["fit"]["cb_par_psi2s_up_lim"][0]); meanPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][0])
+            sigmaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_val"][1], config["fit"]["cb_par_psi2s_lw_lim"][1], config["fit"]["cb_par_psi2s_up_lim"][1]); sigmaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][1])
+            alphaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_val"][2], config["fit"]["cb_par_psi2s_lw_lim"][2], config["fit"]["cb_par_psi2s_up_lim"][2]); alphaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][2])
+            nPsi2S     = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_val"][3], config["fit"]["cb_par_psi2s_lw_lim"][3], config["fit"]["cb_par_psi2s_up_lim"][3]); nPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][3])
+            cbPdfPsi2S = ROOT.RooCBShape("cbPdfPsi2S", "Crystal Ball Psi(2S)", mJpsi, meanPsi2S, sigmaJpsi, alphaPsi2S, nPsi2S)
+        elif config["fit"]["pdf_psi2s_name"] == "CB2":
+            meanPsi2S  = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_name"][0], config["fit"]["cb_par_psi2s_val"][0], config["fit"]["cb_par_psi2s_lw_lim"][0], config["fit"]["cb_par_psi2s_up_lim"][0]); meanPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][0])
+            sigmaPsi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_name"][1], config["fit"]["cb_par_psi2s_val"][1], config["fit"]["cb_par_psi2s_lw_lim"][1], config["fit"]["cb_par_psi2s_up_lim"][1]); sigmaPsi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][1])
+            alpha1Psi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_name"][2], config["fit"]["cb_par_psi2s_val"][2], config["fit"]["cb_par_psi2s_lw_lim"][2], config["fit"]["cb_par_psi2s_up_lim"][2]); alpha1Psi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][2])
+            n1Psi2S     = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_name"][3], config["fit"]["cb_par_psi2s_val"][3], config["fit"]["cb_par_psi2s_lw_lim"][3], config["fit"]["cb_par_psi2s_up_lim"][3]); n1Psi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][3])
+            alpha2Psi2S = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][4], config["fit"]["cb_par_psi2s_name"][4], config["fit"]["cb_par_psi2s_val"][4], config["fit"]["cb_par_psi2s_lw_lim"][4], config["fit"]["cb_par_psi2s_up_lim"][4]); alpha2Psi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][4])
+            n2Psi2S     = ROOT.RooRealVar(config["fit"]["cb_par_psi2s_name"][5], config["fit"]["cb_par_psi2s_name"][5], config["fit"]["cb_par_psi2s_val"][5], config["fit"]["cb_par_psi2s_lw_lim"][5], config["fit"]["cb_par_psi2s_up_lim"][5]); n2Psi2S.setConstant(config["fit"]["cb_par_psi2s_is_const"][5])
+            cbPdfPsi2S = ROOT.CB2Pdf("cbPdfPsi2S", "Double Crystal Ball Psi(2S)", mJpsi, meanPsi2S, sigmaPsi2S, alpha1Psi2S, n1Psi2S, alpha2Psi2S, n2Psi2S)
+        else:
+            print("[ERROR] No Psi(2S) PDF defined!!!")
+            exit()
+
 
     ##same bkg for both
-    chebyParsJpsi = [ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_val"][i], config["fit"]["cheby_par_jpsi_lw_lim"][i], config["fit"]["cheby_par_jpsi_up_lim"][i]) for i in range(3)]
-    for i in range(0, 3): chebyParsJpsi[i].setConstant(config["fit"]["cheby_par_jpsi_is_const"][i])
-    chebyPdfJpsi  = ROOT.RooChebychev("chebyPdfJpsi", "Cheby for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
+    if config["fit"]["bkg_jpsi_name"] == "Cheby":
+        chebyParsJpsi = [ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_val"][i], config["fit"]["cheby_par_jpsi_lw_lim"][i], config["fit"]["cheby_par_jpsi_up_lim"][i]) for i in range(3)]
+        for i in range(0, 3): chebyParsJpsi[i].setConstant(config["fit"]["cheby_par_jpsi_is_const"][i])
+        chebyPdfJpsi  = ROOT.RooChebychev("chebyPdfJpsi", "Cheby for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
+    elif config["fit"]["bkg_jpsi_name"] == "VWG":
+        ROOT.gROOT.ProcessLineSync(".x ../fit_library/VWGPdf.cxx+")
+        vwgParJpsi1  = ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][0], config["fit"]["cheby_par_jpsi_name"][0], config["fit"]["cheby_par_jpsi_val"][0], config["fit"]["cheby_par_jpsi_lw_lim"][0], config["fit"]["cheby_par_jpsi_up_lim"][0]); vwgParJpsi1.setConstant(config["fit"]["cheby_par_jpsi_is_const"][0])
+        vwgParJpsi2 = ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][1], config["fit"]["cheby_par_jpsi_name"][1], config["fit"]["cheby_par_jpsi_val"][1], config["fit"]["cheby_par_jpsi_lw_lim"][1], config["fit"]["cheby_par_jpsi_up_lim"][1]); vwgParJpsi2.setConstant(config["fit"]["cheby_par_jpsi_is_const"][1])
+        vwgParJpsi3 = ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][2], config["fit"]["cheby_par_jpsi_name"][2], config["fit"]["cheby_par_jpsi_val"][2], config["fit"]["cheby_par_jpsi_lw_lim"][2], config["fit"]["cheby_par_jpsi_up_lim"][2]); vwgParJpsi3.setConstant(config["fit"]["cheby_par_jpsi_is_const"][2])
+        chebyPdfJpsi = ROOT.VWGPdf("chebyPdfJpsi", "VWG for Bkg1", mJpsi, vwgParJpsi1, vwgParJpsi2, vwgParJpsi3)
+    elif config["fit"]["bkg_jpsi_name"] == "Cheby3":
+        chebyParsJpsi = [ROOT.RooRealVar(config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_name"][i], config["fit"]["cheby_par_jpsi_val"][i], config["fit"]["cheby_par_jpsi_lw_lim"][i], config["fit"]["cheby_par_jpsi_up_lim"][i]) for i in range(4)]
+        for i in range(0, 4): chebyParsJpsi[i].setConstant(config["fit"]["cheby_par_jpsi_is_const"][i])
+        chebyPdfJpsi  = ROOT.RooChebychev("cheby3PdfJpsi", "Cheby3 for Bkg1", mJpsi, ROOT.RooArgList(*chebyParsJpsi))
+    else:
+        print("[ERROR] No J/psi background defined!!!")
+        exit()
 
-    meanD0  = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_val"][0], config["fit"]["cb_par_d0_lw_lim"][0], config["fit"]["cb_par_d0_up_lim"][0]); meanD0.setConstant(config["fit"]["cb_par_d0_is_const"][0])
-    sigmaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_val"][1], config["fit"]["cb_par_d0_lw_lim"][1], config["fit"]["cb_par_d0_up_lim"][1]); sigmaD0.setConstant(config["fit"]["cb_par_d0_is_const"][1])
-    alphaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_val"][2], config["fit"]["cb_par_d0_lw_lim"][2], config["fit"]["cb_par_d0_up_lim"][1]); alphaD0.setConstant(config["fit"]["cb_par_d0_is_const"][2])
-    nD0     = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_val"][3], config["fit"]["cb_par_d0_lw_lim"][3], config["fit"]["cb_par_d0_up_lim"][2]); nD0.setConstant(config["fit"]["cb_par_d0_is_const"][3])
-    cbPdfD0 = ROOT.RooCBShape("cbPdfD0", "Crystal Ball D0", mD0, meanD0, sigmaD0, alphaD0, nD0)
+    if config["fit"]["pdf_d0_name"] == "CB":
+        meanD0  = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_val"][0], config["fit"]["cb_par_d0_lw_lim"][0], config["fit"]["cb_par_d0_up_lim"][0]); meanD0.setConstant(config["fit"]["cb_par_d0_is_const"][0])
+        sigmaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_val"][1], config["fit"]["cb_par_d0_lw_lim"][1], config["fit"]["cb_par_d0_up_lim"][1]); sigmaD0.setConstant(config["fit"]["cb_par_d0_is_const"][1])
+        alphaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_name"][2], config["fit"]["cb_par_d0_val"][2], config["fit"]["cb_par_d0_lw_lim"][2], config["fit"]["cb_par_d0_up_lim"][1]); alphaD0.setConstant(config["fit"]["cb_par_d0_is_const"][2])
+        nD0     = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_name"][3], config["fit"]["cb_par_d0_val"][3], config["fit"]["cb_par_d0_lw_lim"][3], config["fit"]["cb_par_d0_up_lim"][2]); nD0.setConstant(config["fit"]["cb_par_d0_is_const"][3])
+        cbPdfD0 = ROOT.RooCBShape("cbPdfD0", "Crystal Ball D0", mD0, meanD0, sigmaD0, alphaD0, nD0)
+    elif config["fit"]["pdf_d0_name"] == "Gaus":
+        meanD0  = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_name"][0], config["fit"]["cb_par_d0_val"][0], config["fit"]["cb_par_d0_lw_lim"][0], config["fit"]["cb_par_d0_up_lim"][0]); meanD0.setConstant(config["fit"]["cb_par_d0_is_const"][0])
+        sigmaD0 = ROOT.RooRealVar(config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_name"][1], config["fit"]["cb_par_d0_val"][1], config["fit"]["cb_par_d0_lw_lim"][1], config["fit"]["cb_par_d0_up_lim"][1]); sigmaD0.setConstant(config["fit"]["cb_par_d0_is_const"][1])
+        cbPdfD0 = ROOT.RooGaussian("gausPdfD0", "Gaussian D0", mD0, meanD0, sigmaD0)
+    else:
+        print("[ERROR] No D0 pdf defined!!!")
+        exit()
 
-    chebyParsD0 = [ROOT.RooRealVar(config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_val"][i], config["fit"]["cheby_par_d0_lw_lim"][i], config["fit"]["cheby_par_d0_up_lim"][i]) for i in range(3)]
-    for i in range(0, 3): chebyParsD0[i].setConstant(config["fit"]["cheby_par_d0_is_const"][i])
-    chebyPdfD0  = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg1", mD0, ROOT.RooArgList(*chebyParsD0))
+    if config["fit"]["bkg_d0_name"] == "Cheby":
+        chebyParsD0 = [ROOT.RooRealVar(config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_val"][i], config["fit"]["cheby_par_d0_lw_lim"][i], config["fit"]["cheby_par_d0_up_lim"][i]) for i in range(3)]
+        for i in range(0, 3): chebyParsD0[i].setConstant(config["fit"]["cheby_par_d0_is_const"][i])
+        chebyPdfD0  = ROOT.RooChebychev("chebyPdfD0", "Cheby for Bkg2", mD0, ROOT.RooArgList(*chebyParsD0))
+    elif config["fit"]["bkg_d0_name"] == "Poly":
+        chebyParsD0 = [ROOT.RooRealVar(config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_name"][i], config["fit"]["cheby_par_d0_val"][i], config["fit"]["cheby_par_d0_lw_lim"][i], config["fit"]["cheby_par_d0_up_lim"][i]) for i in range(3)]
+        for i in range(0, 3): chebyParsD0[i].setConstant(config["fit"]["cheby_par_d0_is_const"][i])
+        chebyPdfD0  = ROOT.RooPolynomial("polyPdfD0", "Polynomial for Bkg2", mD0, ROOT.RooArgList(*chebyParsD0))
 
     # reflection
     fRefl = ROOT.TFile(config["reflections"]["data"], "READ")
@@ -113,6 +168,8 @@ def constructWorkspace(config, includeJpsi, includeD0, nEvent, variations):
     else:
         print(f"Error: The integral of hSig in the mass range is zero.")
         sys.exit(1)  # Exit the script with a non-zero status to indicate an error
+    # Update the reflection ratio for systematic studies
+    reflRatio = reflRatio * d0ReflRatio
 
     reflFracD0 = ROOT.RooRealVar("reflFracD0", "reflFracD0", reflRatio); reflFracD0.setConstant(True)
     
