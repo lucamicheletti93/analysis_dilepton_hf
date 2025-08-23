@@ -108,6 +108,14 @@ def plot(sigma_eff_helac):
     infile_jpsi.Close()
 
     # JPsi/D0
+    infile_jpsiszero = ROOT.TFile.Open("../data_shared/jpsidzero_xsec_pp13dot6TeV.root")
+    hist_jpsidzero_xsec = infile_jpsiszero.Get("histStatXsecInt")
+    hist_jpsidzero_xsec.SetDirectory(0)
+    hist_jpsidzero_ratio = infile_jpsiszero.Get("histStatRatioInt")
+    hist_jpsidzero_ratio.SetDirectory(0)
+    infile_jpsiszero.Close()
+
+    # JPsi/D0
     # hist_jpsi_dzero_ratio = hist_jpsi_xsec.Clone("hist_jpsi_dzero_ratio")
     # hist_jpsi_dzero_ratio.SetDirectory(0)
     # hist_jpsi_dzero_ratio.Divide(hist_dzero_xsec)
@@ -153,7 +161,6 @@ def plot(sigma_eff_helac):
                                                cfg_sys["dzero"]["lumi"]])
 
     #JPsi-D0
-
     graph_xsec_stat_all = ROOT.TGraphAsymmErrors(1)
     graph_xsec_syst_all = ROOT.TGraphAsymmErrors(1)
     graph_xsec_stat_all.SetName("graph_xsec_stat_all")
@@ -166,8 +173,10 @@ def plot(sigma_eff_helac):
     graph_xsec_stat_all.SetPoint(1, xsec_jpsi, 3.) # J/Psi meson in fiducial acceptance
     graph_xsec_syst_all.SetPoint(0, xsec_dzero, 4.) # D meson in fiducial acceptance
     graph_xsec_syst_all.SetPoint(1, xsec_jpsi, 3.) # J/Psi meson in fiducial acceptance
-    xsec_jpsidmes = 0.282189 # TODO: replace me with a value from file
-    xsec_unc_jpsidmes = xsec_jpsidmes * 0.07 # TODO: replace me with a value from file
+    #xsec_jpsidmes = 0.282189 # TODO: replace me with a value from file
+    #xsec_unc_jpsidmes = xsec_jpsidmes * 0.07 # TODO: replace me with a value from file
+    xsec_jpsidmes = hist_jpsidzero_xsec.GetBinContent(1)
+    xsec_unc_jpsidmes = hist_jpsidzero_xsec.GetBinError(1)
     graph_xsec_stat_all.SetPoint(2, xsec_jpsidmes, 2.)
     graph_xsec_syst_all.SetPoint(2, xsec_jpsidmes, 2.)
     graph_xsec_stat_all.SetPointError(0, hist_dzero_xsec.GetBinError(1), hist_dzero_xsec.GetBinError(1), 0., 0.) # D meson in fiducial acceptance
@@ -211,10 +220,12 @@ def plot(sigma_eff_helac):
     graph_ratio_syst.SetName("graph_ratio_syst")
     set_style(graph_ratio_stat, ROOT.kBlack, ROOT.kFullCircle, 1.5, 0, 2, 1)
     set_style(graph_ratio_syst, ROOT.kBlack, ROOT.kFullCircle, 1.5, 0, 2, 1)
-    ratio = 37.481 # TODO: replace me with a value from file
+    #ratio = 37.481 # TODO: replace me with a value from file
+    ratio = hist_jpsidzero_ratio.GetBinContent(1) / 1000.
     graph_ratio_stat.SetPoint(0, ratio, 2.)
     graph_ratio_syst.SetPoint(0, ratio, 2.)
-    stat_unc = 0.07 * ratio # TODO: replace me with a value from file
+    #stat_unc = 0.07 * ratio # TODO: replace me with a value from file
+    stat_unc = hist_jpsidzero_ratio.GetBinError(1) / 1000.
     graph_ratio_stat.SetPointError(0, stat_unc, stat_unc, 0., 0.)
     graph_ratio_syst.SetPointError(0, syst_jpsi_dzero_ratio * ratio, syst_jpsi_dzero_ratio * ratio, 0.1, 0.1)
 

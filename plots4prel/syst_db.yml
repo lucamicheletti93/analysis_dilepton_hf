@@ -17,5 +17,5 @@ jpsi:
   lumi: 0.1
 
 dzerojpsi:
-  yield_extraction: 0.09
+  yield_extraction: 0.08
 
