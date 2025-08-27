@@ -10,7 +10,7 @@ dzero:
 jpsi:
   yield_extraction: 0.02
   sel_eff: 0.02
-  trk_eff: 0.01
+  trk_eff: 0.03
   match_eff: 0.03
   frac: 0.
   br: 0.005
