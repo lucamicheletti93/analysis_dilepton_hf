@@ -488,7 +488,8 @@ def fit(config):
     mJpsiframe = workSpace.var("fMass").frame(Title=" ")
     sampleToFit.plotOn(mJpsiframe, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
     model.plotOn(mJpsiframe, Name={"model"})
-    model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={"sigD0_sigJpsiPdf"}, LineStyle=5, LineColor=ROOT.kRed+1)
+    model.plotOn(mJpsiframe, Name={"sigD0_sigJpsiPdf"}, Components={"sigD0_sigJpsiPdf"}, LineStyle=1, LineColor=ROOT.kRed+1, FillStyle=1001, FillColor=ROOT.kRed+1, DrawOption="FL")
+    mJpsiframe.getAttFill().SetFillColorAlpha(ROOT.kRed+1, 0.3)
     model.plotOn(mJpsiframe, Name={"bkgD0_sigJpsiPdf"}, Components={"bkgD0_sigJpsiPdf"}, LineStyle=5, LineColor=ROOT.kAzure+1)
     model.plotOn(mJpsiframe, Name={"bkgJpsi_sigD0Pdf"}, Components={"bkgJpsi_sigD0Pdf"}, LineStyle=2, LineColor=ROOT.kGreen+1)
     model.plotOn(mJpsiframe, Name={"bkgD0_bkgJpsiPdf"}, Components={"bkgD0_bkgJpsiPdf"}, LineStyle=2, LineColor=ROOT.kMagenta+1)
@@ -502,7 +503,8 @@ def fit(config):
     mD0frame = workSpace.var("fMassDmes").frame(Title=" ")
     sampleToFit.plotOn(mD0frame, ROOT.RooFit.Name("data"), ROOT.RooFit.Binning(config["plot_results"]["dataBins"]))
     model.plotOn(mD0frame, Name={"model"})
-    model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={"sigD0_sigJpsiPdf"}, LineStyle=5, LineColor=ROOT.kRed+1)
+    model.plotOn(mD0frame, Name={"sigD0_sigJpsiPdf"}, Components={"sigD0_sigJpsiPdf"}, LineStyle=1, LineColor=ROOT.kRed+1, FillStyle=1001, FillColor=ROOT.kRed+1, DrawOption="FL")
+    mD0frame.getAttFill().SetFillColorAlpha(ROOT.kRed+1, 0.3)
     model.plotOn(mD0frame, Name={"bkgD0_sigJpsiPdf"}, Components={"bkgD0_sigJpsiPdf"}, LineStyle=5, LineColor=ROOT.kAzure+1)
     model.plotOn(mD0frame, Name={"bkgJpsi_sigD0Pdf"}, Components={"bkgJpsi_sigD0Pdf"}, LineStyle=2, LineColor=ROOT.kGreen+1)
     model.plotOn(mD0frame, Name={"bkgD0_bkgJpsiPdf"}, Components={"bkgD0_bkgJpsiPdf"}, LineStyle=2, LineColor=ROOT.kMagenta+1)
@@ -513,7 +515,7 @@ def fit(config):
         model.plotOn(mD0frame, Name={"bkgD0_sigPsi2SPdf"}, Components={"bkgD0_sigPsi2SPdf"}, LineStyle=3, LineColor=ROOT.kAzure+1)
         model.plotOn(mD0frame, Name={"reflD0_sigPsi2SPdf"}, Components={"reflD0_sigPsi2SPdf"}, LineStyle=3, LineColor=ROOT.kYellow+2)
     
-    legend_comp = ROOT.TLegend(0.59, 0.57, 0.89, 0.87)
+    legend_comp = ROOT.TLegend(0.65, 0.47, 0.95, 0.77)
     legend_comp.SetBorderSize(0)
     legend_comp.SetFillStyle(0)
     legend_comp.AddEntry(mD0frame.findObject("data"), "data", "PE")
@@ -522,20 +524,20 @@ def fit(config):
     if config["fit"]["add_psi2s"]:
         hist_Jpsi = ROOT.TH1F("hist_Jpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_Jpsi.SetLineWidth(3); hist_Jpsi.SetLineStyle(5); hist_Jpsi.SetLineColor(ROOT.kBlack)
         hist_psi2s = ROOT.TH1F("hist_psi2s","", 100, minFitRangeD0, maxFitRangeD0); hist_psi2s.SetLineWidth(3); hist_psi2s.SetLineStyle(3); hist_psi2s.SetLineColor(ROOT.kBlack)
-        hist_sigD0_sigJpsi = ROOT.TH1F("hist_sigD0_sigJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_sigD0_sigJpsi.SetLineWidth(3); hist_sigD0_sigJpsi.SetLineStyle(5); hist_sigD0_sigJpsi.SetLineColor(ROOT.kRed+1)
+        hist_sigD0_sigJpsi = ROOT.TH1F("hist_sigD0_sigJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_sigD0_sigJpsi.SetLineWidth(1); hist_sigD0_sigJpsi.SetLineStyle(1); hist_sigD0_sigJpsi.SetLineColor(ROOT.kRed+1); hist_sigD0_sigJpsi.SetFillColorAlpha(ROOT.kRed+1, 0.3)
         hist_bkgD0_sigJpsi = ROOT.TH1F("hist_bkgD0_sigJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_bkgD0_sigJpsi.SetLineWidth(3); hist_bkgD0_sigJpsi.SetLineStyle(5); hist_bkgD0_sigJpsi.SetLineColor(ROOT.kAzure+1)
         hist_bkgJpsi_sigD0 = ROOT.TH1F("hist_bkgJpsi_sigD0","", 100, minFitRangeD0, maxFitRangeD0); hist_bkgJpsi_sigD0.SetLineWidth(3); hist_bkgJpsi_sigD0.SetLineStyle(2); hist_bkgJpsi_sigD0.SetLineColor(ROOT.kGreen+1)
         hist_bkgD0_bkgJpsi = ROOT.TH1F("hist_bkgD0_bkgJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_bkgD0_bkgJpsi.SetLineWidth(3); hist_bkgD0_bkgJpsi.SetLineStyle(2); hist_bkgD0_bkgJpsi.SetLineColor(ROOT.kMagenta+1)
         hist_reflD0_sigJpsi = ROOT.TH1F("hist_reflD0_sigJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_reflD0_sigJpsi.SetLineWidth(3); hist_reflD0_sigJpsi.SetLineStyle(5); hist_reflD0_sigJpsi.SetLineColor(ROOT.kYellow+2)
         hist_reflD0_bkgJpsi = ROOT.TH1F("hist_reflD0_bkgJpsi","", 100, minFitRangeD0, maxFitRangeD0); hist_reflD0_bkgJpsi.SetLineWidth(3); hist_reflD0_bkgJpsi.SetLineStyle(2); hist_reflD0_bkgJpsi.SetLineColor(ROOT.kGray+1)
-        legend_comp.AddEntry(hist_sigD0_sigJpsi, "sig. #psi - sig. D^{0}", "L")
-        legend_comp.AddEntry(hist_bkgD0_sigJpsi, "sig. #psi - bkg. D^{0}", "L")
-        legend_comp.AddEntry(hist_reflD0_sigJpsi, "sig. #psi - refl. D^{0}", "L")
+        legend_comp.AddEntry(hist_sigD0_sigJpsi, "sig. #psi#minus sig. D^{0}", "F")
+        legend_comp.AddEntry(hist_bkgD0_sigJpsi, "sig. #psi#minus bkg. D^{0}", "L")
+        legend_comp.AddEntry(hist_reflD0_sigJpsi, "sig. #psi#minus refl. D^{0}", "L")
         legend_comp.AddEntry(hist_Jpsi,"","")
         legend_comp.AddEntry(hist_psi2s,"","")
-        legend_comp.AddEntry(hist_bkgJpsi_sigD0, "bkg. #psi - sig. D^{0}", "L")
-        legend_comp.AddEntry(hist_bkgD0_bkgJpsi, "bkg. #psi - bkg. D^{0}", "L")
-        legend_comp.AddEntry(hist_reflD0_bkgJpsi, "bkg. #psi - refl. D^{0}", "L")
+        legend_comp.AddEntry(hist_bkgJpsi_sigD0, "bkg. #psi#minus sig. D^{0}", "L")
+        legend_comp.AddEntry(hist_bkgD0_bkgJpsi, "bkg. #psi#minus bkg. D^{0}", "L")
+        legend_comp.AddEntry(hist_reflD0_bkgJpsi, "bkg. #psi#minus refl. D^{0}", "L")
 
         legend_comp2 = ROOT.TLegend(legend_comp.GetX1()+0.05, legend_comp.GetY1(), legend_comp.GetX2()+0.05, legend_comp.GetY2())
         legend_comp2.SetBorderSize(0)
@@ -553,12 +555,12 @@ def fit(config):
 
 
     else: #if the psi2s is not included just use the same for D0
-        legend_comp.AddEntry(mD0frame.findObject("sigD0_sigJpsiPdf"), "sig. J/#psi - sig. D^{0}", "L")
-        legend_comp.AddEntry(mD0frame.findObject("bkgD0_sigJpsiPdf"), "sig. J/#psi - bkg. D^{0}", "L")
-        legend_comp.AddEntry(mD0frame.findObject("reflD0_sigJpsiPdf"), "sig. J/#psi - refl. D^{0}", "L")
-        legend_comp.AddEntry(mD0frame.findObject("bkgJpsi_sigD0Pdf"), "bkg. J/#psi - sig. D^{0}", "L")
-        legend_comp.AddEntry(mD0frame.findObject("bkgD0_bkgJpsiPdf"), "bkg. J/#psi - bkg. D^{0}", "L")
-        legend_comp.AddEntry(mD0frame.findObject("reflD0_bkgJpsiPdf"), "bkg. J/#psi - refl. D^{0}", "L")
+        legend_comp.AddEntry(mD0frame.findObject("sigD0_sigJpsiPdf"), "sig. J/#psi#minus sig. D^{0}", "L")
+        legend_comp.AddEntry(mD0frame.findObject("bkgD0_sigJpsiPdf"), "sig. J/#psi#minus bkg. D^{0}", "L")
+        legend_comp.AddEntry(mD0frame.findObject("reflD0_sigJpsiPdf"), "sig. J/#psi#minus refl. D^{0}", "L")
+        legend_comp.AddEntry(mD0frame.findObject("bkgJpsi_sigD0Pdf"), "bkg. J/#psi#minus sig. D^{0}", "L")
+        legend_comp.AddEntry(mD0frame.findObject("bkgD0_bkgJpsiPdf"), "bkg. J/#psi#minus bkg. D^{0}", "L")
+        legend_comp.AddEntry(mD0frame.findObject("reflD0_bkgJpsiPdf"), "bkg. J/#psi#minus refl. D^{0}", "L")
 
     
     #legend_comp.Draw()
@@ -573,42 +575,53 @@ def fit(config):
     latexRap.SetNDC()
     latexRap.SetTextFont(42)
 
-    
+    latexRap2D = ROOT.TLatex()
+    latexRap2D.SetTextSize(0.04)
+    latexRap2D.SetNDC()
+    latexRap2D.SetTextFont(42)
+
+    LoadStyle()
     
     canvasFitJpsi = ROOT.TCanvas("canvasFitJpsi", "canvasFitJpsi", 800, 800)
     canvasFitJpsi.SetTickx(1)
     canvasFitJpsi.SetTicky(1)
     #mJpsiframe.GetYaxis().SetRangeUser(config["plot_results"]["jpsiFrame"]["y_range"][0], config["plot_results"]["jpsiFrame"]["y_range"][1])
+    mJpsiframe.GetXaxis().SetTitleOffset(1.4)
+    mJpsiframe.GetXaxis().SetTitleSize(0.04)
+    mJpsiframe.GetXaxis().SetLabelSize(0.04)
+    mJpsiframe.GetYaxis().SetTitleOffset(1.9)
+    mJpsiframe.GetYaxis().SetTitleSize(0.04)
+    mJpsiframe.GetYaxis().SetLabelSize(0.04)
     mJpsiframe.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries() )
-    mJpsiframe.GetYaxis().SetTitleOffset(1.4)
     mJpsiframe.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_jpsi"]-config["fit"]["min_fit_range_jpsi"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mJpsiframe.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
-    latexTitle.DrawLatex(0.15, 0.835, "Work in progress")
-    latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    yLatex = 0.72
-    dyLatex = 0.04
-    latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexTitle.DrawLatex(0.20, 0.88, "ALICE Preliminary")
+    latexTitle.DrawLatex(0.20, 0.82, "pp, #kern[-0.4]{#sqrt{#it{s}}} = 13.6 TeV, #kern[-0.4]{#it{L}_{int}} = 39.7 pb^{-1}")
+    yLatex = 0.75
+    dyLatex = 0.05
+    latexRap.DrawLatex(0.20, yLatex, f"#lbar#it{{y}}_{{#piK}}#lbar < {config['fit']['max_d0_rap']}, #it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        #latexRap.DrawLatex(0.20, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.20, yLatex, f"{-config['fit']['max_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {-config['fit']['min_jpsi_rap']}, #it{{p}}_{{T,#mu#mu}} > 0") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.20, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.20, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.15, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.20, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
         yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.20, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
             yLatex -= dyLatex
-    if config["fit"]["min_d0_pt"] > 0:
-         latexRap.DrawLatex(0.15, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
+    #if config["fit"]["min_d0_pt"] > 0:
+         #latexRap.DrawLatex(0.20, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
 
     weighted_label = "weightedFits" if config['fit']['weighted'] else "unweightedFits"
     output_dir = f'{config["output"]["figures"]}/{config["inputs"]["inputLabel"]}_{weighted_label}_dRap_{getLabel(config["fit"]["min_dRap"])}_{getLabel(config["fit"]["max_dRap"])}'
@@ -626,39 +639,43 @@ def fit(config):
     canvasFitD0 = ROOT.TCanvas("canvasFitD0", "canvasFitD0", 800, 800)
     canvasFitD0.SetTickx(1)
     canvasFitD0.SetTicky(1)
-    mD0frame.GetYaxis().SetTitleOffset(1.4)
-    mD0frame.GetYaxis().SetLabelSize(0.03)
-    mD0frame.GetYaxis().SetRangeUser(0, 0.1*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.1*sampleToFit.numEntries())
+    mD0frame.GetXaxis().SetTitleOffset(1.4)
+    mD0frame.GetXaxis().SetTitleSize(0.04)
+    mD0frame.GetXaxis().SetLabelSize(0.04)
+    mD0frame.GetYaxis().SetTitleOffset(1.9)
+    mD0frame.GetYaxis().SetTitleSize(0.04)
+    mD0frame.GetYaxis().SetLabelSize(0.04)
+    mD0frame.GetYaxis().SetRangeUser(0, 0.07*sampleToFit.sumEntries() if config['fit']['weighted'] else 0.07*sampleToFit.numEntries())
 
     mD0frame.GetYaxis().SetTitle(f'Counts per {round(1000*((config["fit"]["max_fit_range_d0"]-config["fit"]["min_fit_range_d0"])/config["plot_results"]["dataBins"]))} MeV/#it{{c}}^{{2}}')
     mD0frame.Draw()
     legend_comp.Draw()
     if config["fit"]["add_psi2s"]:
         legend_comp2.Draw()
-    latexTitle.DrawLatex(0.15, 0.835, "Work in progress")
-    latexTitle.DrawLatex(0.15, 0.78, "pp, #sqrt{#it{s}} = 13.6 TeV")
-    yLatex = 0.72
-    dyLatex = 0.04
-    latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    latexTitle.DrawLatex(0.20, 0.88, "ALICE Preliminary")
+    latexTitle.DrawLatex(0.20, 0.82, "pp, #kern[-0.4]{#sqrt{#it{s}}} = 13.6 TeV, #kern[-0.4]{#it{L}_{int}} = 39.7 pb^{-1}")
+    yLatex = 0.75
+    dyLatex = 0.05
+    latexRap.DrawLatex(0.20, yLatex, f"#lbar#it{{y}}_{{#piK}}#lbar < {config['fit']['max_d0_rap']}, #it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap.DrawLatex(0.20, yLatex, f"{-config['fit']['max_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {-config['fit']['min_jpsi_rap']}, #it{{p}}_{{T,#mu#mu}} > 0") #titleSuffix
     else:
-        latexRap.DrawLatex(0.15, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap.DrawLatex(0.20, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
 
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.20, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.15, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap.DrawLatex(0.20, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
         yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.15, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            latexRap.DrawLatex(0.20, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
             yLatex -= dyLatex
-    if config["fit"]["min_d0_pt"] > 0:
-        latexRap.DrawLatex(0.15, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
+    #if config["fit"]["min_d0_pt"] > 0:
+        #latexRap.DrawLatex(0.20, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
 
     canvasFitD0.Update()
     canvasFitD0.SaveAs(f'{output_dir}/projected_{config["fit"]["JpsiChannel"]}_d0_fit_{getGlobalLabel(config)}.pdf')
@@ -672,25 +689,33 @@ def fit(config):
     canvasFitHist3D = ROOT.TCanvas("canvasFitHist3D", "canvasFitHist3D", 1000, 1000)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gPad.SetLeftMargin(0.15)
+    ROOT.gPad.SetTopMargin(0.15)
     
     if config["fit"]["unbinned"]:
         sample.Draw("fMass : fMassDmes >> hist_fMass_fMassDmes", f'fMass > {minFitRangeJpsi} && fMass < {maxFitRangeJpsi} && fMassDmes > {minFitRangeD0} && fMassDmes < {maxFitRangeD0} && fRapJpsi>{config["fit"]["min_jpsi_rap"]} && fRapJpsi<{config["fit"]["max_jpsi_rap"]} && fPtDmes>{config["fit"]["min_d0_pt"]} && fabs(fDeltaY) > {config["fit"]["min_dRap"]} && fabs(fDeltaY) < {config["fit"]["max_dRap"]}', "LEGO2")
         htemp = ROOT.gPad.GetPrimitive("hist_fMass_fMassDmes")
         htemp.SetTitle(" ")
         htemp.GetXaxis().SetTitleOffset(2.0)
-        htemp.GetXaxis().SetLabelSize(0.03)
+        htemp.GetXaxis().SetTitleSize(0.035)
+        htemp.GetXaxis().SetLabelSize(0.035)
         htemp.GetYaxis().SetTitleOffset(2.0)
-        htemp.GetYaxis().SetLabelSize(0.03)
+        htemp.GetYaxis().SetTitleSize(0.035)
+        htemp.GetYaxis().SetLabelSize(0.035)
         htemp.GetZaxis().SetTitleOffset(2.0)
-        htemp.GetZaxis().SetLabelSize(0.03)
+        htemp.GetZaxis().SetTitleSize(0.035)
+        htemp.GetZaxis().SetLabelSize(0.035)
         htemp.GetXaxis().SetTitle("#it{m}_{#piK} (GeV/#it{c}^{2})")
         htemp.GetYaxis().SetTitle("#it{m}_{#mu#mu} (GeV/#it{c}^{2})")
+        htemp.GetZaxis().SetTitle("Counts")
         htemp.Rebin2D(2, 2)
         htemp.Draw("LEGO2")
     else:
         sample.GetXaxis().SetTitleOffset(2.0)
+        sample.GetXaxis().SetLabelSize(0.04)
         sample.GetYaxis().SetTitleOffset(2.0)
+        sample.GetYaxis().SetLabelSize(0.04)
         sample.GetZaxis().SetTitleOffset(2.0)
+        sample.GetZaxis().SetLabelSize(0.04)
         sample.Draw("LEGO2")
     
     modelHist.Draw("SURF SAME")
@@ -699,29 +724,30 @@ def fit(config):
     canvasFitHist3D.SetPhi(230)
     canvasFitHist3D.SetTheta(20)
     
-    latexTitle.DrawLatex(0.1, 0.94, "Work in progress")
-    latexTitle.DrawLatex(0.1, 0.88, "pp, #sqrt{#it{s}} = 13.6 TeV")
+    latexTitle.DrawLatex(0.1, 0.94, "ALICE Preliminary")
+    latexTitle.DrawLatex(0.1, 0.88, "pp, #kern[-0.4]{#sqrt{#it{s}}} = 13.6 TeV")
+    latexTitle.DrawLatex(0.1, 0.82, "#it{L}_{int} = 39.7 pb^{-1}")
     yLatex = 0.93
-    dyLatex = 0.04
-    latexRap.DrawLatex(0.73, yLatex, f"|#it{{y}}_{{#piK}}| < {config['fit']['max_d0_rap']}")
+    dyLatex = 0.06
+    latexRap2D.DrawLatex(0.60, yLatex, f"#lbar#it{{y}}_{{#piK}}#lbar < {config['fit']['max_d0_rap']}, #it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']} GeV/#it{{c}}")
     yLatex -= dyLatex
     if config["fit"]["JpsiChannel"] == "Jpsi2mumu":
-        latexRap.DrawLatex(0.73, yLatex, f"{config['fit']['min_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {config['fit']['max_jpsi_rap']}") #titleSuffix
+        latexRap2D.DrawLatex(0.60, yLatex, f"{-config['fit']['max_jpsi_rap']} < #it{{y}}_{{#mu#mu}} < {-config['fit']['min_jpsi_rap']}, #it{{p}}_{{T,#mu#mu}} > 0") #titleSuffix
     else:
-        latexRap.DrawLatex(0.73, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
+        latexRap2D.DrawLatex(0.60, yLatex, f"|#it{{y}}_{{ee}}| < {config['fit']['max_jpsi_rap']}")
     yLatex -= dyLatex
     if config["fit"]["min_dRap"] > 0:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.73, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
+            latexRap2D.DrawLatex(0.60, yLatex, f"{config['fit']['min_dRap']} < #Delta y < {config['fit']['max_dRap']}")
         else:
-            latexRap.DrawLatex(0.73, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
+            latexRap2D.DrawLatex(0.60, yLatex, f"#Delta y > {config['fit']['min_dRap']}")
         yLatex -= dyLatex
     else:
         if config["fit"]["max_dRap"] < 5:
-            latexRap.DrawLatex(0.73, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
+            latexRap2D.DrawLatex(0.60, yLatex, f"#Delta y < {config['fit']['max_dRap']}")
             yLatex -= dyLatex
-    if config["fit"]["min_d0_pt"] > 0:
-        latexRap.DrawLatex(0.73, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
+    #if config["fit"]["min_d0_pt"] > 0:
+        #latexRap2D.DrawLatex(0.60, yLatex, f"#it{{p}}_{{T,#piK}} > {config['fit']['min_d0_pt']}")
         
     canvasFitHist3D.Update()
     canvasFitHist3D.SaveAs(f'{output_dir}/fit_2D_{config["fit"]["JpsiChannel"]}_fitSave_{getGlobalLabel(config)}.pdf')
@@ -737,7 +763,7 @@ def fit(config):
     canvasFitHist3D.Write()
     fOut.Close()
 
-    input()
+    #input()
     exit()
 
 def upper_limit(config):
